@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'aws-sdk'
-  spec.add_dependency 'dslh', '>= 0.1.3'
+  spec.add_dependency 'dslh', '>= 0.1.4'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
 end
