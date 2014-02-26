@@ -1,0 +1,26 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "ami_name": "CentOS-6.4-x86_64-with_Updates-{{timestamp}}",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "ap-northeast-1",
+    "source_ami": "ami-31e86030",
+    "instance_type": "t1.micro",
+    "ssh_username": "root",
+    "ssh_timeout": "3m"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "yum install -y http://ftp.iij.ad.jp/pub/linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm",
+      "yum install -y cloud-init",
+      "yum install -y https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.amzn1.noarch.rpm",
+      "rm -rf /root/.ssh"
+    ]
+  }]
+}
