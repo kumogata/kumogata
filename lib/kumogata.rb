@@ -1,5 +1,5 @@
-require "kumogata/version"
+module Kumogata; end
 
-module Kumogata
-  # Your code goes here...
-end
+require 'kumogata/version'
+require 'kumogata/client'
+require 'kumogata/ext/string_ext'
