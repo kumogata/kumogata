@@ -2,6 +2,7 @@ module Kumogata; end
 require 'kumogata/version'
 
 require 'aws-sdk'
+require 'base64'
 require 'dslh'
 require 'hashie'
 require 'json'

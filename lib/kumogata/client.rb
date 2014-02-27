@@ -32,8 +32,17 @@ class Kumogata::Client
     Dslh.eval(template.read, {
       :key_conv   => key_converter,
       :value_conv => value_converter,
-      :filename   => template.path
+      :scope_hook => method(:define_template_func),
+      :filename   => template.path,
     })
+  end
+
+  def define_template_func(scope)
+    scope.instance_eval do
+      def user_data(data)
+        data.strip_lines.encode64
+      end
+    end
   end
 
   def create_stack(template)

@@ -28,4 +28,12 @@ class String
   def camelcase
     self[0, 1].upcase + self[1..-1].downcase
   end
+
+  def encode64
+    Base64.encode64(self).delete("\n")
+  end
+
+  def strip_lines
+    self.strip.split("\n").map {|i| i.strip }.join("\n")
+  end
 end
