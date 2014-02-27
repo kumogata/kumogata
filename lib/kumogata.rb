@@ -1,6 +1,7 @@
 module Kumogata; end
 require 'kumogata/version'
 
+require 'aws-sdk'
 require 'dslh'
 require 'hashie'
 require 'logger'

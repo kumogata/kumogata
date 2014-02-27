@@ -14,8 +14,8 @@ class Kumogata::ArgumentParser
   }
 
   class << self
-    def parse!
-      self.new.parse!
+    def parse!(&block)
+      self.new.parse!(&block)
     end
   end # of class methods
 
@@ -28,8 +28,11 @@ class Kumogata::ArgumentParser
       update_usage(opt)
 
       begin
-        opt.on(''  , '--no-color') { options[:color] = false }
-        opt.on(''  , '--debug')    { options[:debug] = true  }
+        opt.on('-k', '--access-key ACCESS_KEY') {|v| options[:access_key] = v     }
+        opt.on('-s', '--secret-key SECRET_KEY') {|v| options[:secret_key] = v     }
+        opt.on('-r', '--region REGION')         {|v| options[:region]     = v     }
+        opt.on(''  , '--no-color')              {    options[:color]      = false }
+        opt.on(''  , '--debug')                 {    options[:debug]      = true  }
         opt.parse!
 
         unless (command = ARGV.shift)
@@ -45,15 +48,18 @@ class Kumogata::ArgumentParser
 
         arguments = ARGV.dup
         validate_arguments(command, arguments)
+
+        options = DEFAULT_OPTIONS.merge(options)
+        options = Hashie::Mash.new(options)
+
+        if block_given?
+          yield(opt, command, arguments, options)
+        end
       rescue => e
-        $stderr.puts e
-        # XXX: Add debug mode
+        $stderr.puts("[ERROR] #{e.message}")
         exit 1
       end
     end
-
-    options = DEFAULT_OPTIONS.merge(options)
-    options = Hashie::Mash.new(options)
 
     [command, arguments, options]
   end

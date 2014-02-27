@@ -3,8 +3,26 @@ $: << File.expand_path("#{File.dirname __FILE__}/../lib")
 require 'rubygems'
 require 'kumogata'
 
+options = {}
+
 begin
-  command, arguments, options = Kumogata::ArgumentParser.parse!
+  aws_opts = {}
+
+  parsed = Kumogata::ArgumentParser.parse! {|opt, command, arguments, options|
+    if options.access_key? and options.secret_key?
+      aws_opts[:access_key_id]     = options.access_key
+      aws_opts[:secret_access_key] = options.secret_key
+    elsif options.access_key? or options.secret_key?
+      puts opt.help
+      exit 1
+    end
+  }
+
+  command, arguments, options = parsed
+
+  aws_opts[:region] = options.region if options.region?
+  AWS.config(aws_opts) unless aws_opts.empty?
+
   String.colorize = options.color?
 
   if options.debug?
@@ -19,6 +37,6 @@ begin
   Kumogata::Client.new(options).send(command, *arguments)
 rescue => e
   $stderr.puts("[ERROR] #{e.message}".red)
-  raise e # XXX: Check debug mode
+  raise e if options[:debug]
   exit 1
 end
