@@ -1,0 +1,28 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}"
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "ami_name": "Ubuntu-12.04.4-LTS-x86_64-ebs-{{timestamp}}",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "region": "ap-northeast-1",
+    "source_ami": "ami-f381f5f2",
+    "instance_type": "t1.micro",
+    "ssh_username": "ubuntu",
+    "ssh_timeout": "3m"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sudo apt-get -y install python-setuptools",
+      "wget -P /tmp https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
+      "sudo mkdir -p /tmp/aws-cfn-bootstrap-latest",
+      "sudo tar xvfz /tmp/aws-cfn-bootstrap-latest.tar.gz --strip-components=1 -C /tmp/aws-cfn-bootstrap-latest",
+      "sudo easy_install /tmp/aws-cfn-bootstrap-latest/",
+      "sudo rm -rf /tmp/aws-cfn-bootstrap-latest"
+    ]
+  }]
+}
