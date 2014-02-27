@@ -2,3 +2,12 @@
 $: << File.expand_path("#{File.dirname __FILE__}/../lib")
 require 'rubygems'
 require 'kumogata'
+
+begin
+  parsed = Kumogata::ArgumentParser.parse!
+  p parsed
+rescue => e
+  $stderr.puts("[ERROR] #{e.message}".red)
+  raise e # XXX: Check debug mode
+  exit 1
+end
