@@ -2,6 +2,8 @@ Version = Kumogata::VERSION
 
 class Kumogata::ArgumentParser
   DEFAULT_OPTIONS = {
+    :replace_underscore => true,
+    :delete_stack => true,
     :color => true,
     :debug => false,
   }
@@ -28,11 +30,13 @@ class Kumogata::ArgumentParser
       update_usage(opt)
 
       begin
-        opt.on('-k', '--access-key ACCESS_KEY') {|v| options[:access_key_id]     = v     }
-        opt.on('-s', '--secret-key SECRET_KEY') {|v| options[:secret_access_key] = v     }
-        opt.on('-r', '--region REGION')         {|v| options[:region]            = v     }
-        opt.on(''  , '--no-color')              {    options[:color]             = false }
-        opt.on(''  , '--debug')                 {    options[:debug]             = true  }
+        opt.on('-k', '--access-key ACCESS_KEY')   {|v| options[:access_key_id]      = v     }
+        opt.on('-s', '--secret-key SECRET_KEY')   {|v| options[:secret_access_key]  = v     }
+        opt.on('-r', '--region REGION')           {|v| options[:region]             = v     }
+        opt.on(''  , '--skip-replace-underscore') {    options[:replace_underscore] = false }
+        opt.on(''  , '--skip-delete-stack')       {    options[:delete_stack]       = false }
+        opt.on(''  , '--no-color')                {    options[:color]              = false }
+        opt.on(''  , '--debug')                   {    options[:debug]              = true  }
         opt.parse!
 
         unless (command = ARGV.shift)

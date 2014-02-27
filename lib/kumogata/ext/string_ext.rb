@@ -24,4 +24,8 @@ class String
       end
     EOS
   end
+
+  def camelcase
+    self[0, 1].upcase + self[1..-1].downcase
+  end
 end
