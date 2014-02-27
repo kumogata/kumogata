@@ -49,10 +49,10 @@ class Kumogata::Client
     stack_name = 'kumogata-' + UUIDTools::UUID.timestamp_create
     stack = @cloud_formation.stacks.create(stack_name, template.to_json)
 
-    print 'Creating'
+    print 'Creating'.cyan
 
     while stack.status == 'CREATE_IN_PROGRESS'
-      print '.'
+      print '.'.intense_black
       sleep 1
     end
 
