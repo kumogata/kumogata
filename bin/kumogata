@@ -4,8 +4,19 @@ require 'rubygems'
 require 'kumogata'
 
 begin
-  parsed = Kumogata::ArgumentParser.parse!
-  p parsed
+  command, arguments, options = Kumogata::ArgumentParser.parse!
+  String.colorize = options.color?
+
+  if options.debug?
+    Kumogata.logger.set_debug(true)
+
+    AWS.config({
+      :http_wire_trace => true,
+      :logger => Kumogata.logger,
+    })
+  end
+
+  Kumogata::Client.new(options).send(command, *arguments)
 rescue => e
   $stderr.puts("[ERROR] #{e.message}".red)
   raise e # XXX: Check debug mode

@@ -1,7 +1,10 @@
 Version = Kumogata::VERSION
 
 class Kumogata::ArgumentParser
-  DEFAULT_OPTIONS = {}
+  DEFAULT_OPTIONS = {
+    :color => true,
+    :debug => false,
+  }
 
   COMMANDS = {
     :create => {
@@ -25,8 +28,8 @@ class Kumogata::ArgumentParser
       update_usage(opt)
 
       begin
-        opt.on('-f', '--foo') {|v| options[:foo] = v }
-        opt.on('-b', '--bar') {|v| options[:bar] = v }
+        opt.on(''  , '--no-color') { options[:color] = false }
+        opt.on(''  , '--debug')    { options[:debug] = true  }
         opt.parse!
 
         unless (command = ARGV.shift)
@@ -41,7 +44,6 @@ class Kumogata::ArgumentParser
         end
 
         arguments = ARGV.dup
-
         validate_arguments(command, arguments)
       rescue => e
         $stderr.puts e
@@ -50,11 +52,10 @@ class Kumogata::ArgumentParser
       end
     end
 
-    {
-      :command   => command,
-      :arguments => arguments,
-      :options   => DEFAULT_OPTIONS.merge(options),
-    }
+    options = DEFAULT_OPTIONS.merge(options)
+    options = Hashie::Mash.new(options)
+
+    [command, arguments, options]
   end
 
   private
