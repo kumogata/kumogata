@@ -55,7 +55,7 @@ class Kumogata::Client
 
   def create_stack(template)
     stack_name = 'kumogata-' + UUIDTools::UUID.timestamp_create
-    stack = @cloud_formation.stacks.create(stack_name, template.to_json)
+    stack = @cloud_formation.stacks.create(stack_name, template.to_json, build_create_options)
 
     print 'Creating'.cyan
 
@@ -73,6 +73,27 @@ class Kumogata::Client
 
     status_message = status.split('_').last.camelcase
     puts status_message.send(completed ? :green : :red)
+  end
+
+  def build_create_options
+    create_options = {}
+
+    if @options[:parameters]
+      parameters = {}
+
+      @options[:parameters].each do |i|
+        key, value = i.split('=', 2)
+        parameters[key] = value
+      end
+
+      create_options[:parameters] = parameters
+    end
+
+    [:capabilities, :disable_rollback, :notify, :timeout].each do |k|
+      create_options[k] = @options[k] if @options[k]
+    end
+
+    return create_options
   end
 
   def validate_template(template)

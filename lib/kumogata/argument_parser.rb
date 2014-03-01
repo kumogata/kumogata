@@ -34,13 +34,18 @@ class Kumogata::ArgumentParser
       update_usage(opt)
 
       begin
-        opt.on('-k', '--access-key ACCESS_KEY')   {|v| options[:access_key_id]      = v     }
-        opt.on('-s', '--secret-key SECRET_KEY')   {|v| options[:secret_access_key]  = v     }
-        opt.on('-r', '--region REGION')           {|v| options[:region]             = v     }
-        opt.on(''  , '--skip-replace-underscore') {    options[:replace_underscore] = false }
-        opt.on(''  , '--skip-delete-stack')       {    options[:delete_stack]       = false }
-        opt.on(''  , '--no-color')                {    options[:color]              = false }
-        opt.on(''  , '--debug')                   {    options[:debug]              = true  }
+        opt.on('-k', '--access-key ACCESS_KEY')            {|v| options[:access_key_id]      = v     }
+        opt.on('-s', '--secret-key SECRET_KEY')            {|v| options[:secret_access_key]  = v     }
+        opt.on('-r', '--region REGION')                    {|v| options[:region]             = v     }
+        opt.on(''  , '--skip-replace-underscore')          {    options[:replace_underscore] = false }
+        opt.on(''  , '--skip-delete-stack')                {    options[:delete_stack]       = false }
+        opt.on(''  , '--parameters KEY_VALUES', Array)     {|v| options[:parameters]         = v     }
+        opt.on(''  , '--capabilities CAPABILITIES', Array) {|v| options[:capabilities]       = v     }
+        opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]   = true  }
+        opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]             = v     }
+        opt.on(''  , '--timeout MINUTES', Integer)         {|v| options[:timeout]            = v     }
+        opt.on(''  , '--no-color')                         {    options[:color]              = false }
+        opt.on(''  , '--debug')                            {    options[:debug]              = true  }
         opt.parse!
 
         unless (command = ARGV.shift)
