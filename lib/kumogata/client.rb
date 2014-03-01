@@ -73,7 +73,14 @@ class Kumogata::Client
       key
     end
 
-    value_converter = proc {|v| v.to_s }
+    value_converter = proc do |v|
+      case v
+      when Hash, Array
+        v
+      else
+        v.to_s
+      end
+    end
 
     Dslh.eval(template.read, {
       :key_conv   => key_converter,
@@ -84,40 +91,42 @@ class Kumogata::Client
   end
 
   def devaluate_template(template)
-    key_conv = proc do |k|
-      k.to_s.gsub('::', '__')
+    exclude_key = proc do |k|
+      k = k.to_s.gsub('::', '__')
+      k !~ /\A[_a-z]\w+\Z/i and k !~ %r|(?:/[:graph:]+)+|
     end
 
-    # XXX:
-    #exclude_key = proc do |k|
-    #  k = k.to_s.gsub('::', '__')
-    #  k !~ /\A[_a-z]\w+\Z/i and k !~ %r|(?:/[:graph:]+)+|
-    #end
-    #
-    #key_conv = proc do |k|
-    #  k = k.to_s
-    #
-    #  if k =~ %r|(?:/[:graph:]+)+|
-    #    proc do |v, nested|
-    #      if nested
-    #        "_path(#{k.inspect}) #{v}"
-    #      else
-    #        "_path #{k.inspect}, #{v}"
-    #      end
-    #    end
-    #  else
-    #    k.gsub('::', '__')
-    #  end
-    #end
+    key_conv = proc do |k|
+      k = k.to_s
 
-    Dslh.deval(template, :key_conv => key_conv)
+      if k =~ %r|(?:/[:graph:]+)+|
+        proc do |v, nested|
+          if nested
+            "_path(#{k.inspect}) #{v}"
+          else
+            "_path #{k.inspect}, #{v}"
+          end
+        end
+      else
+        k.gsub('::', '__')
+      end
+    end
+
+    Dslh.deval(template, :key_conv => key_conv, :exclude_key => exclude_key)
   end
 
   def define_template_func(scope)
-    # XXX: Add _path()
     scope.instance_eval do
       def user_data(data)
         data.strip_lines.encode64
+      end
+
+      def _path(path, value = nil, &block)
+        if block
+          value = Dslh::ScopeBlock.nest(binding, 'block')
+        end
+
+        @__hash__[path] = value
       end
     end
   end
