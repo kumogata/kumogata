@@ -50,7 +50,7 @@ class Kumogata::Client
     puts JSON.pretty_generate(stacks)
   end
 
-  private
+  private ###########################################################
 
   def open_template(path_or_url)
     open(path_or_url) do |f|
@@ -151,10 +151,15 @@ class Kumogata::Client
       raise errmsgs.join(': ')
     end
 
+    outputs = outputs_for(stack)
+    summaries = resource_summaries_for(stack)
+
     if @options.delete_stack?
       Kumogata.logger.info("Delete stack: #{stack.name}".yellow)
       stack.delete
     end
+
+    output_result(outputs, summaries)
   end
 
   def update_stack(template, stack_name)
@@ -246,5 +251,59 @@ class Kumogata::Client
     end
 
     Kumogata.logger.info('Template validated successfully'.green)
+  end
+
+  def outputs_for(stack)
+    outputs_hash = {}
+
+    stack.outputs.each do |output|
+      outputs_hash[output.key] = output.value
+    end
+
+    return outputs_hash
+  end
+
+  def resource_summaries_for(stack)
+    stack.resource_summaries.map do |summary|
+      summary_hash = {}
+
+      [
+        :logical_resource_id,
+        :physical_resource_id,
+        :resource_type,
+        :resource_status,
+        :resource_status_reason,
+        :last_updated_timestamp
+      ].each do |k|
+        summary_hash[k.to_s.camelcase] = summary[k]
+      end
+
+      summary_hash
+    end
+  end
+
+  def output_result(outputs, summaries)
+    result = {
+      'Outputs' => outputs,
+      'StackResourceSummaries' => summaries,
+    }
+
+    puts <<-EOS
+
+Outputs:
+#{JSON.pretty_generate(outputs)}
+
+Stack Resource Summaries:
+#{JSON.pretty_generate(summaries)}
+
+(Save to `#{@options.result_log}`)
+    EOS
+
+    open(@options.result_log, 'wb') do |f|
+      f.puts JSON.pretty_generate({
+        'Outputs' => outputs,
+        'StackResourceSummaries' => summaries,
+      })
+    end
   end
 end

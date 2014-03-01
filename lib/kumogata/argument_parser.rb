@@ -4,6 +4,7 @@ class Kumogata::ArgumentParser
   DEFAULT_OPTIONS = {
     :replace_underscore => true,
     :delete_stack => true,
+    :result_log => File.join(Dir.pwd, 'result.json'),
     :color => true,
     :debug => false,
   }
@@ -60,7 +61,8 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]   = true  }
         opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]             = v     }
         opt.on(''  , '--timeout MINUTES', Integer)         {|v| options[:timeout]            = v     }
-        opt.on(''  , '--force')                            {    options[:force]              = true }
+        opt.on(''  , '--result-log PATH')                  {|v| options[:result_log]         = v     }
+        opt.on(''  , '--force')                            {    options[:force]              = true  }
         opt.on(''  , '--no-color')                         {    options[:color]              = false }
         opt.on(''  , '--debug')                            {    options[:debug]              = true  }
         opt.parse!

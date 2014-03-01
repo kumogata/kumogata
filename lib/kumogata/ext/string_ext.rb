@@ -26,7 +26,9 @@ class String
   end
 
   def camelcase
-    self[0, 1].upcase + self[1..-1].downcase
+    self.split(/[-_]/).map {|str|
+      str[0, 1].upcase + str[1..-1].downcase
+    }.join
   end
 
   def encode64
