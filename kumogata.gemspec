@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'aws-sdk'
-  spec.add_dependency 'dslh', '>= 0.1.7'
+  spec.add_dependency 'dslh', '>= 0.1.9'
   spec.add_dependency 'hashie'
   spec.add_dependency 'json'
   spec.add_dependency 'term-ansicolor'
