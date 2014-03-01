@@ -155,8 +155,7 @@ class Kumogata::Client
     summaries = resource_summaries_for(stack)
 
     if @options.delete_stack?
-      Kumogata.logger.info("Delete stack: #{stack.name}".yellow)
-      stack.delete
+      delete_stack(stack_name)
     end
 
     output_result(stack_name, outputs, summaries)
