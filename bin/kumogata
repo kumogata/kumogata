@@ -7,7 +7,7 @@ options = nil
 
 begin
   parsed = Kumogata::ArgumentParser.parse! {|parser, cmd, args, opts|
-    if (opts.access_key_id? and not opts.secret_access_key?) or 
+    if (opts.access_key_id? and not opts.secret_access_key?) or
        (not opts.access_key_id? and opts.secret_access_key?)
       puts parser.help
       exit 1

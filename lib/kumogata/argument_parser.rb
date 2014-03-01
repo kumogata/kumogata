@@ -9,9 +9,17 @@ class Kumogata::ArgumentParser
   }
 
   COMMANDS = {
+    :list => {
+      :description => '(list description)',
+      :arguments   => [:stack_name?]
+    },
     :create => {
       :description => '(create description)',
-      :arguments   => [:path_or_url]
+      :arguments   => [:path_or_url, :stack_name?]
+    },
+    :update => {
+      :description => '(update description)',
+      :arguments   => [:path_or_url, :stack_name]
     },
     :validate => {
       :description => '(validate description)',
@@ -56,7 +64,7 @@ class Kumogata::ArgumentParser
         command = command.to_sym
 
         unless COMMANDS.has_key?(command)
-          raise "Invalid command: #{command}"
+          raise "Unknown command: #{command}"
         end
 
         arguments = ARGV.dup
@@ -69,7 +77,7 @@ class Kumogata::ArgumentParser
           yield(opt, command, arguments, options)
         end
       rescue => e
-        $stderr.puts("[ERROR] #{e.message}")
+        $stderr.puts("#{e.message}")
         exit 1
       end
     end
