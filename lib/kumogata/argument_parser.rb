@@ -105,6 +105,7 @@ class Kumogata::ArgumentParser
 
     command_max_length = COMMANDS.keys.map(&:length).max
 
+    # XXX: Show subcommand arguments
     opt.separator(COMMANDS.map {|command, attributes|
       description = attributes[:description]
       '  %-*s  %-s' % [command_max_length, command, description]
