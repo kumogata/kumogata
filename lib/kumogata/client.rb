@@ -159,7 +159,7 @@ class Kumogata::Client
       stack.delete
     end
 
-    output_result(outputs, summaries)
+    output_result(stack_name, outputs, summaries)
   end
 
   def update_stack(template, stack_name)
@@ -167,7 +167,7 @@ class Kumogata::Client
     stack.status
     stack.update(build_update_options(template.to_json))
 
-    Kumogata.logger.info("Updating stack: #{stack_name}")
+    Kumogata.logger.info("Updating stack: #{stack_name}".green)
 
     unless while_in_progress(stack, 'UPDATE_COMPLETE')
       errmsgs = ['Update failed']
@@ -175,13 +175,17 @@ class Kumogata::Client
       errmsgs << sstack.tatus_reason if stack.status_reason
       raise errmsgs.join(': ')
     end
+
+    outputs = outputs_for(stack)
+    summaries = resource_summaries_for(stack)
+    output_result(stack_name, outputs, summaries)
   end
 
   def delete_stack(stack_name)
     stack = @cloud_formation.stacks[stack_name]
     stack.status
 
-    Kumogata.logger.info("Deleting stack: #{stack_name}")
+    Kumogata.logger.info("Deleting stack: #{stack_name}".red)
     stack.delete
 
     completed = false
@@ -282,13 +286,11 @@ class Kumogata::Client
     end
   end
 
-  def output_result(outputs, summaries)
-    result = {
-      'Outputs' => outputs,
-      'StackResourceSummaries' => summaries,
-    }
-
+  def output_result(stack_name, outputs, summaries)
     puts <<-EOS
+
+StackName:
+#{stack_name}
 
 Outputs:
 #{JSON.pretty_generate(outputs)}
@@ -301,6 +303,7 @@ Stack Resource Summaries:
 
     open(@options.result_log, 'wb') do |f|
       f.puts JSON.pretty_generate({
+        'StackName' => stack_name,
         'Outputs' => outputs,
         'StackResourceSummaries' => summaries,
       })
