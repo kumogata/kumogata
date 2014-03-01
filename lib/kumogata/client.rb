@@ -47,6 +47,16 @@ class Kumogata::Client
 
   private
 
+  def open_template(path_or_url)
+    open(path_or_url) do |f|
+      if File.extname(path_or_url) == '.rb'
+        evaluate_template(f)
+      else
+        JSON.parse(f.read)
+      end
+    end
+  end
+
   def evaluate_template(template)
     key_converter = proc do |key|
       key = key.to_s
@@ -136,6 +146,7 @@ class Kumogata::Client
     rescue AWS::CloudFormation::Errors::ValidationError
       # Handle `Stack does not exist`
       completed = true
+      Kumogata.logger.info('Successfully')
     end
 
     unless completed
@@ -148,7 +159,7 @@ class Kumogata::Client
 
   def while_in_progress(stack, complete_status)
     while stack.status =~ /_IN_PROGRESS\Z/
-      print '.'.intense_black
+      print '.'.intense_black unless @opts.debug?
       sleep 1
     end
 
