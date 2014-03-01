@@ -199,7 +199,7 @@ class Kumogata::Client
 
   def while_in_progress(stack, complete_status)
     while stack.status =~ /_IN_PROGRESS\Z/
-      print '.'.intense_black unless @opts.debug?
+      print '.'.intense_black unless @options.debug?
       sleep 1
     end
 
