@@ -5,6 +5,7 @@ class Kumogata::Client
   end
 
   def create(path_or_url, stack_name = nil)
+    @options.delete_stack = true if stack_name
     template = open_template(path_or_url)
 
     if @options.delete_stack?
