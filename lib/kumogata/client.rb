@@ -126,11 +126,19 @@ class Kumogata::Client
     stack = @cloud_formation.stacks[stack_name]
     stack.status
 
-
     Kumogata.logger.info("Deleting stack: #{stack_name}")
     stack.delete
 
-    unless while_in_progress(stack, 'DELETE_COMPLETE', :allow_not_exist => true)
+    completed = false
+
+    begin
+      completed = while_in_progress(stack, 'DELETE_COMPLETE')
+    rescue AWS::CloudFormation::Errors::ValidationError
+      # Handle `Stack does not exist`
+      completed = true
+    end
+
+    unless completed
       errmsgs = ['Delete failed']
       errmsgs << stack_name
       errmsgs << sstack.tatus_reason if stack.status_reason
@@ -138,8 +146,8 @@ class Kumogata::Client
     end
   end
 
-  def while_in_progress(stack, complete_status, opts = {})
-    while (opts[:allow_not_exist] and stack.exists?) or stack.status =~ /_IN_PROGRESS\Z/
+  def while_in_progress(stack, complete_status)
+    while stack.status =~ /_IN_PROGRESS\Z/
       print '.'.intense_black
       sleep 1
     end
