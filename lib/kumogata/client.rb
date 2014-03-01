@@ -31,6 +31,12 @@ class Kumogata::Client
     update_stack(template, stack_name)
   end
 
+  def delete(stack_name)
+    if @options.force? or agree("Aare you sure you want to delete `#{stack_name}`? ".yellow)
+      delete_stack(stack_name)
+    end
+  end
+
   def validate(path_or_url)
     template = open(path_or_url) do |f|
       evaluate_template(f)
@@ -89,13 +95,13 @@ class Kumogata::Client
     stack = @cloud_formation.stacks.create(stack_name, template.to_json, build_create_options)
 
     unless while_in_progress(stack, 'CREATE_COMPLETE')
-      errmsgs = ['Create stack failed']
+      errmsgs = ['Create failed']
       errmsgs << stack_name
       errmsgs << sstack.tatus_reason if stack.status_reason
       raise errmsgs.join(': ')
     end
 
-    if @options.delete_stack
+    if @options.delete_stack?
       Kumogata.logger.info("Delete stack: #{stack.name}".yellow)
       stack.delete
     end
@@ -109,15 +115,31 @@ class Kumogata::Client
     Kumogata.logger.info("Updating stack: #{stack_name}")
 
     unless while_in_progress(stack, 'UPDATE_COMPLETE')
-      errmsgs = ['Update stack failed']
+      errmsgs = ['Update failed']
       errmsgs << stack_name
       errmsgs << sstack.tatus_reason if stack.status_reason
       raise errmsgs.join(': ')
     end
   end
 
-  def while_in_progress(stack, complete_status)
-    while stack.status =~ /_IN_PROGRESS\Z/
+  def delete_stack(stack_name)
+    stack = @cloud_formation.stacks[stack_name]
+    stack.status
+
+
+    Kumogata.logger.info("Deleting stack: #{stack_name}")
+    stack.delete
+
+    unless while_in_progress(stack, 'DELETE_COMPLETE', :allow_not_exist => true)
+      errmsgs = ['Delete failed']
+      errmsgs << stack_name
+      errmsgs << sstack.tatus_reason if stack.status_reason
+      raise errmsgs.join(': ')
+    end
+  end
+
+  def while_in_progress(stack, complete_status, opts = {})
+    while (opts[:allow_not_exist] and stack.exists?) or stack.status =~ /_IN_PROGRESS\Z/
       print '.'.intense_black
       sleep 1
     end
@@ -145,10 +167,10 @@ class Kumogata::Client
   end
 
   def add_parameters(hash)
-    if @options[:parameters]
+    if @options.parameters?
       parameters = {}
 
-      @options[:parameters].each do |i|
+      @options.parameters.each do |i|
         key, value = i.split('=', 2)
         parameters[key] = value
       end

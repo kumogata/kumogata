@@ -9,21 +9,25 @@ class Kumogata::ArgumentParser
   }
 
   COMMANDS = {
-    :list => {
-      :description => '(list description)',
-      :arguments   => [:stack_name?]
-    },
     :create => {
       :description => '(create description)',
       :arguments   => [:path_or_url, :stack_name?]
+    },
+    :validate => {
+      :description => '(validate description)',
+      :arguments   => [:path_or_url]
     },
     :update => {
       :description => '(update description)',
       :arguments   => [:path_or_url, :stack_name]
     },
-    :validate => {
-      :description => '(validate description)',
-      :arguments   => [:path_or_url]
+    :delete => {
+      :description => '(delete description)',
+      :arguments   => [:stack_name]
+    },
+    :list => {
+      :description => '(list description)',
+      :arguments   => [:stack_name?]
     },
   }
 
@@ -52,6 +56,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]   = true  }
         opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]             = v     }
         opt.on(''  , '--timeout MINUTES', Integer)         {|v| options[:timeout]            = v     }
+        opt.on(''  , '--force')                            {    options[:force]              = true }
         opt.on(''  , '--no-color')                         {    options[:color]              = false }
         opt.on(''  , '--debug')                            {    options[:debug]              = true  }
         opt.parse!
