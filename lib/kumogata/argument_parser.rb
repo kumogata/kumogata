@@ -13,6 +13,10 @@ class Kumogata::ArgumentParser
       :description => '(create description)',
       :arguments   => [:path_or_url]
     },
+    :validate => {
+      :description => '(validate description)',
+      :arguments   => [:path_or_url]
+    },
   }
 
   class << self

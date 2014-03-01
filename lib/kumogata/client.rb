@@ -18,6 +18,14 @@ class Kumogata::Client
     create_stack(template)
   end
 
+  def validate(path_or_url)
+    template = open(path_or_url) do |f|
+      evaluate_template(f)
+    end
+
+    validate_template(template)
+  end
+
   private
 
   def evaluate_template(template)
@@ -65,5 +73,15 @@ class Kumogata::Client
 
     status_message = status.split('_').last.camelcase
     puts status_message.send(completed ? :green : :red)
+  end
+
+  def validate_template(template)
+    result = @cloud_formation.validate_template(template.to_json)
+
+    if result[:code]
+      raise result.values_at(:code, :message).join(': ')
+    end
+
+    Kumogata.logger.info('Template validated successfully'.green)
   end
 end
