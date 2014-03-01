@@ -17,6 +17,10 @@ class Kumogata::ArgumentParser
       :description => '(validate description)',
       :arguments   => [:path_or_url]
     },
+    :convert => {
+      :description => '(convert description)',
+      :arguments   => [:path_or_url]
+    },
     :update => {
       :description => '(update description)',
       :arguments   => [:path_or_url, :stack_name]

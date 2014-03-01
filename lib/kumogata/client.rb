@@ -4,15 +4,8 @@ class Kumogata::Client
     @cloud_formation = AWS::CloudFormation.new
   end
 
-  def list(stack_name = nil)
-    stacks = describe_stacks(stack_name)
-    puts JSON.pretty_generate(stacks)
-  end
-
   def create(path_or_url, stack_name = nil)
-    template = open(path_or_url) do |f|
-      evaluate_template(f)
-    end
+    template = open_template(path_or_url)
 
     if @options.delete_stack?
       template['Resources'].each do |k, v|
@@ -21,6 +14,21 @@ class Kumogata::Client
     end
 
     create_stack(template, stack_name)
+  end
+
+  def validate(path_or_url)
+    template = open_template(path_or_url)
+    validate_template(template)
+  end
+
+  def convert(path_or_url)
+    template = open_template(path_or_url)
+
+    if ruby_template?(path_or_url)
+      puts JSON.pretty_generate(template)
+    else
+      puts devaluate_template(template)
+    end
   end
 
   def update(path_or_url, stack_name)
@@ -37,24 +45,25 @@ class Kumogata::Client
     end
   end
 
-  def validate(path_or_url)
-    template = open(path_or_url) do |f|
-      evaluate_template(f)
-    end
-
-    validate_template(template)
+  def list(stack_name = nil)
+    stacks = describe_stacks(stack_name)
+    puts JSON.pretty_generate(stacks)
   end
 
   private
 
   def open_template(path_or_url)
     open(path_or_url) do |f|
-      if File.extname(path_or_url) == '.rb'
+      if ruby_template?(path_or_url)
         evaluate_template(f)
       else
         JSON.parse(f.read)
       end
     end
+  end
+
+  def ruby_template?(path_or_url)
+    File.extname(path_or_url) == '.rb'
   end
 
   def evaluate_template(template)
@@ -74,7 +83,38 @@ class Kumogata::Client
     })
   end
 
+  def devaluate_template(template)
+    key_conv = proc do |k|
+      k.to_s.gsub('::', '__')
+    end
+
+    # XXX:
+    #exclude_key = proc do |k|
+    #  k = k.to_s.gsub('::', '__')
+    #  k !~ /\A[_a-z]\w+\Z/i and k !~ %r|(?:/[:graph:]+)+|
+    #end
+    #
+    #key_conv = proc do |k|
+    #  k = k.to_s
+    #
+    #  if k =~ %r|(?:/[:graph:]+)+|
+    #    proc do |v, nested|
+    #      if nested
+    #        "_path(#{k.inspect}) #{v}"
+    #      else
+    #        "_path #{k.inspect}, #{v}"
+    #      end
+    #    end
+    #  else
+    #    k.gsub('::', '__')
+    #  end
+    #end
+
+    Dslh.deval(template, :key_conv => key_conv)
+  end
+
   def define_template_func(scope)
+    # XXX: Add _path()
     scope.instance_eval do
       def user_data(data)
         data.strip_lines.encode64
