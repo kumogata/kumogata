@@ -11,11 +11,11 @@ class Kumogata::ArgumentParser
 
   COMMANDS = {
     :create => {
-      :description => 'Creates resources as specified in the template',
+      :description => 'Create resources as specified in the template',
       :arguments   => [:path_or_url, :stack_name?]
     },
     :validate => {
-      :description => 'Validates a specified template',
+      :description => 'Validate a specified template',
       :arguments   => [:path_or_url]
     },
     :convert => {
@@ -23,7 +23,7 @@ class Kumogata::ArgumentParser
       :arguments   => [:path_or_url]
     },
     :update => {
-      :description => 'Updates a stack as specified in the template',
+      :description => 'Update a stack as specified in the template',
       :arguments   => [:path_or_url, :stack_name]
     },
     :delete => {
