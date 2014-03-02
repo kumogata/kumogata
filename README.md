@@ -1,18 +1,38 @@
 # Kumogata
 
-TODO: Write a gem description
+Kumogata is a tool for AWS CroudFormation.
+
+It can define a template in Ruby DSL, such as:
+
+```ruby
+Parameters do
+  InstanceType do
+    Default "t1.micro"
+    Description "Instance Type"
+    Type "String"
+  end
+end
+
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType { Ref "InstanceType" }
+    end
+  end
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+```
 
 ## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'kumogata'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
 
     $ gem install kumogata
 
