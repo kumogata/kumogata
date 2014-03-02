@@ -16,20 +16,22 @@ class Kumogata::Client
     end
 
     create_stack(template, stack_name)
+    nil
   end
 
   def validate(path_or_url)
     template = open_template(path_or_url)
     validate_template(template)
+    nil
   end
 
   def convert(path_or_url)
     template = open_template(path_or_url)
 
     if ruby_template?(path_or_url)
-      puts JSON.pretty_generate(template)
+      JSON.pretty_generate(template)
     else
-      puts devaluate_template(template)
+      devaluate_template(template)
     end
   end
 
@@ -39,17 +41,20 @@ class Kumogata::Client
     end
 
     update_stack(template, stack_name)
+    nil
   end
 
   def delete(stack_name)
     if @options.force? or agree("Aare you sure you want to delete `#{stack_name}`? ".yellow)
       delete_stack(stack_name)
     end
+
+    nil
   end
 
   def list(stack_name = nil)
     stacks = describe_stacks(stack_name)
-    puts JSON.pretty_generate(stacks)
+    JSON.pretty_generate(stacks)
   end
 
   private ###########################################################
