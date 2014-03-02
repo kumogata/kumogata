@@ -27,7 +27,7 @@ class Kumogata::ArgumentParser
       :arguments   => [:path_or_url, :stack_name]
     },
     :delete => {
-      :description => 'Deletes a specified stack',
+      :description => 'Delete a specified stack',
       :arguments   => [:stack_name]
     },
     :list => {
