@@ -11,11 +11,11 @@ class Kumogata::ArgumentParser
 
   COMMANDS = {
     :create => {
-      :description => '(create description)',
+      :description => 'Creates a stack as specified in the template',
       :arguments   => [:path_or_url, :stack_name?]
     },
     :validate => {
-      :description => '(validate description)',
+      :description => 'Validates a specified template',
       :arguments   => [:path_or_url]
     },
     :convert => {
