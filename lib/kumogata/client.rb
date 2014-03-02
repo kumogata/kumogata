@@ -31,7 +31,7 @@ class Kumogata::Client
     if ruby_template?(path_or_url)
       JSON.pretty_generate(template)
     else
-      devaluate_template(template)
+      devaluate_template(template).chomp
     end
   end
 
