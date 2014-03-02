@@ -124,7 +124,7 @@ class Kumogata::Client
 
   def define_template_func(scope)
     scope.instance_eval do
-      def user_data(data)
+      def _user_data(data)
         data.strip_lines.encode64
       end
 
