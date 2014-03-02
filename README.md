@@ -58,6 +58,7 @@ Commands:
   update   PATH_OR_URL STACK_NAME    Update a stack as specified in the template
   delete   STACK_NAME                Delete a specified stack
   list     [STACK_NAME]              List summary information for stacks
+  export   STACK_NAME                Export a template from a specified stack
 
 Options:
     -k, --access-key ACCESS_KEY
