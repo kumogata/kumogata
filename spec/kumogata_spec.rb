@@ -18,7 +18,7 @@ Outputs do
     end
   end
 end
-EOS
+    EOS
 
     run_client(:validate, :template => template) do |client, cf|
       json = eval_template(template).to_json
@@ -27,6 +27,41 @@ EOS
         {}
       }
     end
+  end
+
+  it 'validate Ruby template (with error)' do
+    template = <<-EOS
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-07f68106"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+#Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+#end
+    EOS
+
+    expect {
+      run_client(:validate, :template => template) do |client, cf|
+        json = eval_template(template).to_json
+
+        cf.should_receive(:validate_template).with(json) {
+          {
+            :code => 'CODE',
+            :message => 'MESSAGE'
+          }
+        }
+      end
+    }.to raise_error('CODE: MESSAGE')
   end
 
   it 'convert Ruby template to JSON template' do
@@ -48,7 +83,7 @@ Outputs do
     end
   end
 end
-EOS
+    EOS
 
     json_template = run_client(:convert, :template => template)
 
@@ -74,7 +109,7 @@ EOS
     }
   }
 }
-EOS
+    EOS
   end
 
   it 'convert Ruby template to JSON template' do
@@ -100,7 +135,7 @@ EOS
     }
   }
 }
-EOS
+    EOS
 
     ruby_template = run_client(:convert, :template => template, :template_ext => '.template')
 
@@ -121,6 +156,6 @@ Outputs do
     end
   end
 end
-EOS
+    EOS
   end
 end
