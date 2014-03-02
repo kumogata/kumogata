@@ -19,7 +19,7 @@ def tempfile(content, template_ext)
 end
 
 def run_client(command, options = {})
-  $stdout = open('/dev/null', 'w')
+  $stdout = open('/dev/null', 'w') unless ENV['DEBUG']
 
   kumogata_template = options[:template]
   kumogata_arguments = options[:arguments] || []
