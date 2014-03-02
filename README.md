@@ -41,7 +41,33 @@ end
 
 ## Usage
 
-TODO: Write usage instructions here
+```
+Usage: kumogata <command> [args] [options]
+
+Commands:
+  create   PATH_OR_URL [STACK_NAME]  Creates a stack as specified in the template
+  validate PATH_OR_URL               Validates a specified template
+  convert  PATH_OR_URL               Convert a template format
+  update   PATH_OR_URL STACK_NAME    Updates a stack as specified in the template
+  delete   STACK_NAME                Deletes a specified stack
+  list     [STACK_NAME]              List summary information for stacks
+
+Options:
+    -k, --access-key ACCESS_KEY
+    -s, --secret-key SECRET_KEY
+    -r, --region REGION
+        --skip-replace-underscore
+        --skip-delete-stack
+    -p, --parameters KEY_VALUES
+        --capabilities CAPABILITIES
+        --disable-rollback
+        --notify SNS_TOPICS
+        --timeout MINUTES
+        --result-log PATH
+        --force
+        --no-color
+        --debug
+```
 
 ## Contributing
 
