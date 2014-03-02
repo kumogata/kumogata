@@ -19,19 +19,19 @@ class Kumogata::ArgumentParser
       :arguments   => [:path_or_url]
     },
     :convert => {
-      :description => '(convert description)',
+      :description => 'Convert a template format',
       :arguments   => [:path_or_url]
     },
     :update => {
-      :description => '(update description)',
+      :description => 'Updates a stack as specified in the template',
       :arguments   => [:path_or_url, :stack_name]
     },
     :delete => {
-      :description => '(delete description)',
+      :description => 'Deletes a specified stack',
       :arguments   => [:stack_name]
     },
     :list => {
-      :description => '(list description)',
+      :description => 'List summary information for stacks',
       :arguments   => [:stack_name?]
     },
   }
