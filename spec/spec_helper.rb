@@ -1,5 +1,10 @@
 require 'kumogata'
 require 'tempfile'
+require 'uuidtools'
+
+class UUIDTools::UUID
+  def self.timestamp_create; 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'; end
+end
 
 def tempfile(content, template_ext)
   basename = "#{File.basename __FILE__}.#{$$}"
@@ -39,7 +44,19 @@ def eval_template(template, options = {})
   kumogata_options = Kumogata::ArgumentParser::DEFAULT_OPTIONS.merge(options[:options] || {})
   template_ext = options[:template_ext] || '.rb'
 
-  tempfile(template, template_ext) do |f|
+  template = tempfile(template, template_ext) do |f|
     Kumogata::Client.new(kumogata_options).send(:evaluate_template, f)
+  end
+
+  if options[:update_deletion_policy]
+    update_deletion_policy(template)
+  end
+
+  return template
+end
+
+def update_deletion_policy(template)
+  template['Resources'].each do |k, v|
+    v['DeletionPolicy'] = 'Retain'
   end
 end
