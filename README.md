@@ -22,6 +22,7 @@ Resources do
     Properties do
       ImageId "ami-XXXXXXXX"
       InstanceType { Ref "InstanceType" }
+      KeyName "your_key_name"
 
       UserData _user_data(<<-EOS)
         #!/bin/bash
@@ -82,6 +83,11 @@ Options:
 If you want to save the stack, please specify the stack name:
 
     $ kumogata creat template.rb any_stack_name
+
+If you want to pass parameters, please use `-p` option:
+
+    $ kumogata creat template.rb -p "InstanceType=m1.large,KeyName=any_other_key"
+
 
 **Notice**
 
