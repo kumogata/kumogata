@@ -79,7 +79,7 @@ If you want to save the stack, please specify the stack name:
 
 **Notice**
 
-The stack will be delete if you do not specify the stack name explicitly.
+**The stack will be delete if you do not specify the stack name explicitly.**
 (And only the resources will remain)
 
 I think the stack that manage resources is not required in many case...
