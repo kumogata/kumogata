@@ -1,4 +1,4 @@
-describe Kumogata::Client do
+describe 'Kumogata::Client#convert' do
   it 'convert Ruby template to JSON template' do
     template = <<-EOS
 Resources do

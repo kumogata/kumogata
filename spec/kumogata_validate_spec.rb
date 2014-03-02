@@ -1,4 +1,4 @@
-describe Kumogata::Client do
+describe 'Kumogata::Client#validate' do
   it 'validate Ruby template (without error)' do
     template = <<-EOS
 Resources do

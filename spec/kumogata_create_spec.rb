@@ -1,4 +1,4 @@
-describe Kumogata::Client do
+describe 'Kumogata::Client#create' do
   it 'create a stack from Ruby template' do
     template = <<-EOS
 Resources do
@@ -47,7 +47,7 @@ end
         obj.should_receive(:delete)
       end
 
-      stacks = make_double('status') do |obj|
+      stacks = make_double('stacks') do |obj|
         obj.should_receive(:create)
            .with('kumogata-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {}) { stack }
         obj.should_receive(:[])
@@ -89,7 +89,7 @@ end
 
     run_client(:create, :template => template, :options => {:parameters => ['InstanceType=m1.large']}) do |client, cf|
       json = eval_template(template, :update_deletion_policy => true).to_json
-      stacks = double('status')
+      stacks = double('stacks')
 
       output = make_double('output') do |obj|
         obj.should_receive(:key) { 'AZ' }
@@ -114,7 +114,7 @@ end
         obj.should_receive(:delete)
       end
 
-      stacks = make_double('status') do |obj|
+      stacks = make_double('stacks') do |obj|
         obj.should_receive(:create)
            .with('kumogata-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {:parameters=>{"InstanceType"=>"m1.large"}}) { stack }
         obj.should_receive(:[])
