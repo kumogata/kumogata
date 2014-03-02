@@ -1,6 +1,7 @@
 class Kumogata::Client
   def initialize(options)
     @options = options
+    @options = Hashie::Mash.new(@options) unless @options.kind_of?(Hashie::Mash)
     @cloud_formation = AWS::CloudFormation.new
   end
 
