@@ -1,8 +1,6 @@
 describe 'Kumogata::Client#list' do
   it 'list stacks' do
     json = run_client(:list) do |client, cf|
-      stacks = double('status')
-
       stack1 = make_double('stack1') do |obj|
         obj.should_receive(:name) { 'stack1' }
         obj.should_receive(:creation_time) { '2014-03-02 16:17:18 UTC' }
@@ -40,8 +38,6 @@ describe 'Kumogata::Client#list' do
 
   it 'list a specified stack' do
     json = run_client(:list, :arguments => ['stack1']) do |client, cf|
-      stacks = double('status')
-
       stack1 = make_double('stack1') do |obj|
         obj.should_receive(:name).twice { 'stack1' }
         obj.should_receive(:creation_time) { '2014-03-02 16:17:18 UTC' }
