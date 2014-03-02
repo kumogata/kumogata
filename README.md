@@ -45,11 +45,11 @@ end
 Usage: kumogata <command> [args] [options]
 
 Commands:
-  create   PATH_OR_URL [STACK_NAME]  Creates resources as specified in the template
-  validate PATH_OR_URL               Validates a specified template
+  create   PATH_OR_URL [STACK_NAME]  Create resources as specified in the template
+  validate PATH_OR_URL               Validate a specified template
   convert  PATH_OR_URL               Convert a template format
-  update   PATH_OR_URL STACK_NAME    Updates a stack as specified in the template
-  delete   STACK_NAME                Deletes a specified stack
+  update   PATH_OR_URL STACK_NAME    Update a stack as specified in the template
+  delete   STACK_NAME                Delete a specified stack
   list     [STACK_NAME]              List summary information for stacks
 
 Options:
@@ -68,6 +68,33 @@ Options:
         --no-color
         --debug
 ```
+
+### Create resources
+
+    $ kumogata creat template.rb
+
+If you want to save the stack, please specify the stack name:
+
+    $ kumogata creat template.rb any_stack_name
+
+**Notice**
+
+The stack will be delete if you do not specify the stack name explicitly.
+(And only the resources will remain)
+
+I think the stack that manage resources is not required in many case...
+
+### Convert JSON to Ruby
+
+JSON template can be converted to Ruby template.
+
+    $ kumogata convert https://s3.amazonaws.com/cloudformation-templates-us-east-1/Drupal_Single_Instance.template
+
+* Data that cannot be converted will be converted to Array and Hash
+* `::` is converted to `__`
+  * `Fn::GetAtt` => `Fn__GetAtt`
+* `_{ ... }` is convered to Hash
+  * `SecurityGroups [_{Ref "WebServerSecurityGroup"}]` => `{"SecurityGroups": [{"Ref": "WebServerSecurityGroup"}]}`
 
 ## Contributing
 
