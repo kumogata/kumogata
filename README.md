@@ -2,8 +2,8 @@
 
 Kumogata is a tool for AWS CroudFormation.
 
-[![Gem Version](https://badge.fury.io/rb/kumogata.png)](http://badge.fury.io/rb/kumogata)
-[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png)](https://drone.io/github.com/winebarrel/kumogata/latest)
+[![Gem Version](https://badge.fury.io/rb/kumogata.png?201403021923)](http://badge.fury.io/rb/kumogata)
+[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403021923)](https://drone.io/github.com/winebarrel/kumogata/latest)
 
 It can define a template in Ruby DSL, such as:
 
