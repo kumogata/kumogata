@@ -119,7 +119,15 @@ class Kumogata::Client
       end
     end
 
-    Dslh.deval(template, :key_conv => key_conv, :exclude_key => exclude_key)
+    value_conv = proc do |v|
+      if v.kind_of?(String) and v =~ /\A(?:0|[1-9]\d*)\Z/
+        v.to_i
+      else
+        v
+      end
+    end
+
+    Dslh.deval(template, :key_conv => key_conv, :value_conv => value_conv, :exclude_key => exclude_key)
   end
 
   def define_template_func(scope)
