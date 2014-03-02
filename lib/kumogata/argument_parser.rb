@@ -103,12 +103,23 @@ class Kumogata::ArgumentParser
     opt.separator ''
     opt.separator 'Commands:'
 
-    command_max_length = COMMANDS.keys.map(&:length).max
+    cmd_max = COMMANDS.keys.map {|i| i.to_s.length }.max
+
+    cmd_arg_descs = COMMANDS.map {|command, attributes|
+      arguments = attributes[:arguments]
+      description = attributes[:description]
+
+      [
+        '%-*s %s' % [cmd_max, command, arguments_to_message(arguments)],
+        description,
+      ]
+    }
+
+    cmd_arg_max = cmd_arg_descs.map {|i| i[0].length }.max
 
     # XXX: Show subcommand arguments
-    opt.separator(COMMANDS.map {|command, attributes|
-      description = attributes[:description]
-      '  %-*s  %-s' % [command_max_length, command, description]
+    opt.separator(cmd_arg_descs.map {|cmd_arg, desc|
+      '  %-*s  %-s' % [cmd_arg_max, cmd_arg, desc]
     }.join("\n"))
 
     opt.separator ''
@@ -122,8 +133,11 @@ class Kumogata::ArgumentParser
     max = expected.length
 
     if arguments.length < min or max < arguments.length
-      expected_arguments = expected.map {|i| i.to_s.sub(/(.+)\?\Z/) { "[#{$1}]" }.upcase }.join(' ')
-      raise "Usage: kumogata #{command} #{expected_arguments} [options]"
+      raise "Usage: kumogata #{command} #{arguments_to_message(expected)} [options]"
     end
+  end
+
+  def arguments_to_message(arguments)
+    arguments.map {|i| i.to_s.sub(/(.+)\?\Z/) { "[#{$1}]" }.upcase }.join(' ')
   end
 end
