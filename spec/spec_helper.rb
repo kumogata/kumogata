@@ -60,3 +60,9 @@ def update_deletion_policy(template)
     v['DeletionPolicy'] = 'Retain'
   end
 end
+
+def make_double(name)
+  obj = double(name)
+  yield(obj)
+  return obj
+end
