@@ -45,7 +45,7 @@ class Kumogata::Client
   end
 
   def delete(stack_name)
-    if @options.force? or agree("Aare you sure you want to delete `#{stack_name}`? ".yellow)
+    if @options.force? or agree("Are you sure you want to delete `#{stack_name}`? ".yellow)
       delete_stack(stack_name)
     end
 
