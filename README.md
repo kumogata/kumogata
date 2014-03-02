@@ -111,7 +111,12 @@ JSON template can be converted to Ruby template.
 * `_path()` creates Hash that has a key of path
   * `_path("/etc/passwd-s3fs") { content "..." }` => `{"/etc/passwd-s3fs": {"content": "..."}}`
 
-##
+## Demo
+
+* Create resources
+  * https://asciinema.org/a/7979
+* Convert a template
+  * https://asciinema.org/a/7980
 
 ## Contributing
 
