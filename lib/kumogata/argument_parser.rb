@@ -56,7 +56,7 @@ class Kumogata::ArgumentParser
         opt.on('-r', '--region REGION')                    {|v| options[:region]             = v     }
         opt.on(''  , '--skip-replace-underscore')          {    options[:replace_underscore] = false }
         opt.on(''  , '--skip-delete-stack')                {    options[:delete_stack]       = false }
-        opt.on(''  , '--parameters KEY_VALUES', Array)     {|v| options[:parameters]         = v     }
+        opt.on('-p', '--parameters KEY_VALUES', Array)     {|v| options[:parameters]         = v     }
         opt.on(''  , '--capabilities CAPABILITIES', Array) {|v| options[:capabilities]       = v     }
         opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]   = true  }
         opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]             = v     }
@@ -117,7 +117,6 @@ class Kumogata::ArgumentParser
 
     cmd_arg_max = cmd_arg_descs.map {|i| i[0].length }.max
 
-    # XXX: Show subcommand arguments
     opt.separator(cmd_arg_descs.map {|cmd_arg, desc|
       '  %-*s  %-s' % [cmd_arg_max, cmd_arg, desc]
     }.join("\n"))
