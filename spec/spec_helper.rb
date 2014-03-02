@@ -9,7 +9,6 @@ def tempfile(content, template_ext)
     f << content
     f.flush
     f.rewind
-    p f.path
     yield(f)
   end
 end
