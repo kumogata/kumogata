@@ -14,6 +14,8 @@ def tempfile(content, template_ext)
 end
 
 def run_client(command, options = {})
+  $stdout = open('/dev/null', 'w')
+
   kumogata_template = options[:template]
   kumogata_arguments = options[:arguments] || []
   kumogata_options = Kumogata::ArgumentParser::DEFAULT_OPTIONS.merge(options[:options] || {})
@@ -30,5 +32,14 @@ def run_client(command, options = {})
     end
   else
     client.send(command, *kumogata_arguments)
+  end
+end
+
+def eval_template(template, options = {})
+  kumogata_options = Kumogata::ArgumentParser::DEFAULT_OPTIONS.merge(options[:options] || {})
+  template_ext = options[:template_ext] || '.rb'
+
+  tempfile(template, template_ext) do |f|
+    Kumogata::Client.new(kumogata_options).send(:evaluate_template, f)
   end
 end
