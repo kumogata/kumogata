@@ -298,9 +298,6 @@ class Kumogata::Client
   def output_result(stack_name, outputs, summaries)
     puts <<-EOS
 
-StackName:
-#{stack_name}
-
 Outputs:
 #{JSON.pretty_generate(outputs)}
 
