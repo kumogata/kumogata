@@ -34,6 +34,10 @@ class Kumogata::ArgumentParser
       :description => 'List summary information for stacks',
       :arguments   => [:stack_name?]
     },
+    :export => {
+      :description => 'Export a template from a specified stack',
+      :arguments   => [:stack_name]
+    },
   }
 
   class << self

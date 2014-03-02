@@ -57,6 +57,11 @@ class Kumogata::Client
     JSON.pretty_generate(stacks)
   end
 
+  def export(stack_name = nil)
+    template = export_template(stack_name)
+    devaluate_template(template).chomp
+  end
+
   private ###########################################################
 
   def open_template(path_or_url)
@@ -146,22 +151,6 @@ class Kumogata::Client
     end
   end
 
-  def describe_stacks(stack_name)
-    AWS.memoize do
-      stacks = @cloud_formation.stacks
-      stacks = stacks.select {|i| i.name == stack_name } if stack_name
-
-      stacks.map do |stack|
-        {
-          'StackName'    => stack.name,
-          'CreationTime' => stack.creation_time,
-          'StackStatus'  => stack.status,
-          'Description'  => stack.description,
-        }
-      end
-    end
-  end
-
   def create_stack(template, stack_name)
     stack_name = stack_name || 'kumogata-' + UUIDTools::UUID.timestamp_create
 
@@ -227,6 +216,28 @@ class Kumogata::Client
       errmsgs << sstack.tatus_reason if stack.status_reason
       raise errmsgs.join(': ')
     end
+  end
+
+  def describe_stacks(stack_name)
+    AWS.memoize do
+      stacks = @cloud_formation.stacks
+      stacks = stacks.select {|i| i.name == stack_name } if stack_name
+
+      stacks.map do |stack|
+        {
+          'StackName'    => stack.name,
+          'CreationTime' => stack.creation_time,
+          'StackStatus'  => stack.status,
+          'Description'  => stack.description,
+        }
+      end
+    end
+  end
+
+  def export_template(stack_name)
+    stack = @cloud_formation.stacks[stack_name]
+    stack.status
+    JSON.parse(stack.template)
   end
 
   def while_in_progress(stack, complete_status)
