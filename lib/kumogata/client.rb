@@ -100,13 +100,13 @@ class Kumogata::Client
   def devaluate_template(template)
     exclude_key = proc do |k|
       k = k.to_s.gsub('::', '__')
-      k !~ /\A[_a-z]\w+\Z/i and k !~ %r|(?:/[:graph:]+)+|
+      k !~ /\A[_a-z]\w+\Z/i and k !~ %r|\A/\S*\Z|
     end
 
     key_conv = proc do |k|
       k = k.to_s
 
-      if k =~ %r|(?:/[:graph:]+)+|
+      if k =~ %r|\A/\S*\Z|
         proc do |v, nested|
           if nested
             "_path(#{k.inspect}) #{v}"
