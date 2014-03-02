@@ -45,7 +45,7 @@ end
 Usage: kumogata <command> [args] [options]
 
 Commands:
-  create   PATH_OR_URL [STACK_NAME]  Creates a stack as specified in the template
+  create   PATH_OR_URL [STACK_NAME]  Creates resources as specified in the template
   validate PATH_OR_URL               Validates a specified template
   convert  PATH_OR_URL               Convert a template format
   update   PATH_OR_URL STACK_NAME    Updates a stack as specified in the template

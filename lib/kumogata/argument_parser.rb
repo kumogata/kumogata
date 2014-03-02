@@ -11,7 +11,7 @@ class Kumogata::ArgumentParser
 
   COMMANDS = {
     :create => {
-      :description => 'Creates a stack as specified in the template',
+      :description => 'Creates resources as specified in the template',
       :arguments   => [:path_or_url, :stack_name?]
     },
     :validate => {
