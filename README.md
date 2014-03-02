@@ -22,6 +22,12 @@ Resources do
     Properties do
       ImageId "ami-XXXXXXXX"
       InstanceType { Ref "InstanceType" }
+
+      UserData user_data(<<-EOS)
+        #!/bin/bash
+        yum install -y httpd
+        service httpd start
+      EOS
     end
   end
 end
