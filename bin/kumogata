@@ -35,7 +35,8 @@ begin
     })
   end
 
-  Kumogata::Client.new(options).send(command, *arguments)
+  out = Kumogata::Client.new(options).send(command, *arguments)
+  puts out if out
 rescue => e
   $stderr.puts("[ERROR] #{e.message}".red)
 
