@@ -38,6 +38,10 @@ class Kumogata::ArgumentParser
       :description => 'Export a template from a specified stack',
       :arguments   => [:stack_name]
     },
+    :resources => {
+      :description => 'Show resources for a specified stack',
+      :arguments   => [:stack_name]
+    },
   }
 
   class << self
