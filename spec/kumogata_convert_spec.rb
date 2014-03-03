@@ -93,4 +93,141 @@ Outputs do
 end
     EOS
   end
+
+  it 'convert Ruby template to JSON template with _join()' do
+    template = <<-TEMPLATE
+Parameters do
+  Password do
+    NoEcho true
+    Type "String"
+  end
+end
+
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-07f68106"
+      InstanceType "t1.micro"
+      KeyName "winebarrel"
+
+      UserData do
+        Fn__Base64 _join(<<-EOS)
+          #!/bin/bash
+          /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackName" %> -r myEC2Instance --region <%= Ref "AWS::Region" %>
+        EOS
+      end
+    end
+
+    Metadata do
+      AWS__CloudFormation__Init do
+        config do
+
+          packages do
+            yum({"httpd"=>[]})
+          end
+
+          services do
+            sysvinit do
+              httpd do
+                enabled "true"
+                ensureRunning "true"
+              end
+            end
+          end
+
+          commands do
+            any_name do
+              command _join(<<-EOS)
+                echo <%= Ref "Password" %> > /tmp/my-password
+              EOS
+            end
+          end
+
+        end # config
+      end # AWS__CloudFormation__Init
+    end # Metadata
+  end
+end
+    TEMPLATE
+
+    json_template = run_client(:convert, :template => template)
+
+    expect(json_template).to eq((<<-'EOS').strip)
+{
+  "Parameters": {
+    "Password": {
+      "NoEcho": "true",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "myEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-07f68106",
+        "InstanceType": "t1.micro",
+        "KeyName": "winebarrel",
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\n/opt/aws/bin/cfn-init -s ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                " -r myEC2Instance --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "packages": {
+              "yum": {
+                "httpd": [
+
+                ]
+              }
+            },
+            "services": {
+              "sysvinit": {
+                "httpd": {
+                  "enabled": "true",
+                  "ensureRunning": "true"
+                }
+              }
+            },
+            "commands": {
+              "any_name": {
+                "command": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "echo ",
+                      {
+                        "Ref": "Password"
+                      },
+                      " > /tmp/my-password",
+                      "\n"
+                    ]
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    EOS
+  end
 end
