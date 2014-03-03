@@ -138,7 +138,7 @@ end
       {
         "Ref": "AWS::StackId"
       },
-      "-r myEC2Instance --region ",
+      " -r myEC2Instance --region ",
       {
         "Ref": "AWS::Region"
       },

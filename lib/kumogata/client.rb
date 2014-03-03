@@ -195,8 +195,8 @@ class Kumogata::Client
           end
         end
 
-        if data.last.kind_of?(String) and data.last == ""
-          data.last << "\n"
+        if data.last.kind_of?(String) and data.last.strip == ""
+          data.last.replace("\n")
         end
 
         unless data.last.kind_of?(String) and data.last =~ /\n\Z/
