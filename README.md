@@ -1,6 +1,6 @@
 # Kumogata
 
-Kumogata is a tool for AWS CloudFormation.
+Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
 [![Gem Version](https://badge.fury.io/rb/kumogata.png?201403030250)](http://badge.fury.io/rb/kumogata)
 [![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403030250)](https://drone.io/github.com/winebarrel/kumogata/latest)
@@ -41,6 +41,8 @@ Outputs do
   end
 end
 ```
+
+Ruby template format is almost the same as [JSON template](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-structure.html).
 
 ## Installation
 
