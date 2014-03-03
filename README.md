@@ -54,13 +54,15 @@ Ruby template structure is almost the same as [JSON template](http://docs.aws.am
 Usage: kumogata <command> [args] [options]
 
 Commands:
-  create   PATH_OR_URL [STACK_NAME]  Create resources as specified in the template
-  validate PATH_OR_URL               Validate a specified template
-  convert  PATH_OR_URL               Convert a template format
-  update   PATH_OR_URL STACK_NAME    Update a stack as specified in the template
-  delete   STACK_NAME                Delete a specified stack
-  list     [STACK_NAME]              List summary information for stacks
-  export   STACK_NAME                Export a template from a specified stack
+  create         PATH_OR_URL [STACK_NAME]  Create resources as specified in the template
+  validate       PATH_OR_URL               Validate a specified template
+  convert        PATH_OR_URL               Convert a template format
+  update         PATH_OR_URL STACK_NAME    Update a stack as specified in the template
+  delete         STACK_NAME                Delete a specified stack
+  list           [STACK_NAME]              List summary information for stacks
+  export         STACK_NAME                Export a template from a specified stack
+  show-outputs   STACK_NAME                Show outputs for a specified stack
+  show-resources STACK_NAME                Show resources for a specified stack
 
 Options:
     -k, --access-key ACCESS_KEY
