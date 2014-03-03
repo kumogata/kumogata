@@ -62,7 +62,12 @@ class Kumogata::Client
     devaluate_template(template).chomp
   end
 
-  def resources(stack_name)
+  def show_outputs(stack_name)
+    outputs = describe_outputs(stack_name)
+    JSON.pretty_generate(outputs)
+  end
+
+  def show_resources(stack_name)
     resources = describe_resources(stack_name)
     JSON.pretty_generate(resources)
   end
@@ -243,6 +248,14 @@ class Kumogata::Client
     stack = @cloud_formation.stacks[stack_name]
     stack.status
     JSON.parse(stack.template)
+  end
+
+  def describe_outputs(stack_name)
+    AWS.memoize do
+      stack = @cloud_formation.stacks[stack_name]
+      stack.status
+      outputs_for(stack)
+    end
   end
 
   def describe_resources(stack_name)

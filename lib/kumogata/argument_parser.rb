@@ -38,7 +38,11 @@ class Kumogata::ArgumentParser
       :description => 'Export a template from a specified stack',
       :arguments   => [:stack_name]
     },
-    :resources => {
+    :'show-outputs' => {
+      :description => 'Show outputs for a specified stack',
+      :arguments   => [:stack_name]
+    },
+    :'show-resources' => {
       :description => 'Show resources for a specified stack',
       :arguments   => [:stack_name]
     },
@@ -101,6 +105,7 @@ class Kumogata::ArgumentParser
       end
     end
 
+    command = command.to_s.gsub('-', '_').to_sym
     [command, arguments, options]
   end
 
