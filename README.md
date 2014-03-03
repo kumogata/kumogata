@@ -42,7 +42,7 @@ Outputs do
 end
 ```
 
-Ruby template format is almost the same as [JSON template](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-structure.html).
+Ruby template structure is almost the same as [JSON template](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-structure.html).
 
 ## Installation
 
