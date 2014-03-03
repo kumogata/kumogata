@@ -34,8 +34,4 @@ class String
   def encode64
     Base64.encode64(self).delete("\n")
   end
-
-  def strip_lines
-    self.strip.split("\n").map {|i| i.strip }.join("\n")
-  end
 end

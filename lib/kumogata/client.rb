@@ -153,8 +153,12 @@ class Kumogata::Client
           :strip  => true,
         }.merge(options)
 
-        data = data.strip_lines + "\n" if options[:strip]
+        if options[:strip]
+          data = data.split("\n").map {|i| i.gsub(/\A\s+/, "") }.join("\n") + "\n"
+        end
+
         data = data.encode64 if options[:encode]
+
         return data
       end
 
@@ -175,12 +179,22 @@ class Kumogata::Client
 
         data = data.flatten.select {|i| not i.nil? }
 
-        unless data.last.kind_of?(String) and data.last =~ /\n\Z/
-          data << "\n"
+        if options[:strip]
+          data = data.map do |item|
+            if item.kind_of?(String)
+              item.split("\n").map {|i| i.gsub(/\A\s+/, "") }.join("\n")
+            else
+              item
+            end
+          end
         end
 
-        if options[:strip]
-          data = data.map {|i| i.kind_of?(String) ? i.strip + "\n" : i }
+        if data.last.kind_of?(String) and data.last == ""
+          data.last << "\n"
+        end
+
+        unless data.last.kind_of?(String) and data.last =~ /\n\Z/
+          data << "\n"
         end
 
         return {
