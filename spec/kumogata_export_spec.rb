@@ -22,7 +22,7 @@ describe 'Kumogata::Client#export' do
     }
   }
 }
-EOS
+    EOS
 
     template = run_client(:export, :arguments => ['MyStack']) do |client, cf|
       stack = make_double('stack') do |obj|
