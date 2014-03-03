@@ -124,7 +124,7 @@ Ruby templates will be converted as follows by `_join()`:
 UserData do
   Fn__Base64 _join(<<-EOS)
     #!/bin/bash
-    /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackId" %> -r myEC2Instance --region <%= Ref "AWS::Region" %>
+    /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackName" %> -r myEC2Instance --region <%= Ref "AWS::Region" %>
   EOS
 end
 ```
@@ -136,7 +136,7 @@ end
     [
       "#!/bin/bash\n/opt/aws/bin/cfn-init -s ",
       {
-        "Ref": "AWS::StackId"
+        "Ref": "AWS::StackName"
       },
       " -r myEC2Instance --region ",
       {
