@@ -79,15 +79,15 @@ Options:
 
 ### Create resources
 
-    $ kumogata creat template.rb
+    $ kumogata create template.rb
 
 If you want to save the stack, please specify the stack name:
 
-    $ kumogata creat template.rb any_stack_name
+    $ kumogata create template.rb any_stack_name
 
 If you want to pass parameters, please use `-p` option:
 
-    $ kumogata creat template.rb -p "InstanceType=m1.large,KeyName=any_other_key"
+    $ kumogata create template.rb -p "InstanceType=m1.large,KeyName=any_other_key"
 
 
 **Notice**
