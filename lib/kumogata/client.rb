@@ -184,8 +184,9 @@ class Kumogata::Client
 
           data = data.map do |item|
             if item.kind_of?(String)
-              item = item.split("\n").map {|i| i.gsub(/\A\s+/, "") }.join("\n")
-              item = " " + item if prev_not_str
+              item = item.split("\n").map {|i|
+                prev_not_str ? i : i.gsub(/\A\s+/, "")
+              }.join("\n")
               prev_not_str = false
               item
             else
