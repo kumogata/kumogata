@@ -1,6 +1,6 @@
 # Kumogata
 
-Kumogata is a tool for AWS CroudFormation.
+Kumogata is a tool for AWS CloudFormation.
 
 [![Gem Version](https://badge.fury.io/rb/kumogata.png?201403030250)](http://badge.fury.io/rb/kumogata)
 [![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403030250)](https://drone.io/github.com/winebarrel/kumogata/latest)

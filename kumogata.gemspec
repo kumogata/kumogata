@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Kumogata::VERSION
   spec.authors       = ['Genki Sugawara']
   spec.email         = ['sgwr_dts@yahoo.co.jp']
-  spec.summary       = %q{A tool for AWS CroudFormation.}
-  spec.description   = %q{A tool for AWS CroudFormation. It can define a template in Ruby DSL.}
+  spec.summary       = %q{A tool for AWS CloudFormation.}
+  spec.description   = %q{A tool for AWS CloudFormation. It can define a template in Ruby DSL.}
   spec.homepage      = 'https://github.com/winebarrel/kumogata'
   spec.license       = 'MIT'
 
