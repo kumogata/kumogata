@@ -196,7 +196,7 @@ class Kumogata::Client
           end
         end
 
-        if data.last.kind_of?(String) and data.last.strip == ""
+        if data.last.kind_of?(String) and data.last.strip.empty?
           data.last.replace("\n")
         end
 
