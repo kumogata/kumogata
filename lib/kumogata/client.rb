@@ -146,9 +146,46 @@ class Kumogata::Client
   end
 
   def define_template_func(scope)
-    scope.instance_eval do
-      def _user_data(data)
-        data.strip_lines.encode64
+    scope.instance_eval(<<-'EOS')
+      def _user_data(data, options = {})
+        options = {
+          :encode => true,
+          :strip  => true,
+        }.merge(options)
+
+        data = data.strip_lines + "\n" if options[:strip]
+        data = data.encode64 if options[:encode]
+        return data
+      end
+
+      def _join(data, options = {})
+        options = {
+          :strip  => true,
+          :trim_mode => nil,
+        }.merge(options)
+
+
+        @__refs__ = []
+        def Ref(value); @__refs__ << {"Ref" => value}; "\0"; end
+        data = ERB.new(data, nil, options[:trim_mode]).result(binding)
+        undef Ref
+
+        data = data.split("\0").zip(@__refs__)
+        @__refs__ = nil
+
+        data = data.flatten.select {|i| not i.nil? }
+
+        unless data.last.kind_of?(String) and data.last =~ /\n\Z/
+          data << "\n"
+        end
+
+        if options[:strip]
+          data = data.map {|i| i.kind_of?(String) ? i.strip + "\n" : i }
+        end
+
+        return {
+          "Fn::Join" => ["", data]
+        }
       end
 
       def _path(path, value = nil, &block)
@@ -158,7 +195,7 @@ class Kumogata::Client
 
         @__hash__[path] = value
       end
-    end
+    EOS
   end
 
   def create_stack(template, stack_name)
