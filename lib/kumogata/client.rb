@@ -180,10 +180,16 @@ class Kumogata::Client
         data = data.flatten.select {|i| not i.nil? }
 
         if options[:strip]
+          prev_not_str = false
+
           data = data.map do |item|
             if item.kind_of?(String)
-              item.split("\n").map {|i| i.gsub(/\A\s+/, "") }.join("\n")
+              item = item.split("\n").map {|i| i.gsub(/\A\s+/, "") }.join("\n")
+              item = " " + item if prev_not_str
+              prev_not_str = false
+              item
             else
+              prev_not_str = true
               item
             end
           end
