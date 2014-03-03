@@ -116,6 +116,38 @@ JSON template can be converted to Ruby template.
 * `_path()` creates Hash that has a key of path
   * `_path("/etc/passwd-s3fs") { content "..." }` => `{"/etc/passwd-s3fs": {"content": "..."}}`
 
+### _joine()
+
+Ruby templates will be converted as follows by `_join()`:
+
+```ruby
+UserData do
+  Fn__Base64 _join(<<-EOS)
+    #!/bin/bash,
+    /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackId" %> -r myEC2Instance --region <%= Ref "AWS::Region" %>
+  EOS
+end
+```
+
+```javascript
+"Fn::Base64": {
+  "Fn::Join": [
+    "",
+    [
+      "#!/bin/bash,\n          /opt/aws/bin/cfn-init -s\n",
+      {
+        "Ref": "AWS::StackId"
+      },
+      "-r myEC2Instance --region\n",
+      {
+        "Ref": "AWS::Region"
+      },
+      "\n"
+    ]
+  ]
+}
+```
+
 ## Demo
 
 * Create resources
