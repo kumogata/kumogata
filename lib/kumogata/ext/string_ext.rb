@@ -53,6 +53,11 @@ class String
         #{null.inspect}
       end
 
+      def Fn__FindInMap(map_name, top_level_key, second_level_key)
+        @__functions__ << {'Fn::FindInMap' => [map_name, top_level_key, second_level_key]}
+        #{null.inspect}
+      end
+
       def Fn__GetAtt(logical_name, attr_name)
         @__functions__ << {'Fn::GetAtt' => [logical_name, attr_name]}
         #{null.inspect}

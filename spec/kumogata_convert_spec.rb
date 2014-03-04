@@ -356,6 +356,12 @@ Outputs do
       <%= Fn__Base64 "AWS CloudFormation" %>
     EOS
   end
+
+  MappedValue do
+    Value (<<-EOS).fn_join
+      <%= Fn__FindInMap "RegionMap", { "Ref" => "AWS::Region" }, 32 %>
+    EOS
+  end
 end
     TEMPLATE
 
@@ -461,6 +467,25 @@ end
           [
             {
               "Fn::Base64": "AWS CloudFormation"
+            },
+            "\n"
+          ]
+        ]
+      }
+    },
+    "MappedValue": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::FindInMap": [
+                "RegionMap",
+                {
+                  "Ref": "AWS::Region"
+                },
+                32
+              ]
             },
             "\n"
           ]
