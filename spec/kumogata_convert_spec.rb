@@ -184,8 +184,7 @@ end
                   "Ref": "AWS::Region"
                 },
                 "\n",
-                "echo END | logger",
-                "\n"
+                "echo END | logger\n"
               ]
             ]
           }
@@ -219,8 +218,7 @@ end
                       {
                         "Ref": "Password"
                       },
-                      " > /tmp/my-password",
-                      "\n"
+                      " > /tmp/my-password\n"
                     ]
                   ]
                 }
@@ -379,8 +377,7 @@ end
                   "Ref": "AWS::Region"
                 },
                 "\n",
-                "echo END | logger",
-                "\n"
+                "echo END | logger\n"
               ]
             ]
           }
@@ -414,8 +411,7 @@ end
                       {
                         "Ref": "Password"
                       },
-                      " > /tmp/my-password",
-                      "\n"
+                      " > /tmp/my-password\n"
                     ]
                   ]
                 }

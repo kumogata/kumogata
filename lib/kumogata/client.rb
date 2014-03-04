@@ -165,6 +165,8 @@ class Kumogata::Client
           :trim_mode => nil,
         }.merge(options)
 
+        data = data.undent if options[:undent]
+
         @__refs__ = []
         def Ref(value); @__refs__ << {"Ref" => value}; "\0"; end
         data = ERB.new(data, nil, options[:trim_mode]).result(binding)
@@ -173,47 +175,16 @@ class Kumogata::Client
         data = data.split("\0").zip(@__refs__)
         @__refs__ = nil
 
-        data = data.flatten.select {|i| not i.nil? }
-
-        if options[:undent]
-          prev_elem_is_string = true
-
-          data = data.map {|item|
-            if item.kind_of?(String)
-              new_item = []
-              splited = item.split("\n")
-
-              splited.each_with_index do |i, idx|
-                unless idx.zero? and not prev_elem_is_string
-                  i.gsub!(/\A\s+/, '')
-                end
-
-                if idx < splited.length - 1
-                  i << "\n"
-                end
-
-                new_item << i
-              end
-
-              prev_elem_is_string = true
-              new_item
-            else
-              prev_elem_is_string = false
-              item
-            end
-          }.flatten
-        end
-
-        if data.last.kind_of?(String) and data.last.strip.empty?
-          data.last.replace("\n")
-        end
-
-        unless data.last.kind_of?(String) and data.last =~ /\n\Z/
-          data << "\n"
-        end
+        data = data.flatten.select {|i| not i.nil? }.map {|i|
+          if i.kind_of?(String)
+            StringIO.new(i).to_a
+          else
+            i
+          end
+        }.flatten
 
         return {
-          "Fn::Join" => ["", data]
+          'Fn::Join' => ['', data]
         }
       end
 
