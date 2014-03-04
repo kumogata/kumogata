@@ -25,12 +25,6 @@ class String
     EOS
   end
 
-  def camelcase
-    self.split(/[-_]/).map {|str|
-      str[0, 1].upcase + str[1..-1].downcase
-    }.join
-  end
-
   def encode64
     Base64.encode64(self).delete("\n")
   end

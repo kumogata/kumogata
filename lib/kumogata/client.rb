@@ -376,7 +376,11 @@ class Kumogata::Client
         :resource_status_reason,
         :last_updated_timestamp
       ].each do |k|
-        summary_hash[k.to_s.camelcase] = summary[k]
+        camelcase = k.to_s.split(/[-_]/).map {|i|
+          i[0, 1].upcase + i[1..-1].downcase
+        }.join
+
+        summary_hash[camelcase] = summary[k]
       end
 
       summary_hash
