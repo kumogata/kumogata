@@ -47,13 +47,19 @@ class String
 
     data = Object.new.instance_eval(<<-EOS)
       @__functions__ = []
-      def Ref(value)
-        @__functions__ << {'Ref' => value}
+
+      def Fn__Base64(value)
+        @__functions__ << {'Fn::Base64' => value}
         #{null.inspect}
       end
 
       def Fn__GetAtt(logical_name, attr_name)
         @__functions__ << {'Fn::GetAtt' => [logical_name, attr_name]}
+        #{null.inspect}
+      end
+
+      def Ref(value)
+        @__functions__ << {'Ref' => value}
         #{null.inspect}
       end
 

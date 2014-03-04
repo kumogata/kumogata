@@ -350,6 +350,12 @@ Outputs do
       http://<%= Fn__GetAtt "myEC2Instance", "PublicDnsName" %>
     EOS
   end
+
+  Base64Str do
+    Value (<<-EOS).fn_join
+      <%= Fn__Base64 "AWS CloudFormation" %>
+    EOS
+  end
 end
     TEMPLATE
 
@@ -442,6 +448,19 @@ end
                 "myEC2Instance",
                 "PublicDnsName"
               ]
+            },
+            "\n"
+          ]
+        ]
+      }
+    },
+    "Base64Str": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::Base64": "AWS CloudFormation"
             },
             "\n"
           ]
