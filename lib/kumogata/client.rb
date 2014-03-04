@@ -154,14 +154,14 @@ class Kumogata::Client
         }.merge(options)
 
         data = data.undent if options[:undent]
+        trim_mode = options[:trim_mode]
+        null = "\0"
 
-        @__refs__ = []
-        def Ref(value); @__refs__ << {'Ref' => value}; "\0"; end
-        data = ERB.new(data, nil, options[:trim_mode]).result(binding)
-        undef Ref
-
-        data = data.split("\0").zip(@__refs__)
-        @__refs__ = nil
+        data = Object.new.instance_eval(<<-_EOS)
+          @__refs__ = []
+          def Ref(value); @__refs__ << {'Ref' => value}; #{null.inspect}; end
+          ERB.new(#{data.inspect}, nil, #{trim_mode.inspect}).result(binding).split(#{null.inspect}).zip(@__refs__)
+        _EOS
 
         data = data.flatten.select {|i| not i.nil? }.map {|i|
           if i.kind_of?(String)
