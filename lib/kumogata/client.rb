@@ -150,10 +150,10 @@ class Kumogata::Client
       def _user_data(data, options = {})
         options = {
           :encode => true,
-          :strip  => true,
+          :undent => true,
         }.merge(options)
 
-        if options[:strip]
+        if options[:undent]
           data = data.split("\n").map {|i| i.gsub(/\A\s+/, '') }.join("\n") + "\n"
         end
 
@@ -164,7 +164,7 @@ class Kumogata::Client
 
       def _join(data, options = {})
         options = {
-          :strip  => true,
+          :undent    => true,
           :trim_mode => nil,
         }.merge(options)
 
@@ -179,7 +179,7 @@ class Kumogata::Client
 
         data = data.flatten.select {|i| not i.nil? }
 
-        if options[:strip]
+        if options[:undent]
           prev_elem_is_string = true
 
           data = data.map {|item|
