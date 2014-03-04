@@ -156,7 +156,7 @@ class Kumogata::Client
         data = data.undent if options[:undent]
 
         @__refs__ = []
-        def Ref(value); @__refs__ << {"Ref" => value}; "\0"; end
+        def Ref(value); @__refs__ << {'Ref' => value}; "\0"; end
         data = ERB.new(data, nil, options[:trim_mode]).result(binding)
         undef Ref
 
