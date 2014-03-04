@@ -137,7 +137,8 @@ end
   "Fn::Join": [
     "",
     [
-      "#!/bin/bash\n/opt/aws/bin/cfn-init -s ",
+      "#!/bin/bash\n",
+      "/opt/aws/bin/cfn-init -s ",
       {
         "Ref": "AWS::StackName"
       },
