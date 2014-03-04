@@ -123,7 +123,7 @@ JSON template can be converted to Ruby template.
 
 ### String#fn_joine()
 
-Ruby templates will be converted as follows by `_join()`:
+Ruby templates will be converted as follows by `String#_join()`:
 
 ```ruby
 UserData do
