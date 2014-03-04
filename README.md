@@ -115,18 +115,19 @@ JSON template can be converted to Ruby template.
   * `Fn::GetAtt` => `Fn__GetAtt`
 * `_{ ... }` is convered to Hash
   * `SecurityGroups [_{Ref "WebServerSecurityGroup"}]` => `{"SecurityGroups": [{"Ref": "WebServerSecurityGroup"}]}`
-* ~~_user_data() creates Base64-encoded UserData~~
-  * `_user_data()` has been removed
 * `_path()` creates Hash that has a key of path
   * `_path("/etc/passwd-s3fs") { content "..." }` => `{"/etc/passwd-s3fs": {"content": "..."}}`
+* ~~_user_data() creates Base64-encoded UserData~~
+  * `_user_data()` has been removed
+* `_join()` has been removed
 
-### _joine()
+### String#fn_joine()
 
 Ruby templates will be converted as follows by `_join()`:
 
 ```ruby
 UserData do
-  Fn__Base64 _join(<<-EOS)
+  Fn__Base64 (<<-EOS).fn_join
     #!/bin/bash
     /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackName" %> -r myEC2Instance --region <%= Ref "AWS::Region" %>
   EOS
