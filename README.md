@@ -27,7 +27,7 @@ Resources do
       InstanceType { Ref "InstanceType" }
       KeyName "your_key_name"
 
-      UserData _user_data(<<-EOS)
+      UserData (<<-EOS).undent.encode64
         #!/bin/bash
         yum install -y httpd
         service httpd start
@@ -115,7 +115,8 @@ JSON template can be converted to Ruby template.
   * `Fn::GetAtt` => `Fn__GetAtt`
 * `_{ ... }` is convered to Hash
   * `SecurityGroups [_{Ref "WebServerSecurityGroup"}]` => `{"SecurityGroups": [{"Ref": "WebServerSecurityGroup"}]}`
-* `_user_data()` creates Base64-encoded UserData
+* ~~_user_data() creates Base64-encoded UserData~~
+  * `_user_data()` has been removed
 * `_path()` creates Hash that has a key of path
   * `_path("/etc/passwd-s3fs") { content "..." }` => `{"/etc/passwd-s3fs": {"content": "..."}}`
 

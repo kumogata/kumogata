@@ -249,7 +249,7 @@ Resources do
       ImageId "ami-XXXXXXXX"
       InstanceType "t1.micro"
 
-      UserData _user_data(<<-EOS)
+      UserData (<<-EOS).undent.encode64
         #!/bin/bash
         yum install -y httpd
         services start httpd

@@ -147,18 +147,6 @@ class Kumogata::Client
 
   def define_template_func(scope)
     scope.instance_eval(<<-'EOS')
-      def _user_data(data, options = {})
-        options = {
-          :encode => true,
-          :undent => true,
-        }.merge(options)
-
-        data = data.undent if options[:undent]
-        data = data.encode64 if options[:encode]
-
-        return data
-      end
-
       def _join(data, options = {})
         options = {
           :undent    => true,
