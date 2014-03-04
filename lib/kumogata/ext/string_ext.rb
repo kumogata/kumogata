@@ -48,18 +48,29 @@ class String
     data = Object.new.instance_eval(<<-EOS)
       @__functions__ = []
 
+      @__value_conv__ = proc do |v|
+        case v
+        when Array, Hash
+          v
+        else
+          v.to_s
+        end
+      end
+
       def Fn__Base64(value)
-        @__functions__ << {'Fn::Base64' => value}
+        @__functions__ << {'Fn::Base64' => @__value_conv__[value]}
         #{null.inspect}
       end
 
       def Fn__FindInMap(map_name, top_level_key, second_level_key)
-        @__functions__ << {'Fn::FindInMap' => [map_name, top_level_key, second_level_key]}
+        @__functions__ << {'Fn::FindInMap' => [
+          map_name, top_level_key, second_level_key].map(&@__value_conv__)}
         #{null.inspect}
       end
 
       def Fn__GetAtt(logical_name, attr_name)
-        @__functions__ << {'Fn::GetAtt' => [logical_name, attr_name]}
+        @__functions__ << {'Fn::GetAtt' => [
+          logical_name, attr_name].map(&@__value_conv__)}
         #{null.inspect}
       end
 
