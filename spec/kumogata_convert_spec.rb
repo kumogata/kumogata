@@ -343,6 +343,14 @@ Resources do
     end # Metadata
   end
 end
+
+Outputs do
+  WebsiteURL do
+    Value (<<-EOS).fn_join
+      http://<%= Fn__GetAtt "myEC2Instance", "PublicDnsName" %>
+    EOS
+  end
+end
     TEMPLATE
 
     json_template = run_client(:convert, :template => template)
@@ -419,6 +427,25 @@ end
             }
           }
         }
+      }
+    }
+  },
+  "Outputs": {
+    "WebsiteURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt": [
+                "myEC2Instance",
+                "PublicDnsName"
+              ]
+            },
+            "\n"
+          ]
+        ]
       }
     }
   }

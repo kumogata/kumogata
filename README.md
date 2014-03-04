@@ -11,6 +11,13 @@ Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformatio
 It can define a template in Ruby DSL, such as:
 
 ```ruby
+AWSTemplateFormatVersion "2010-09-09"
+
+Description (<<-EOS).undent
+  Kumogata Sample Template
+  You can use Here document!
+EOS
+
 Parameters do
   InstanceType do
     Default "t1.micro"

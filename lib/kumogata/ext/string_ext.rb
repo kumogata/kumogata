@@ -46,9 +46,18 @@ class String
     null = "\0"
 
     data = Object.new.instance_eval(<<-EOS)
-      @__refs__ = []
-      def Ref(value); @__refs__ << {'Ref' => value}; #{null.inspect}; end
-      ERB.new(#{data.inspect}, nil, #{trim_mode.inspect}).result(binding).split(#{null.inspect}).zip(@__refs__)
+      @__functions__ = []
+      def Ref(value)
+        @__functions__ << {'Ref' => value}
+        #{null.inspect}
+      end
+
+      def Fn__GetAtt(logical_name, attr_name)
+        @__functions__ << {'Fn::GetAtt' => [logical_name, attr_name]}
+        #{null.inspect}
+      end
+
+      ERB.new(#{data.inspect}, nil, #{trim_mode.inspect}).result(binding).split(#{null.inspect}).zip(@__functions__)
     EOS
 
     data = data.flatten.select {|i| not i.nil? }.map {|i|
