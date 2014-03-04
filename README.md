@@ -1,5 +1,8 @@
 # Kumogata
 
+![Stack is not required!](http://serif.hatelabo.jp/images/cache/a69b56ca6985b6ee7e605a102445953f355f54f5/62192c286da4377e608f3f5a5200f1bec272a92e.gif)
+
+
 Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
 [![Gem Version](https://badge.fury.io/rb/kumogata.png?201403031647)](http://badge.fury.io/rb/kumogata)
