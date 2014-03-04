@@ -362,6 +362,12 @@ Outputs do
       <%= Fn__FindInMap "RegionMap", { "Ref" => "AWS::Region" }, 32 %>
     EOS
   end
+
+  AZ do
+    Value (<<-EOS).fn_join
+      <%= Fn__GetAZs "us-east-1" %>
+    EOS
+  end
 end
     TEMPLATE
 
@@ -486,6 +492,19 @@ end
                 },
                 "32"
               ]
+            },
+            "\n"
+          ]
+        ]
+      }
+    },
+    "AZ": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::GetAZs": "us-east-1"
             },
             "\n"
           ]

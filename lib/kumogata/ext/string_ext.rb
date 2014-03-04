@@ -74,6 +74,11 @@ class String
         #{null.inspect}
       end
 
+      def Fn__GetAZs(region)
+        @__functions__ << {'Fn::GetAZs' => @__value_conv__[region]}
+        #{null.inspect}
+      end
+
       def Ref(value)
         @__functions__ << {'Ref' => value}
         #{null.inspect}
