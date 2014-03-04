@@ -33,4 +33,34 @@ class String
     min_space_num = self.split("\n").delete_if{|s| s=~ /^\s*$/ }.map{|s| s[/^\s+/].length }.min
     gsub(/^[ \t]{,#{min_space_num}}/, '')
   end
+
+  def fn_join(options = {})
+    options = {
+      :undent    => true,
+      :trim_mode => nil,
+    }.merge(options)
+
+    data = self.dup
+    data = data.undent if options[:undent]
+    trim_mode = options[:trim_mode]
+    null = "\0"
+
+    data = Object.new.instance_eval(<<-EOS)
+      @__refs__ = []
+      def Ref(value); @__refs__ << {'Ref' => value}; #{null.inspect}; end
+      ERB.new(#{data.inspect}, nil, #{trim_mode.inspect}).result(binding).split(#{null.inspect}).zip(@__refs__)
+    EOS
+
+    data = data.flatten.select {|i| not i.nil? }.map {|i|
+      if i.kind_of?(String)
+        StringIO.new(i).to_a
+      else
+        i
+      end
+    }.flatten
+
+    return {
+      'Fn::Join' => ['', data]
+    }
+  end
 end

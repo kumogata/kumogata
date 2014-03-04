@@ -147,35 +147,6 @@ class Kumogata::Client
 
   def define_template_func(scope)
     scope.instance_eval(<<-'EOS')
-      def _join(data, options = {})
-        options = {
-          :undent    => true,
-          :trim_mode => nil,
-        }.merge(options)
-
-        data = data.undent if options[:undent]
-        trim_mode = options[:trim_mode]
-        null = "\0"
-
-        data = Object.new.instance_eval(<<-_EOS)
-          @__refs__ = []
-          def Ref(value); @__refs__ << {'Ref' => value}; #{null.inspect}; end
-          ERB.new(#{data.inspect}, nil, #{trim_mode.inspect}).result(binding).split(#{null.inspect}).zip(@__refs__)
-        _EOS
-
-        data = data.flatten.select {|i| not i.nil? }.map {|i|
-          if i.kind_of?(String)
-            StringIO.new(i).to_a
-          else
-            i
-          end
-        }.flatten
-
-        return {
-          'Fn::Join' => ['', data]
-        }
-      end
-
       def _path(path, value = nil, &block)
         if block
           value = Dslh::ScopeBlock.nest(binding, 'block')

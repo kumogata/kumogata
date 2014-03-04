@@ -94,7 +94,7 @@ end
     EOS
   end
 
-  it 'convert Ruby template to JSON template with _join()' do
+  it 'convert Ruby template to JSON template with fn_join()' do
     template = <<-TEMPLATE
 Parameters do
   Password do
@@ -111,7 +111,7 @@ Resources do
       InstanceType "t1.micro"
 
       UserData do
-        Fn__Base64 _join(<<-EOS)
+        Fn__Base64 (<<-EOS).fn_join
           #!/bin/bash
           echo START | logger
           /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackName" %> -r myEC2Instance --region <%= Ref "AWS::Region" %>
@@ -139,7 +139,7 @@ Resources do
 
           commands do
             any_name do
-              command _join(<<-EOS)
+              command (<<-EOS).fn_join
                 echo <%= Ref "Password" %> > /tmp/my-password
               EOS
             end
@@ -233,7 +233,7 @@ end
     EOS
   end
 
-  it 'convert Ruby template to JSON template with _user_data()' do
+  it 'convert Ruby template to JSON template with converting user_data' do
     template = <<-TEMPLATE
 Parameters do
   Password do
@@ -304,7 +304,7 @@ Resources do
       InstanceType "t1.micro"
 
       UserData do
-        Fn__Base64 _join(<<-EOS)
+        Fn__Base64 (<<-EOS).fn_join
           #!/bin/bash
           echo START | logger
           /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackName" %> -r #{resource_name} --region <%= Ref "AWS::Region" %>
@@ -332,7 +332,7 @@ Resources do
 
           commands do
             any_name do
-              command _join(<<-EOS)
+              command (<<-EOS).fn_join
                 echo <%= Ref "Password" %> > /tmp/my-password
               EOS
             end
