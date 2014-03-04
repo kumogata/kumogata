@@ -154,7 +154,7 @@ class Kumogata::Client
         }.merge(options)
 
         if options[:strip]
-          data = data.split("\n").map {|i| i.gsub(/\A\s+/, "") }.join("\n") + "\n"
+          data = data.split("\n").map {|i| i.gsub(/\A\s+/, '') }.join("\n") + "\n"
         end
 
         data = data.encode64 if options[:encode]
@@ -180,20 +180,32 @@ class Kumogata::Client
         data = data.flatten.select {|i| not i.nil? }
 
         if options[:strip]
-          prev_not_str = false
+          prev_elem_is_string = true
 
-          data = data.map do |item|
+          data = data.map {|item|
             if item.kind_of?(String)
-              item = item.split("\n").map {|i|
-                prev_not_str ? i : i.gsub(/\A\s+/, "")
-              }.join("\n")
-              prev_not_str = false
-              item
+              new_item = []
+              splited = item.split("\n")
+
+              splited.each_with_index do |i, idx|
+                unless idx.zero? and not prev_elem_is_string
+                  i.gsub!(/\A\s+/, '')
+                end
+
+                if idx < splited.length - 1
+                  i << "\n"
+                end
+
+                new_item << i
+              end
+
+              prev_elem_is_string = true
+              new_item
             else
-              prev_not_str = true
+              prev_elem_is_string = false
               item
             end
-          end
+          }.flatten
         end
 
         if data.last.kind_of?(String) and data.last.strip.empty?

@@ -113,7 +113,9 @@ Resources do
       UserData do
         Fn__Base64 _join(<<-EOS)
           #!/bin/bash
+          echo START | logger
           /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackName" %> -r myEC2Instance --region <%= Ref "AWS::Region" %>
+          echo END | logger
         EOS
       end
     end
@@ -171,7 +173,9 @@ end
             "Fn::Join": [
               "",
               [
-                "#!/bin/bash\n/opt/aws/bin/cfn-init -s ",
+                "#!/bin/bash\n",
+                "echo START | logger\n",
+                "/opt/aws/bin/cfn-init -s ",
                 {
                   "Ref": "AWS::StackName"
                 },
@@ -179,6 +183,8 @@ end
                 {
                   "Ref": "AWS::Region"
                 },
+                "\n",
+                "echo END | logger",
                 "\n"
               ]
             ]
