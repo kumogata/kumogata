@@ -359,7 +359,7 @@ Outputs do
 
   MappedValue do
     Value (<<-EOS).fn_join
-      <%= Fn__FindInMap "RegionMap", _{ Ref  "AWS::Region" }, 32 %>
+      <%= Fn__FindInMap "RegionMap", _{ Ref "AWS::Region" }, 32 %>
     EOS
   end
 
