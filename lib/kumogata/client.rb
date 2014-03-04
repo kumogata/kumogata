@@ -154,7 +154,7 @@ class Kumogata::Client
         }.merge(options)
 
         if options[:undent]
-          data = data.split("\n").map {|i| i.gsub(/\A\s+/, '') }.join("\n") + "\n"
+          data = data.split("\n").map {|i| i.gsub(/\A\s+/, '') }.join("\n")
         end
 
         data = data.encode64 if options[:encode]
