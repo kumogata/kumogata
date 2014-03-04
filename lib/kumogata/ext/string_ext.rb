@@ -58,30 +58,79 @@ class String
       end
 
       def Fn__Base64(value)
-        @__functions__ << {'Fn::Base64' => @__value_conv__[value]}
+        value = {'Fn::Base64' => @__value_conv__[value]}
+
+        case @__functions__
+        when Array
+          @__functions__ << value
+        when Hash
+          @__functions__.update(value)
+        end
+
         #{null.inspect}
       end
 
       def Fn__FindInMap(map_name, top_level_key, second_level_key)
-        @__functions__ << {'Fn::FindInMap' => [
+        value = {'Fn::FindInMap' => [
           map_name, top_level_key, second_level_key].map(&@__value_conv__)}
+
+        case @__functions__
+        when Array
+          @__functions__ << value
+        when Hash
+          @__functions__.update(value)
+        end
+
         #{null.inspect}
       end
 
       def Fn__GetAtt(logical_name, attr_name)
-        @__functions__ << {'Fn::GetAtt' => [
+        value = {'Fn::GetAtt' => [
           logical_name, attr_name].map(&@__value_conv__)}
+
+        case @__functions__
+        when Array
+          @__functions__ << value
+        when Hash
+          @__functions__.update(value)
+        end
+
         #{null.inspect}
       end
 
       def Fn__GetAZs(region)
-        @__functions__ << {'Fn::GetAZs' => @__value_conv__[region]}
+        value = {'Fn::GetAZs' => @__value_conv__[region]}
+
+        case @__functions__
+        when Array
+          @__functions__ << value
+        when Hash
+          @__functions__.update(value)
+        end
+
         #{null.inspect}
       end
 
       def Ref(value)
-        @__functions__ << {'Ref' => value}
+        value = {'Ref' => value}
+
+        case @__functions__
+        when Array
+          @__functions__ << value
+        when Hash
+          @__functions__.update(value)
+        end
+
         #{null.inspect}
+      end
+
+      def _(&block)
+        __functions__orig = @__functions__
+        @__functions__ = {}
+        block.call if block
+        value = @__functions__
+        @__functions__ = __functions__orig
+        return value
       end
 
       ERB.new(#{data.inspect}, nil, #{trim_mode.inspect}).result(binding).split(#{null.inspect}).zip(@__functions__)
