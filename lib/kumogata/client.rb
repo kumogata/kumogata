@@ -153,10 +153,7 @@ class Kumogata::Client
           :undent => true,
         }.merge(options)
 
-        if options[:undent]
-          data = data.split("\n").map {|i| i.gsub(/\A\s+/, '') }.join("\n")
-        end
-
+        data = data.undent if options[:undent]
         data = data.encode64 if options[:encode]
 
         return data
@@ -167,7 +164,6 @@ class Kumogata::Client
           :undent    => true,
           :trim_mode => nil,
         }.merge(options)
-
 
         @__refs__ = []
         def Ref(value); @__refs__ << {"Ref" => value}; "\0"; end
