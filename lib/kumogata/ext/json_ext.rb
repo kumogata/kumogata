@@ -6,7 +6,7 @@ module JSON
       begin
         pretty_generate_orig(object, options)
       rescue JSON::NestingError => e
-        e.message << ': Undefined function (e.g. _user_data()/_join()) may have been referenced'
+        e.message << ': Undefined function may have been referenced [e.g. _user_data()/_join()]'
         raise e
       end
     end
