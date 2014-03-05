@@ -151,7 +151,7 @@ class Kumogata::Client
     scope.instance_eval(<<-EOS)
       def require(path)
         unless path =~ %r|\\A/| or path =~ %r|\\A\\w+://|
-          path = File.expand_path(File.join(File.dirname(#{path_or_url.inspect}), file))
+          path = File.expand_path(File.join(File.dirname(#{path_or_url.inspect}), path))
         end
 
         begin
