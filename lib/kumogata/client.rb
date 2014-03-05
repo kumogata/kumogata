@@ -149,8 +149,10 @@ class Kumogata::Client
 
   def define_template_func(scope, path_or_url)
     scope.instance_eval(<<-EOS)
-      def require(file)
-        path = File.expand_path(File.join(File.dirname(#{path_or_url.inspect}), file))
+      def require(path)
+        unless path =~ %r|\\A/| or path =~ %r|\\A\\w+://|
+          path = File.expand_path(File.join(File.dirname(#{path_or_url.inspect}), file))
+        end
 
         begin
           if File.exist?(path + '.rb')
@@ -158,8 +160,12 @@ class Kumogata::Client
           else
             open(path) {|f| instance_eval(f.read) }
           end
-        rescue
-          Kernel.require(file)
+        rescue => e
+          begin
+            Kernel.require(file)
+          rescue
+            raise e
+          end
         end
       end
 

@@ -515,4 +515,60 @@ end
 }
     EOS
   end
+
+  it 'convert splitted Ruby template to JSON template' do
+    json_template = nil
+
+    part_of_template = <<-EOS
+myEC2Instance do
+  Type "AWS::EC2::Instance"
+  Properties do
+    ImageId "ami-XXXXXXXX"
+    InstanceType "t1.micro"
+  end
+end
+    EOS
+
+    tempfile(part_of_template, '.rb') do |f|
+      template = <<-EOS
+Resources do
+  require #{f.path.inspect}
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+      EOS
+
+      json_template = run_client(:convert, :template => template)
+    end
+
+    expect(json_template).to eq((<<-EOS).chomp)
+{
+  "Resources": {
+    "myEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-XXXXXXXX",
+        "InstanceType": "t1.micro"
+      }
+    }
+  },
+  "Outputs": {
+    "AZ": {
+      "Value": {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+}
+    EOS
+  end
 end
