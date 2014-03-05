@@ -571,4 +571,54 @@ end
 }
     EOS
   end
+
+  it 'convert Ruby template to JSON template with require' do
+    template = <<-EOS
+require 'fileutils'
+
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+
+    json_template = run_client(:convert, :template => template)
+
+    expect(json_template).to eq((<<-EOS).chomp)
+{
+  "Resources": {
+    "myEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-XXXXXXXX",
+        "InstanceType": "t1.micro"
+      }
+    }
+  },
+  "Outputs": {
+    "AZ": {
+      "Value": {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+}
+    EOS
+  end
 end
