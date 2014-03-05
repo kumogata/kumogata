@@ -16,5 +16,6 @@ require 'uuidtools'
 
 require 'kumogata/argument_parser'
 require 'kumogata/client'
+require 'kumogata/ext/json_ext'
 require 'kumogata/ext/string_ext'
 require 'kumogata/logger'
