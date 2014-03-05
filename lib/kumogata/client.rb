@@ -107,7 +107,9 @@ class Kumogata::Client
     Dslh.eval(template.read, {
       :key_conv   => key_converter,
       :value_conv => value_converter,
-      :scope_hook => method(:define_template_func),
+      :scope_hook => proc {|scope|
+        define_template_func(scope, template.path)
+      },
       :filename   => template.path,
     })
   end
@@ -145,8 +147,22 @@ class Kumogata::Client
     Dslh.deval(template, :key_conv => key_conv, :value_conv => value_conv, :exclude_key => exclude_key)
   end
 
-  def define_template_func(scope)
-    scope.instance_eval(<<-'EOS')
+  def define_template_func(scope, path_or_url)
+    scope.instance_eval(<<-EOS)
+      def require(file)
+        path = File.expand_path(File.join(File.dirname(#{path_or_url.inspect}), file))
+
+        begin
+          if File.exist?(path + '.rb')
+            open(path + '.rb') {|f| instance_eval(f.read) }
+          else
+            open(path) {|f| instance_eval(f.read) }
+          end
+        rescue
+          Kernel.require(file)
+        end
+      end
+
       def _path(path, value = nil, &block)
         if block
           value = Dslh::ScopeBlock.nest(binding, 'block')
