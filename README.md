@@ -163,6 +163,48 @@ end
 }
 ```
 
+### Split of configuration
+
+* template.rb
+
+```ruby
+Resources do
+  require 'template2'
+end
+```
+
+* template2.rb
+
+```ruby
+myEC2Instance do
+  Type "AWS::EC2::Instance"
+  Properties do
+    ImageId "ami-XXXXXXXX"
+    InstanceType { Ref "InstanceType" }
+    KeyName "your_key_name"
+  end
+end
+```
+
+* Converted JSON template
+
+```javascript
+{
+  "Resources": {
+    "myEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-XXXXXXXX",
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "KeyName": "your_key_name"
+      }
+    }
+  }
+}
+```
+
 ## Demo
 
 * Create resources
