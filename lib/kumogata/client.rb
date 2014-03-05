@@ -149,7 +149,9 @@ class Kumogata::Client
 
   def define_template_func(scope, path_or_url)
     scope.instance_eval(<<-EOS)
-      def require(path)
+      def require(file)
+        path = file.dup
+
         unless path =~ %r|\\A/| or path =~ %r|\\A\\w+://|
           path = File.expand_path(File.join(File.dirname(#{path_or_url.inspect}), path))
         end
