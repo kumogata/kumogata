@@ -532,7 +532,7 @@ end
     tempfile(part_of_template, '.rb') do |f|
       template = <<-EOS
 Resources do
-  require #{f.path.inspect}
+  _include #{f.path.inspect}
 end
 
 Outputs do
