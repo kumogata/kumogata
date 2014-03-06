@@ -1,4 +1,4 @@
-describe 'Kumogata::Client#resources' do
+describe 'Kumogata::Client#show_resources' do
   it 'show resources' do
 
     resources = run_client(:show_resources, :arguments => ['MyStack']) do |client, cf|

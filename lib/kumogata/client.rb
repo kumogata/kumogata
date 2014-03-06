@@ -369,11 +369,7 @@ class Kumogata::Client
         :stack_name,
         :timestamp,
       ].each do |k|
-        camelcase = k.to_s.split(/[-_]/).map {|i|
-          i[0, 1].upcase + i[1..-1].downcase
-        }.join
-
-        event_hash[camelcase] = event.send(k)
+        event_hash[camelize(k)] = event.send(k)
       end
 
       event_hash
@@ -402,11 +398,7 @@ class Kumogata::Client
         :resource_status_reason,
         :last_updated_timestamp
       ].each do |k|
-        camelcase = k.to_s.split(/[-_]/).map {|i|
-          i[0, 1].upcase + i[1..-1].downcase
-        }.join
-
-        summary_hash[camelcase] = summary[k]
+        summary_hash[camelize(k)] = summary[k]
       end
 
       summary_hash
@@ -432,5 +424,11 @@ Stack Resource Summaries:
         'StackResourceSummaries' => summaries,
       })
     end
+  end
+
+  def camelize(str)
+    str.to_s.split(/[-_]/).map {|i|
+      i[0, 1].upcase + i[1..-1].downcase
+    }.join
   end
 end

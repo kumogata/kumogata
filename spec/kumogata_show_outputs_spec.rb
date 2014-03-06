@@ -1,4 +1,4 @@
-describe 'Kumogata::Client#outputs' do
+describe 'Kumogata::Client#show_outputs' do
   it 'show outputs' do
 
     outputs = run_client(:show_outputs, :arguments => ['MyStack']) do |client, cf|
