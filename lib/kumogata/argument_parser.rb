@@ -38,6 +38,10 @@ class Kumogata::ArgumentParser
       :description => 'Export a template from a specified stack',
       :arguments   => [:stack_name]
     },
+    :'show-events' => {
+      :description => 'Show events for a specified stack',
+      :arguments   => [:stack_name]
+    },
     :'show-outputs' => {
       :description => 'Show outputs for a specified stack',
       :arguments   => [:stack_name]

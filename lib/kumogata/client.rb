@@ -62,6 +62,11 @@ class Kumogata::Client
     devaluate_template(template).chomp
   end
 
+  def show_events(stack_name)
+    events = describe_events(stack_name)
+    JSON.pretty_generate(events)
+  end
+
   def show_outputs(stack_name)
     outputs = describe_outputs(stack_name)
     JSON.pretty_generate(outputs)
@@ -272,6 +277,14 @@ class Kumogata::Client
     JSON.parse(stack.template)
   end
 
+  def describe_events(stack_name)
+    AWS.memoize do
+      stack = @cloud_formation.stacks[stack_name]
+      stack.status
+      events_for(stack)
+    end
+  end
+
   def describe_outputs(stack_name)
     AWS.memoize do
       stack = @cloud_formation.stacks[stack_name]
@@ -337,6 +350,34 @@ class Kumogata::Client
     end
 
     Kumogata.logger.info('Template validated successfully'.green)
+  end
+
+  def events_for(stack)
+    stack.events.map do |event|
+      event_hash = {}
+
+      [
+        :event_id,
+        :logical_resource_id,
+        :physical_resource_id,
+        :resource_properties,
+        :resource_status,
+        :resource_status_reason,
+        :resource_type,
+        :stack,
+        :stack_id,
+        :stack_name,
+        :timestamp,
+      ].each do |k|
+        camelcase = k.to_s.split(/[-_]/).map {|i|
+          i[0, 1].upcase + i[1..-1].downcase
+        }.join
+
+        event_hash[camelcase] = event.send(k)
+      end
+
+      event_hash
+    end
   end
 
   def outputs_for(stack)
