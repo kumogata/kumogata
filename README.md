@@ -169,7 +169,7 @@ end
 
 ```ruby
 Resources do
-  _include 'template2'
+  _include 'template2.rb'
 end
 ```
 
