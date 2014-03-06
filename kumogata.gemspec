@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'aws-sdk'
   spec.add_dependency 'diffy'
-  spec.add_dependency 'dslh', '>= 0.2.3'
+  spec.add_dependency 'dslh', '>= 0.2.4'
   spec.add_dependency 'hashie'
   spec.add_dependency 'highline'
   spec.add_dependency 'json'
