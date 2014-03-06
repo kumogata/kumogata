@@ -163,7 +163,7 @@ end
 }
 ```
 
-### Split of configuration
+### Split a template file
 
 * template.rb
 
