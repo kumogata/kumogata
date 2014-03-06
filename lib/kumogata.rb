@@ -3,6 +3,7 @@ require 'kumogata/version'
 
 require 'aws-sdk'
 require 'base64'
+require 'diffy'
 require 'dslh'
 require 'hashie'
 require 'highline/import'

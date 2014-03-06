@@ -24,7 +24,8 @@ begin
 
   AWS.config(aws_opts) unless aws_opts.empty?
 
-  String.colorize = options.color?
+  String.colorize = ($stdout.tty? and options.color?)
+  Diffy::Diff.default_format = ($stdout.tty? and options.color?) ? :color : :text
 
   if options.debug?
     Kumogata.logger.set_debug(true)

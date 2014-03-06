@@ -72,6 +72,21 @@ class Kumogata::Client
     JSON.pretty_generate(resources)
   end
 
+  def diff(path_or_url1, path_or_url2)
+    templates = [path_or_url1, path_or_url2].map do |path_or_url|
+      template = open_template(path_or_url)
+      JSON.pretty_generate(template)
+    end
+
+    diff_opts = '-U 3'
+    opts = {:include_diff_info => true, :diff => diff_opts}
+    diff_opts << ' -w' if @options.ignore_all_space?
+
+    diff = Diffy::Diff.new(*templates, opts).to_s
+    diff.sub(/^(\e\[\d+m)?\-\-\-(\s+)(\S+)/m) { "#{$1}---#{$2}#{path_or_url1}"}
+        .sub(/^(\e\[\d+m)?\+\+\+(\s+)(\S+)/m) { "#{$1}+++#{$2}#{path_or_url2}"}
+  end
+
   private ###########################################################
 
   def open_template(path_or_url)

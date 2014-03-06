@@ -46,6 +46,10 @@ class Kumogata::ArgumentParser
       :description => 'Show resources for a specified stack',
       :arguments   => [:stack_name]
     },
+    :diff => {
+      :description => 'Compare templates logically',
+      :arguments   => [:path_or_url1, :path_or_url2]
+    },
   }
 
   class << self
@@ -75,6 +79,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--timeout MINUTES', Integer)         {|v| options[:timeout]            = v     }
         opt.on(''  , '--result-log PATH')                  {|v| options[:result_log]         = v     }
         opt.on(''  , '--force')                            {    options[:force]              = true  }
+        opt.on('-w', '--ignore-all-space')                 {    options[:ignore_all_space]   = true  }
         opt.on(''  , '--no-color')                         {    options[:color]              = false }
         opt.on(''  , '--debug')                            {    options[:debug]              = true  }
         opt.parse!
