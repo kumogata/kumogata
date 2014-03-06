@@ -29,9 +29,9 @@ class Kumogata::Client
     template = open_template(path_or_url)
 
     if ruby_template?(path_or_url)
-      colorize_json(JSON.pretty_generate(template))
+      JSON.pretty_generate(template).colorize_as(:json)
     else
-      devaluate_template(template).chomp
+      devaluate_template(template).chomp.colorize_as(:ruby)
     end
   end
 
@@ -54,27 +54,27 @@ class Kumogata::Client
 
   def list(stack_name = nil)
     stacks = describe_stacks(stack_name)
-    colorize_json(JSON.pretty_generate(stacks))
+    JSON.pretty_generate(stacks).colorize_as(:json)
   end
 
   def export(stack_name)
     template = export_template(stack_name)
-    devaluate_template(template).chomp
+    devaluate_template(template).chomp.colorize_as(:ruby)
   end
 
   def show_events(stack_name)
     events = describe_events(stack_name)
-    colorize_json(JSON.pretty_generate(events))
+    JSON.pretty_generate(events).colorize_as(:json)
   end
 
   def show_outputs(stack_name)
     outputs = describe_outputs(stack_name)
-    colorize_json(JSON.pretty_generate(outputs))
+    JSON.pretty_generate(outputs).colorize_as(:json)
   end
 
   def show_resources(stack_name)
     resources = describe_resources(stack_name)
-    colorize_json(JSON.pretty_generate(resources))
+    JSON.pretty_generate(resources).colorize_as(:json)
   end
 
   def diff(path_or_url1, path_or_url2)
@@ -409,10 +409,10 @@ class Kumogata::Client
     puts <<-EOS
 
 Outputs:
-#{colorize_json(JSON.pretty_generate(outputs))}
+#{JSON.pretty_generate(outputs).colorize_as(:json)}
 
 Stack Resource Summaries:
-#{colorize_json(JSON.pretty_generate(summaries))}
+#{JSON.pretty_generate(summaries).colorize_as(:json)}
 
 (Save to `#{@options.result_log}`)
     EOS
@@ -430,16 +430,5 @@ Stack Resource Summaries:
     str.to_s.split(/[-_]/).map {|i|
       i[0, 1].upcase + i[1..-1].downcase
     }.join
-  end
-
-  def colorize_json(str)
-    if $stdout.tty? and @options.color?
-      begin
-        return JsonColor.colorize(str)
-      rescue Racc::ParseError
-      end
-    end
-
-    return str
   end
 end

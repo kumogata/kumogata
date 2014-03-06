@@ -25,6 +25,14 @@ class String
     EOS
   end
 
+  def colorize_as(lang)
+    if @@colorize
+      CodeRay.scan(self, lang).terminal
+    else
+      self
+    end
+  end
+
   def encode64
     Base64.encode64(self).delete("\n")
   end

@@ -19,12 +19,12 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'aws-sdk'
+  spec.add_dependency 'coderay'
   spec.add_dependency 'diffy'
   spec.add_dependency 'dslh', '>= 0.2.4'
   spec.add_dependency 'hashie'
   spec.add_dependency 'highline'
   spec.add_dependency 'json'
-  spec.add_dependency 'json_color'
   spec.add_dependency 'term-ansicolor'
   spec.add_dependency 'uuidtools'
   spec.add_development_dependency 'bundler'
