@@ -192,7 +192,7 @@ class Kumogata::Client
     unless while_in_progress(stack, 'CREATE_COMPLETE')
       errmsgs = ['Create failed']
       errmsgs << stack_name
-      errmsgs << sstack.tatus_reason if stack.status_reason
+      errmsgs << stack.status_reason if stack.status_reason
       raise errmsgs.join(': ')
     end
 
@@ -216,7 +216,7 @@ class Kumogata::Client
     unless while_in_progress(stack, 'UPDATE_COMPLETE')
       errmsgs = ['Update failed']
       errmsgs << stack_name
-      errmsgs << sstack.tatus_reason if stack.status_reason
+      errmsgs << stack.status_reason if stack.status_reason
       raise errmsgs.join(': ')
     end
 
@@ -245,7 +245,7 @@ class Kumogata::Client
     unless completed
       errmsgs = ['Delete failed']
       errmsgs << stack_name
-      errmsgs << sstack.tatus_reason if stack.status_reason
+      errmsgs << stack.status_reason if stack.status_reason
       raise errmsgs.join(': ')
     end
   end
