@@ -78,11 +78,10 @@ class Kumogata::Client
       JSON.pretty_generate(template)
     end
 
-    diff_opts = '-U 3'
+    diff_opts = @options.ignore_all_space? ? '-uw' : '-u'
     opts = {:include_diff_info => true, :diff => diff_opts}
-    diff_opts << ' -w' if @options.ignore_all_space?
-
     diff = Diffy::Diff.new(*templates, opts).to_s
+
     diff.sub(/^(\e\[\d+m)?\-\-\-(\s+)(\S+)/m) { "#{$1}---#{$2}#{path_or_url1}"}
         .sub(/^(\e\[\d+m)?\+\+\+(\s+)(\S+)/m) { "#{$1}+++#{$2}#{path_or_url2}"}
   end
