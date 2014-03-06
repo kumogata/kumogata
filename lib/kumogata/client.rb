@@ -29,7 +29,7 @@ class Kumogata::Client
     template = open_template(path_or_url)
 
     if ruby_template?(path_or_url)
-      JSON.pretty_generate(template)
+      colorize_json(JSON.pretty_generate(template))
     else
       devaluate_template(template).chomp
     end
@@ -54,7 +54,7 @@ class Kumogata::Client
 
   def list(stack_name = nil)
     stacks = describe_stacks(stack_name)
-    JSON.pretty_generate(stacks)
+    colorize_json(JSON.pretty_generate(stacks))
   end
 
   def export(stack_name)
@@ -64,17 +64,17 @@ class Kumogata::Client
 
   def show_events(stack_name)
     events = describe_events(stack_name)
-    JSON.pretty_generate(events)
+    colorize_json(JSON.pretty_generate(events))
   end
 
   def show_outputs(stack_name)
     outputs = describe_outputs(stack_name)
-    JSON.pretty_generate(outputs)
+    colorize_json(JSON.pretty_generate(outputs))
   end
 
   def show_resources(stack_name)
     resources = describe_resources(stack_name)
-    JSON.pretty_generate(resources)
+    colorize_json(JSON.pretty_generate(resources))
   end
 
   def diff(path_or_url1, path_or_url2)
@@ -409,10 +409,10 @@ class Kumogata::Client
     puts <<-EOS
 
 Outputs:
-#{JSON.pretty_generate(outputs)}
+#{colorize_json(JSON.pretty_generate(outputs))}
 
 Stack Resource Summaries:
-#{JSON.pretty_generate(summaries)}
+#{colorize_json(JSON.pretty_generate(summaries))}
 
 (Save to `#{@options.result_log}`)
     EOS
@@ -430,5 +430,16 @@ Stack Resource Summaries:
     str.to_s.split(/[-_]/).map {|i|
       i[0, 1].upcase + i[1..-1].downcase
     }.join
+  end
+
+  def colorize_json(str)
+    if $stdout.tty? and @options.color?
+      begin
+        return JsonColor.colorize(str)
+      rescue Racc::ParseError
+      end
+    end
+
+    return str
   end
 end
