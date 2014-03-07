@@ -134,6 +134,7 @@ class Kumogata::ArgumentParser
     $kumogata.command = command
     $kumogata.arguments = arguments
     $kumogata.options = options
+    options = $kumogata.options # Copy of the reference
 
     [command, arguments, options]
   end
@@ -198,7 +199,6 @@ class Kumogata::ArgumentParser
     end
 
     options.parameters = parameters
-    $kumogata.parameters = options.parameters
 
     if options.encrypt_parameters? and not options.skip_send_password?
       options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd.encode64
