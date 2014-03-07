@@ -1,3 +1,3 @@
 module Kumogata
-  VERSION = '0.2.19'
+  VERSION = '0.3.0'
 end
