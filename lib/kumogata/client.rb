@@ -6,6 +6,8 @@ class Kumogata::Client
   end
 
   def create(path_or_url, stack_name = nil)
+    validate_stack_name(stack_name)
+
     @options.delete_stack = false if stack_name
     template = open_template(path_or_url)
 
@@ -36,6 +38,8 @@ class Kumogata::Client
   end
 
   def update(path_or_url, stack_name)
+    validate_stack_name(stack_name)
+
     template = open(path_or_url) do |f|
       evaluate_template(f)
     end
@@ -45,6 +49,8 @@ class Kumogata::Client
   end
 
   def delete(stack_name)
+    validate_stack_name(stack_name)
+
     if @options.force? or agree("Are you sure you want to delete `#{stack_name}`? ".yellow)
       delete_stack(stack_name)
     end
@@ -53,26 +59,36 @@ class Kumogata::Client
   end
 
   def list(stack_name = nil)
+    validate_stack_name(stack_name)
+
     stacks = describe_stacks(stack_name)
     JSON.pretty_generate(stacks).colorize_as(:json)
   end
 
   def export(stack_name)
+    validate_stack_name(stack_name)
+
     template = export_template(stack_name)
     devaluate_template(template).chomp.colorize_as(:ruby)
   end
 
   def show_events(stack_name)
+    validate_stack_name(stack_name)
+
     events = describe_events(stack_name)
     JSON.pretty_generate(events).colorize_as(:json)
   end
 
   def show_outputs(stack_name)
+    validate_stack_name(stack_name)
+
     outputs = describe_outputs(stack_name)
     JSON.pretty_generate(outputs).colorize_as(:json)
   end
 
   def show_resources(stack_name)
+    validate_stack_name(stack_name)
+
     resources = describe_resources(stack_name)
     JSON.pretty_generate(resources).colorize_as(:json)
   end
@@ -429,5 +445,13 @@ Stack Resource Summaries:
     str.to_s.split(/[-_]/).map {|i|
       i[0, 1].upcase + i[1..-1].downcase
     }.join
+  end
+
+  def validate_stack_name(stack_name)
+    return unless stack_name
+
+    unless /\A[a-zA-Z][-a-zA-Z0-9]*\Z/i =~ stack_name
+      raise "1 validation error detected: Value '#{stack_name}' at 'stackName' failed to satisfy constraint: Member must satisfy regular expression pattern: [a-zA-Z][-a-zA-Z0-9]*"
+    end
   end
 end

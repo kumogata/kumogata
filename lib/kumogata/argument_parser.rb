@@ -77,6 +77,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--skip-replace-underscore')          {    options[:replace_underscore] = false }
         opt.on(''  , '--skip-delete-stack')                {    options[:delete_stack]       = false }
         opt.on('-p', '--parameters KEY_VALUES', Array)     {|v| options[:parameters]         = v     }
+        opt.on('-e', '--encrypt-parameters')               {    options[:encrypt_parameter]  = v     }
         opt.on(''  , '--capabilities CAPABILITIES', Array) {|v| options[:capabilities]       = v     }
         opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]   = true  }
         opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]             = v     }

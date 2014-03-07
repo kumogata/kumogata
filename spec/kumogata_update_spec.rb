@@ -116,4 +116,29 @@ end
       cf.should_receive(:stacks) { stacks }
     end
   end
+
+  it 'update a stack from Ruby template with invalid stack name' do
+    template = <<-EOS
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+    end
+  end
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+
+    expect {
+      run_client(:update, :arguments => ['0MyStack'], :template => template)
+    }.to raise_error("1 validation error detected: Value '0MyStack' at 'stackName' failed to satisfy constraint: Member must satisfy regular expression pattern: [a-zA-Z][-a-zA-Z0-9]*")
+  end
 end
