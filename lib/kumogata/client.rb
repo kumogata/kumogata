@@ -355,8 +355,19 @@ class Kumogata::Client
     if @options.parameters? and not @options.parameters.empty?
       parameters = {}
 
+      enc_params = @options.encrypt_parameters
+      passwd = @options.encryption_password || Kumogata::Crypt.mkpasswd(16)
+
       @options.parameters.each do |key, value|
+        if enc_params and (enc_params.include?('*') or enc_params.include?(key))
+          value = Kumogata::Crypt.encrypt(passwd, value)
+        end
+
         parameters[key] = value
+      end
+
+      if @options.encrypt_parameters? and not @options.skip_send_password?
+        parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd.encode64
       end
 
       hash[:parameters] = parameters

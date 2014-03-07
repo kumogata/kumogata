@@ -185,24 +185,13 @@ class Kumogata::ArgumentParser
 
   def update_parameters(options)
     parameters = {}
-    passwd = options.encryption_password || Kumogata::Crypt.mkpasswd(16)
-    enc_params = options.encrypt_parameters
 
     (options.parameters || []).each do |i|
       key, value = i.split('=', 2)
-
-      if enc_params and (enc_params.include?('*') or enc_params.include?(key))
-        value = Kumogata::Crypt.encrypt(passwd, value)
-      end
-
       parameters[key] = value
     end
 
     options.parameters = parameters
-
-    if options.encrypt_parameters? and not options.skip_send_password?
-      options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd.encode64
-    end
   end
 
   def scan_args(str)
