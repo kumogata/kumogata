@@ -6,6 +6,12 @@ class UUIDTools::UUID
   def self.timestamp_create; 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'; end
 end
 
+class Kumogata::Utils
+  def self.get_user_host
+    'user-host'
+  end
+end
+
 def tempfile(content, template_ext)
   basename = "#{File.basename __FILE__}.#{$$}"
   basename = [basename, template_ext]

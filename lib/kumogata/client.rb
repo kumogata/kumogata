@@ -210,7 +210,7 @@ class Kumogata::Client
       stack_name << UUIDTools::UUID.timestamp_create
 
       stack_name = stack_name.join('-')
-      stack_name.gsub!(/[^-a-z-a-zA-Z0-9]+/, '-')
+      stack_name.gsub!(/[^-a-zA-Z0-9]+/, '-')
     end
 
     Kumogata.logger.info("Creating stack: #{stack_name}".cyan)

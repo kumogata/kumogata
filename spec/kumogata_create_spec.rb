@@ -48,9 +48,9 @@ end
 
       stacks = make_double('stacks') do |obj|
         obj.should_receive(:create)
-           .with('kumogata-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {}) { stack }
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {}) { stack }
         obj.should_receive(:[])
-           .with('kumogata-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX') { stack }
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX') { stack }
       end
 
       cf.should_receive(:stacks).twice { stacks }
@@ -114,9 +114,9 @@ end
 
       stacks = make_double('stacks') do |obj|
         obj.should_receive(:create)
-           .with('kumogata-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {:parameters=>{"InstanceType"=>"m1.large"}}) { stack }
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {:parameters=>{"InstanceType"=>"m1.large"}}) { stack }
         obj.should_receive(:[])
-           .with('kumogata-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX') { stack }
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX') { stack }
       end
 
       cf.should_receive(:stacks).twice { stacks }
@@ -261,9 +261,9 @@ end
 
       stacks = make_double('stacks') do |obj|
         obj.should_receive(:create)
-           .with('kumogata-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {:parameters=>{"InstanceType"=>"m1.large"}}) { stack }
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {:parameters=>{"InstanceType"=>"m1.large"}}) { stack }
         obj.should_receive(:[])
-           .with('kumogata-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX') { stack }
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX') { stack }
       end
 
       cf.should_receive(:stacks).twice { stacks }
