@@ -121,8 +121,6 @@ class Kumogata::Client
   end
 
   def evaluate_template(template)
-    $parameters = {}
-
     key_converter = proc do |key|
       key = key.to_s
       key.gsub!('__', '::') if @options.replace_underscore?
@@ -345,14 +343,14 @@ class Kumogata::Client
   end
 
   def add_parameters(hash)
-    if @options.parameters?
+    if @options.parameters? and not @options.parameters.empty?
       parameters = {}
 
       @options.parameters.each do |key, value|
         parameters[key] = value
       end
 
-      hash[:parameters] = $parameters.merge(parameters)
+      hash[:parameters] = parameters
     end
   end
 

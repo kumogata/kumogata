@@ -120,9 +120,7 @@ class Kumogata::ArgumentParser
           yield(opt, command, arguments, options)
         end
 
-        if options.parameters?
-          update_parameters(options)
-        end
+        update_parameters(options)
       rescue => e
         $stderr.puts("#{e.message}")
         raise e if options[:debug]
@@ -183,7 +181,7 @@ class Kumogata::ArgumentParser
     passwd = options.encryption_password || Kumogata::Crypt.mkpasswd(16)
     enc_params = options.encrypt_parameters
 
-    options.parameters.each do |i|
+    (options.parameters || []).each do |i|
       key, value = i.split('=', 2)
 
       if enc_params and (enc_params.include?('*') or enc_params.include?(key))
@@ -194,6 +192,7 @@ class Kumogata::ArgumentParser
     end
 
     options.parameters = parameters
+    $parameters = options.parameters
 
     if options.encrypt_parameters? and not options.skip_send_password?
       options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd.encode64
