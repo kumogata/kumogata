@@ -10,7 +10,6 @@ describe 'Kumogata::Client#show_events' do
         obj.should_receive(:resource_status) { "CREATE_FAILED" }
         obj.should_receive(:resource_status_reason) { "The following resource(s) failed to create: [myEC2Instance]. " }
         obj.should_receive(:resource_type) { "AWS::CloudFormation::Stack" }
-        obj.should_receive(:stack) { "#<AWS::CloudFormation::Stack:0x007ffe4384ca80>" }
         obj.should_receive(:stack_id) { "arn:aws:cloudformation:ap-northeast-1:822997939312:stack/kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca/f1381a30-a4f7-11e3-a340-506cf9a1c096" }
         obj.should_receive(:stack_name) { "kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca" }
         obj.should_receive(:timestamp) { "2014-03-06 06:24:21 UTC" }
@@ -38,7 +37,6 @@ describe 'Kumogata::Client#show_events' do
     "ResourceStatus": "CREATE_FAILED",
     "ResourceStatusReason": "The following resource(s) failed to create: [myEC2Instance]. ",
     "ResourceType": "AWS::CloudFormation::Stack",
-    "Stack": "#<AWS::CloudFormation::Stack:0x007ffe4384ca80>",
     "StackId": "arn:aws:cloudformation:ap-northeast-1:822997939312:stack/kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca/f1381a30-a4f7-11e3-a340-506cf9a1c096",
     "StackName": "kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca",
     "Timestamp": "2014-03-06 06:24:21 UTC"
