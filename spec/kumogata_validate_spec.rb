@@ -123,9 +123,9 @@ end
 
     expect {
       run_client(:validate, :template => template, :template_ext => '.template') do |client, cf|
-      template = JSON.parse(template)
-      add_encryption_password_for_validation(template)
-      json = template.to_json
+        template = JSON.parse(template)
+        add_encryption_password_for_validation(template)
+        json = template.to_json
 
         cf.should_receive(:validate_template).with(json) {
           {
