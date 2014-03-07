@@ -202,7 +202,16 @@ class Kumogata::Client
   end
 
   def create_stack(template, stack_name)
-    stack_name = stack_name || 'kumogata-' + UUIDTools::UUID.timestamp_create
+    unless stack_name
+      user_host = Kumogata::Utils.get_user_host
+
+      stack_name = ['kumogata']
+      stack_name << user_host if user_host
+      stack_name << UUIDTools::UUID.timestamp_create
+
+      stack_name = stack_name.join('-')
+      stack_name.gsub!(/[^-a-z-a-zA-Z0-9]+/, '-')
+    end
 
     Kumogata.logger.info("Creating stack: #{stack_name}".cyan)
     stack = @cloud_formation.stacks.create(stack_name, template.to_json, build_create_options)
@@ -408,7 +417,7 @@ class Kumogata::Client
         :stack_name,
         :timestamp,
       ].each do |k|
-        event_hash[camelize(k)] = event.send(k)
+        event_hash[Kumogata::Utils.camelize(k)] = event.send(k)
       end
 
       event_hash
@@ -437,7 +446,7 @@ class Kumogata::Client
         :resource_status_reason,
         :last_updated_timestamp
       ].each do |k|
-        summary_hash[camelize(k)] = summary[k]
+        summary_hash[Kumogata::Utils.camelize(k)] = summary[k]
       end
 
       summary_hash
@@ -463,12 +472,6 @@ Stack Resource Summaries:
         'StackResourceSummaries' => summaries,
       })
     end
-  end
-
-  def camelize(str)
-    str.to_s.split(/[-_]/).map {|i|
-      i[0, 1].upcase + i[1..-1].downcase
-    }.join
   end
 
   def validate_stack_name(stack_name)
