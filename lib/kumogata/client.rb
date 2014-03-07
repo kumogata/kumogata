@@ -18,6 +18,7 @@ class Kumogata::Client
 
   def validate(path_or_url)
     template = open_template(path_or_url)
+    add_encryption_password_for_validation(template)
     validate_template(template)
     nil
   end
@@ -370,6 +371,15 @@ class Kumogata::Client
         'NoEcho' => 'true',
       }
     end
+  end
+
+  def add_encryption_password_for_validation(template)
+    template['Parameters'] ||= {}
+
+    template['Parameters'][Kumogata::ENCRYPTION_PASSWORD] ||= {
+      'Type' => 'String',
+      'Default' => "(#{Kumogata::ENCRYPTION_PASSWORD})",
+    }
   end
 
   def validate_template(template)
