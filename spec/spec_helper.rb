@@ -2,6 +2,8 @@ require 'kumogata'
 require 'tempfile'
 require 'uuidtools'
 
+Kumogata::ENCRYPTION_PASSWORD.replace('EncryptionPassword')
+
 class UUIDTools::UUID
   def self.timestamp_create; 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'; end
 end

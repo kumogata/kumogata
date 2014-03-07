@@ -1,10 +1,6 @@
 Version = Kumogata::VERSION
 $kumogata = Hashie::Mash.new
 
-module Kumogata
-  ENCRYPTION_PASSWORD = 'EncryptionPassword'
-end
-
 class Kumogata::ArgumentParser
   DEFAULT_OPTIONS = {
     :replace_underscore => true,
