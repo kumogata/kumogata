@@ -57,6 +57,10 @@ def eval_template(template, options = {})
     add_encryption_password(template)
   end
 
+  if options[:add_encryption_password_for_validation]
+    add_encryption_password_for_validation(template)
+  end
+
   return template
 end
 
@@ -72,6 +76,15 @@ def add_encryption_password(template)
   template['Parameters'][Kumogata::ENCRYPTION_PASSWORD] = {
     'Type'   => 'String',
     'NoEcho' => 'true',
+  }
+end
+
+def add_encryption_password_for_validation(template)
+  template['Parameters'] ||= {}
+
+  template['Parameters'][Kumogata::ENCRYPTION_PASSWORD] = {
+    'Type' => 'String',
+    'Default' => "(#{Kumogata::ENCRYPTION_PASSWORD})",
   }
 end
 

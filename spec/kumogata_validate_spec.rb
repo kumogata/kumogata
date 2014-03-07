@@ -21,7 +21,7 @@ end
     EOS
 
     run_client(:validate, :template => template) do |client, cf|
-      json = eval_template(template).to_json
+      json = eval_template(template, :add_encryption_password_for_validation => true).to_json
 
       cf.should_receive(:validate_template).with(json) {
         {}
@@ -52,7 +52,7 @@ end
 
     expect {
       run_client(:validate, :template => template) do |client, cf|
-        json = eval_template(template).to_json
+        json = eval_template(template, :add_encryption_password_for_validation => true).to_json
 
         cf.should_receive(:validate_template).with(json) {
           {
@@ -88,9 +88,11 @@ end
     EOS
 
     run_client(:validate, :template => template, :template_ext => '.template') do |client, cf|
-      json = JSON.parse(template).to_json
+      template = JSON.parse(template)
+      add_encryption_password_for_validation(template)
+      json = template.to_json
 
-      cf.should_receive(:validate_template).with(json) {
+      cf.should_receive(:validate_template) {
         {}
       }
     end
@@ -121,7 +123,9 @@ end
 
     expect {
       run_client(:validate, :template => template, :template_ext => '.template') do |client, cf|
-        json = JSON.parse(template).to_json
+      template = JSON.parse(template)
+      add_encryption_password_for_validation(template)
+      json = template.to_json
 
         cf.should_receive(:validate_template).with(json) {
           {
