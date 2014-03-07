@@ -193,7 +193,7 @@ class Kumogata::ArgumentParser
     options.parameters = parameters
 
     if options.encrypt_parameters? and not options.skip_pass_encryption_password?
-      options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd
+      options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd.encode64
     end
   end
 end
