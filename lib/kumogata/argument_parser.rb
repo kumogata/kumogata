@@ -1,4 +1,5 @@
 Version = Kumogata::VERSION
+$kumogata = Hashie::Mash.new
 
 module Kumogata
   ENCRYPTION_PASSWORD = 'EncryptionPassword'
@@ -129,6 +130,11 @@ class Kumogata::ArgumentParser
     end
 
     command = command.to_s.gsub('-', '_').to_sym
+
+    $kumogata.command = command
+    $kumogata.arguments = arguments
+    $kumogata.options = options
+
     [command, arguments, options]
   end
 
@@ -192,7 +198,7 @@ class Kumogata::ArgumentParser
     end
 
     options.parameters = parameters
-    $parameters = options.parameters
+    $kumogata.parameters = options.parameters
 
     if options.encrypt_parameters? and not options.skip_send_password?
       options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd.encode64
