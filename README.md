@@ -83,6 +83,9 @@ Options:
         --skip-replace-underscore
         --skip-delete-stack
     -p, --parameters KEY_VALUES
+    -e, --encrypt-parameters KEYS
+        --encryption-password PASS
+        --skip-send-password
         --capabilities CAPABILITIES
         --disable-rollback
         --notify SNS_TOPICS
@@ -206,6 +209,60 @@ end
     }
   }
 }
+```
+
+### Encrypt parameters
+
+* Command line
+
+    $ kumogata create template.rb -e 'Password1,Password2' -p 'Param1=xxx,Param2=xxx,Password1=xxx,Password2=xxx'
+
+* Template
+
+```ruby
+Parameters do
+  Param1 { Type "String" }
+  Param2 { Type "String" }
+  Password1 { Type "String"; NoEcho true }
+  Password2 { Type "String"; NoEcho true }
+end # Parameters
+
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+
+    Properties do
+      ImageId "ami-XXXXXXXX"
+
+      UserData do
+        Fn__Base64 (<<-EOS).fn_join
+          #!/bin/bash
+          /opt/aws/bin/cfn-init -s <%= Ref "AWS::StackName" %> -r myEC2Instance --region <%= Ref "AWS::Region" %>
+        EOS
+      end
+    end
+
+    Metadata do
+      AWS__CloudFormation__Init do
+        config do
+          commands do
+            any_command do
+              command (<<-EOS).fn_join
+                ENCRYPTION_PASSWORD="`echo <%= Ref Kumogata::ENCRYPTION_PASSWORD %> | base64 -d`"
+
+                # Decrypt Password1
+                echo '<%= Ref "Password1" %>' | base64 -d | openssl enc -d -aes256 -pass pass:"$ENCRYPTION_PASSWORD" > password1
+
+                # Decrypt Password2
+                echo '<%= Ref "Password2" %>' | base64 -d | openssl enc -d -aes256 -pass pass:"$ENCRYPTION_PASSWORD" > password2
+              EOS
+            end
+          end
+        end
+      end
+    end
+  end # myEC2Instance
+end # Resources
 ```
 
 ## Demo
