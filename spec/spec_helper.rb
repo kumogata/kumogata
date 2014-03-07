@@ -24,6 +24,7 @@ def run_client(command, options = {})
   kumogata_template = options[:template]
   kumogata_arguments = options[:arguments] || []
   kumogata_options = Kumogata::ArgumentParser::DEFAULT_OPTIONS.merge(options[:options] || {})
+  kumogata_options[:result_log] = '/dev/null'
   template_ext = options[:template_ext] || '.rb'
 
   client = Kumogata::Client.new(kumogata_options)
@@ -52,6 +53,10 @@ def eval_template(template, options = {})
     update_deletion_policy(template)
   end
 
+  if options[:add_encryption_password]
+    add_encryption_password(template)
+  end
+
   return template
 end
 
@@ -59,6 +64,15 @@ def update_deletion_policy(template)
   template['Resources'].each do |k, v|
     v['DeletionPolicy'] = 'Retain'
   end
+end
+
+def add_encryption_password(template)
+  template['Parameters'] ||= {}
+
+  template['Parameters'][Kumogata::ENCRYPTION_PASSWORD] = {
+    'Type'   => 'String',
+    'NoEcho' => 'true',
+  }
 end
 
 def make_double(name)
