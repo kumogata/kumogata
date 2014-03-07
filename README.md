@@ -215,7 +215,9 @@ end
 
 * Command line
 
-    $ kumogata create template.rb -e 'Password1,Password2' -p 'Param1=xxx,Param2=xxx,Password1=xxx,Password2=xxx'
+```
+$ kumogata create template.rb -e 'Password1,Password2' -p 'Param1=xxx,Param2=xxx,Password1=xxx,Password2=xxx'
+```
 
 * Template
 
