@@ -364,7 +364,6 @@ class Kumogata::Client
         :resource_status,
         :resource_status_reason,
         :resource_type,
-        :stack,
         :stack_id,
         :stack_name,
         :timestamp,
