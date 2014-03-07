@@ -18,7 +18,6 @@ class Kumogata::Client
 
   def validate(path_or_url)
     template = open_template(path_or_url)
-    add_encryption_password(template)
     validate_template(template)
     nil
   end
@@ -40,6 +39,7 @@ class Kumogata::Client
       evaluate_template(f)
     end
 
+    add_encryption_password(template)
     update_stack(template, stack_name)
     nil
   end
