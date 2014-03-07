@@ -5,8 +5,8 @@
 
 Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
-[![Gem Version](https://badge.fury.io/rb/kumogata.png?201403072016)](http://badge.fury.io/rb/kumogata)
-[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403072016)](https://drone.io/github.com/winebarrel/kumogata/latest)
+[![Gem Version](https://badge.fury.io/rb/kumogata.png?201403072151)](http://badge.fury.io/rb/kumogata)
+[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403072151)](https://drone.io/github.com/winebarrel/kumogata/latest)
 
 It can define a template in Ruby DSL, such as:
 
@@ -96,6 +96,12 @@ Options:
         --no-color
         --debug
 ```
+
+### KUMOGATA_OPTIONS
+
+`KUMOGATA_OPTIONS` variable specifies default options.
+
+e.g. `KUMOGATA_OPTIONS='-e Password'`
 
 ### Create resources
 
