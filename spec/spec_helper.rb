@@ -12,6 +12,12 @@ class Kumogata::Utils
   end
 end
 
+class Kumogata::Crypt
+  def self.mkpasswd(n)
+    '*' * n
+  end
+end
+
 def tempfile(content, template_ext)
   basename = "#{File.basename __FILE__}.#{$$}"
   basename = [basename, template_ext]

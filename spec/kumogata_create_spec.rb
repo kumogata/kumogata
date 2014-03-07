@@ -233,7 +233,7 @@ Outputs do
 end
     EOS
 
-    run_client(:create, :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}, :encrypt_parameters => true}) do |client, cf|
+    run_client(:create, :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}, :encrypt_parameters => ['Password']}) do |client, cf|
       json = eval_template(template, :update_deletion_policy => true, :add_encryption_password => true).to_json
 
       output = make_double('output') do |obj|
@@ -261,7 +261,7 @@ end
 
       stacks = make_double('stacks') do |obj|
         obj.should_receive(:create)
-           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {:parameters=>{"InstanceType"=>"m1.large"}}) { stack }
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {:parameters=>{"InstanceType"=>"m1.large", "EncryptionPassword"=>"KioqKioqKioqKioqKioqKg=="}}) { stack }
         obj.should_receive(:[])
            .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX') { stack }
       end

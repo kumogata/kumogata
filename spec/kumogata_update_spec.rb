@@ -171,7 +171,7 @@ Outputs do
 end
     EOS
 
-    run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}, :encrypt_parameters => true}) do |client, cf|
+    run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}, :encrypt_parameters => ['Password']}) do |client, cf|
       json = eval_template(template, :add_encryption_password => true).to_json
 
       output = make_double('output') do |obj|
@@ -189,7 +189,7 @@ end
       end
 
       stack = make_double('stack') do |obj|
-        obj.should_receive(:update).with(:template => json, :parameters=>{"InstanceType"=>"m1.large"})
+        obj.should_receive(:update).with(:template => json, :parameters=>{"InstanceType"=>"m1.large", "EncryptionPassword"=>"KioqKioqKioqKioqKioqKg=="})
         obj.should_receive(:status).and_return(
             'UPDATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_COMPLETE')
         obj.should_receive(:outputs) { [output] }
