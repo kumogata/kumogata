@@ -250,7 +250,7 @@ Resources do
           commands do
             any_command do
               command (<<-EOS).fn_join
-                ENCRYPTION_PASSWORD="`echo <%= Ref Kumogata::ENCRYPTION_PASSWORD %> | base64 -d`"
+                ENCRYPTION_PASSWORD="`echo '<%= Ref Kumogata::ENCRYPTION_PASSWORD %>' | base64 -d`"
 
                 # Decrypt Password1
                 echo '<%= Ref "Password1" %>' | base64 -d | openssl enc -d -aes256 -pass pass:"$ENCRYPTION_PASSWORD" > password1
