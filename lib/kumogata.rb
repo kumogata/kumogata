@@ -14,6 +14,7 @@ require 'open-uri'
 require 'optparse'
 require 'singleton'
 require 'stringio'
+require 'strscan'
 require 'uuidtools'
 
 require 'kumogata/argument_parser'

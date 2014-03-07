@@ -5,7 +5,6 @@ module Kumogata
 end
 
 class Kumogata::ArgumentParser
-
   DEFAULT_OPTIONS = {
     :replace_underscore => true,
     :delete_stack => true,
@@ -71,6 +70,10 @@ class Kumogata::ArgumentParser
     command = nil
     arguments = nil
     options = {}
+
+    if ENV['KUMOGATA_OPTIONS']
+      ARGV.concat(scan_args(ENV['KUMOGATA_OPTIONS']))
+    end
 
     ARGV.options do |opt|
       update_usage(opt)
@@ -195,5 +198,32 @@ class Kumogata::ArgumentParser
     if options.encrypt_parameters? and not options.skip_send_password?
       options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd.encode64
     end
+  end
+
+  def scan_args(str)
+    args = []
+    ss = StringScanner.new(str)
+    buf = ''
+
+    until ss.eos?
+      if ss.scan(/\s+/)
+        unless buf.empty?
+          args << buf
+          buf = ''
+        end
+      elsif (tok = ss.scan(/'[^']*'/))
+        buf << tok.gsub(/'([^']*)'/) { $1 }
+      elsif (tok = ss.scan(/"[^"]*"/))
+        buf << tok.gsub(/"([^"]*)"/) { $1 }
+      elsif (tok = ss.scan(/[^\s'"]+/))
+        buf << tok
+      else
+        buf << ss.getch
+      end
+    end
+
+    args << buf unless buf.empty?
+
+    return args
   end
 end
