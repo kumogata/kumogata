@@ -1,6 +1,11 @@
 Version = Kumogata::VERSION
 
+module Kumogata
+  ENCRYPTION_PASSWORD = 'EncryptionPassword'
+end
+
 class Kumogata::ArgumentParser
+
   DEFAULT_OPTIONS = {
     :replace_underscore => true,
     :delete_stack => true,
@@ -71,22 +76,24 @@ class Kumogata::ArgumentParser
       update_usage(opt)
 
       begin
-        opt.on('-k', '--access-key ACCESS_KEY')            {|v| options[:access_key_id]      = v     }
-        opt.on('-s', '--secret-key SECRET_KEY')            {|v| options[:secret_access_key]  = v     }
-        opt.on('-r', '--region REGION')                    {|v| options[:region]             = v     }
-        opt.on(''  , '--skip-replace-underscore')          {    options[:replace_underscore] = false }
-        opt.on(''  , '--skip-delete-stack')                {    options[:delete_stack]       = false }
-        opt.on('-p', '--parameters KEY_VALUES', Array)     {|v| options[:parameters]         = v     }
-        opt.on('-e', '--encrypt-parameters')               {    options[:encrypt_parameters] = v     }
-        opt.on(''  , '--capabilities CAPABILITIES', Array) {|v| options[:capabilities]       = v     }
-        opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]   = true  }
-        opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]             = v     }
-        opt.on(''  , '--timeout MINUTES', Integer)         {|v| options[:timeout]            = v     }
-        opt.on(''  , '--result-log PATH')                  {|v| options[:result_log]         = v     }
-        opt.on(''  , '--force')                            {    options[:force]              = true  }
-        opt.on('-w', '--ignore-all-space')                 {    options[:ignore_all_space]   = true  }
-        opt.on(''  , '--no-color')                         {    options[:color]              = false }
-        opt.on(''  , '--debug')                            {    options[:debug]              = true  }
+        opt.on('-k', '--access-key ACCESS_KEY')            {|v| options[:access_key_id]                 = v     }
+        opt.on('-s', '--secret-key SECRET_KEY')            {|v| options[:secret_access_key]             = v     }
+        opt.on('-r', '--region REGION')                    {|v| options[:region]                        = v     }
+        opt.on(''  , '--skip-replace-underscore')          {    options[:replace_underscore]            = false }
+        opt.on(''  , '--skip-delete-stack')                {    options[:delete_stack]                  = false }
+        opt.on('-p', '--parameters KEY_VALUES', Array)     {|v| options[:parameters]                    = v     }
+        opt.on('-e', '--encrypt-parameters KEYS', Array)   {|v| options[:encrypt_parameters]            = v     }
+        opt.on('',   '--encryption-password PASS')         {|v| options[:encryption_password]           = v     }
+        opt.on('',   '--skip-pass-encryption-password')    {|v| options[:skip_pass_encryption_password] = true  }
+        opt.on(''  , '--capabilities CAPABILITIES', Array) {|v| options[:capabilities]                  = v     }
+        opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]              = true  }
+        opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]                        = v     }
+        opt.on(''  , '--timeout MINUTES', Integer)         {|v| options[:timeout]                       = v     }
+        opt.on(''  , '--result-log PATH')                  {|v| options[:result_log]                    = v     }
+        opt.on(''  , '--force')                            {    options[:force]                         = true  }
+        opt.on('-w', '--ignore-all-space')                 {    options[:ignore_all_space]              = true  }
+        opt.on(''  , '--no-color')                         {    options[:color]                         = false }
+        opt.on(''  , '--debug')                            {    options[:debug]                         = true  }
         opt.parse!
 
         unless (command = ARGV.shift)
@@ -170,13 +177,14 @@ class Kumogata::ArgumentParser
 
   def update_parameters(options)
     parameters = {}
-    passwd = Kumogata::Crypt.mkpasswd(16)
+    passwd = options.encryption_password || Kumogata::Crypt.mkpasswd(16)
+    enc_params = options.encrypt_parameters
 
     options.parameters.each do |i|
       key, value = i.split('=', 2)
 
-      if options.encrypt_parameters?
-        value = Kumogata::Crypt.encrypt(value)
+      if enc_params and (enc_params.include?('*') or enc_params.include?(key))
+        value = Kumogata::Crypt.encrypt(passwd, value)
       end
 
       parameters[key] = value
@@ -184,8 +192,8 @@ class Kumogata::ArgumentParser
 
     options.parameters = parameters
 
-    if options.encrypt_parameters?
-      options.encryption_password = passwd
+    if options.encrypt_parameters? and not options.skip_pass_encryption_password?
+      options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd
     end
   end
 end

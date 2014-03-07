@@ -10,19 +10,15 @@ class Kumogata::Client
 
     @options.delete_stack = false if stack_name
     template = open_template(path_or_url)
-
-    if @options.delete_stack?
-      template['Resources'].each do |k, v|
-        v['DeletionPolicy'] = 'Retain'
-      end
-    end
-
+    update_deletion_policy(template)
+    add_encryption_password(template)
     create_stack(template, stack_name)
     nil
   end
 
   def validate(path_or_url)
     template = open_template(path_or_url)
+    add_encryption_password(template)
     validate_template(template)
     nil
   end
@@ -354,6 +350,25 @@ class Kumogata::Client
       end
 
       hash[:parameters] = parameters
+    end
+  end
+
+  def update_deletion_policy(template)
+    if @options.delete_stack?
+      template['Resources'].each do |k, v|
+        v['DeletionPolicy'] = 'Retain'
+      end
+    end
+  end
+
+  def add_encryption_password(template)
+    if @options.encrypt_parameters? and not @options.skip_pass_encryption_password?
+      template['Parameters'] ||= {}
+
+      template['Parameters'][Kumogata::ENCRYPTION_PASSWORD] = {
+        'Type'   => 'String',
+        'NoEcho' => 'true',
+      }
     end
   end
 
