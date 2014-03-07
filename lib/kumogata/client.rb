@@ -349,8 +349,7 @@ class Kumogata::Client
     if @options.parameters?
       parameters = {}
 
-      @options.parameters.each do |i|
-        key, value = i.split('=', 2)
+      @options.parameters.each do |key, value|
         parameters[key] = value
       end
 

@@ -86,7 +86,7 @@ Outputs do
 end
     EOS
 
-    run_client(:create, :template => template, :options => {:parameters => ['InstanceType=m1.large']}) do |client, cf|
+    run_client(:create, :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}}) do |client, cf|
       json = eval_template(template, :update_deletion_policy => true).to_json
 
       output = make_double('output') do |obj|

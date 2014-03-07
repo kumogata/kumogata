@@ -77,7 +77,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--skip-replace-underscore')          {    options[:replace_underscore] = false }
         opt.on(''  , '--skip-delete-stack')                {    options[:delete_stack]       = false }
         opt.on('-p', '--parameters KEY_VALUES', Array)     {|v| options[:parameters]         = v     }
-        opt.on('-e', '--encrypt-parameters')               {    options[:encrypt_parameter]  = v     }
+        opt.on('-e', '--encrypt-parameters')               {    options[:encrypt_parameters] = v     }
         opt.on(''  , '--capabilities CAPABILITIES', Array) {|v| options[:capabilities]       = v     }
         opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]   = true  }
         opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]             = v     }
@@ -109,8 +109,13 @@ class Kumogata::ArgumentParser
         if block_given?
           yield(opt, command, arguments, options)
         end
+
+        if options.parameters?
+          update_parameters(options)
+        end
       rescue => e
         $stderr.puts("#{e.message}")
+        raise e if options[:debug]
         exit 1
       end
     end
@@ -129,8 +134,8 @@ class Kumogata::ArgumentParser
     cmd_max = COMMANDS.keys.map {|i| i.to_s.length }.max
 
     cmd_arg_descs = COMMANDS.map {|command, attributes|
-      arguments = attributes[:arguments]
       description = attributes[:description]
+      arguments = attributes[:arguments]
 
       [
         '%-*s %s' % [cmd_max, command, arguments_to_message(arguments)],
@@ -161,5 +166,26 @@ class Kumogata::ArgumentParser
 
   def arguments_to_message(arguments)
     arguments.map {|i| i.to_s.sub(/(.+)\?\Z/) { "[#{$1}]" }.upcase }.join(' ')
+  end
+
+  def update_parameters(options)
+    parameters = {}
+    passwd = Kumogata::Crypt.mkpasswd(16)
+
+    options.parameters.each do |i|
+      key, value = i.split('=', 2)
+
+      if options.encrypt_parameters?
+        value = Kumogata::Crypt.encrypt(value)
+      end
+
+      parameters[key] = value
+    end
+
+    options.parameters = parameters
+
+    if options.encrypt_parameters?
+      options.encryption_password = passwd
+    end
   end
 end

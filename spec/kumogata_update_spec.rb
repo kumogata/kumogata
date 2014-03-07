@@ -83,7 +83,7 @@ Outputs do
 end
     EOS
 
-    run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:parameters => ['InstanceType=m1.large']}) do |client, cf|
+    run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}}) do |client, cf|
       json = eval_template(template).to_json
 
       output = make_double('output') do |obj|
