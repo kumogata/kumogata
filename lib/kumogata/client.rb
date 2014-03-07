@@ -362,7 +362,7 @@ class Kumogata::Client
   end
 
   def add_encryption_password(template)
-    if @options.encrypt_parameters? and not @options.skip_pass_encryption_password?
+    if @options.encrypt_parameters? and not @options.skip_send_password?
       template['Parameters'] ||= {}
 
       template['Parameters'][Kumogata::ENCRYPTION_PASSWORD] = {

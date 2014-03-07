@@ -84,7 +84,7 @@ class Kumogata::ArgumentParser
         opt.on('-p', '--parameters KEY_VALUES', Array)     {|v| options[:parameters]                    = v     }
         opt.on('-e', '--encrypt-parameters KEYS', Array)   {|v| options[:encrypt_parameters]            = v     }
         opt.on('',   '--encryption-password PASS')         {|v| options[:encryption_password]           = v     }
-        opt.on('',   '--skip-pass-encryption-password')    {|v| options[:skip_pass_encryption_password] = true  }
+        opt.on('',   '--skip-send-password')               {    options[:skip_send_password] = true  }
         opt.on(''  , '--capabilities CAPABILITIES', Array) {|v| options[:capabilities]                  = v     }
         opt.on(''  , '--disable-rollback')                 {    options[:disable_rollback]              = true  }
         opt.on(''  , '--notify SNS_TOPICS', Array)         {|v| options[:notify]                        = v     }
@@ -192,7 +192,7 @@ class Kumogata::ArgumentParser
 
     options.parameters = parameters
 
-    if options.encrypt_parameters? and not options.skip_pass_encryption_password?
+    if options.encrypt_parameters? and not options.skip_send_password?
       options.parameters[Kumogata::ENCRYPTION_PASSWORD] = passwd.encode64
     end
   end
