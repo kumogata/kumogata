@@ -81,7 +81,7 @@ Options:
     -s, --secret-key SECRET_KEY
     -r, --region REGION
         --skip-replace-underscore
-        --skip-delete-stack
+        --deletion-policy-retain
     -p, --parameters KEY_VALUES
     -e, --encrypt-parameters KEYS
         --encryption-password PASS
