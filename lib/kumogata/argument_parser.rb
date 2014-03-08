@@ -80,7 +80,6 @@ class Kumogata::ArgumentParser
         opt.on('-s', '--secret-key SECRET_KEY')            {|v| options[:secret_access_key]             = v     }
         opt.on('-r', '--region REGION')                    {|v| options[:region]                        = v     }
         opt.on(''  , '--skip-replace-underscore')          {    options[:replace_underscore]            = false }
-        opt.on(''  , '--skip-delete-stack')                {    options[:delete_stack]                  = false }
         opt.on('-p', '--parameters KEY_VALUES', Array)     {|v| options[:parameters]                    = v     }
         opt.on('-e', '--encrypt-parameters KEYS', Array)   {|v| options[:encrypt_parameters]            = v     }
         opt.on('',   '--encryption-password PASS')         {|v| options[:encryption_password]           = v     }
