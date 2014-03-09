@@ -39,7 +39,7 @@ begin
   out = Kumogata::Client.new(options).send(command, *arguments)
   puts out if out
 rescue Exception => e
-  $stderr.puts("[ERROR] #{e.message}".red)
+  $stderr.puts("[ERROR] #{e.message}".red) unless e.kind_of?(Interrupt)
 
   if options and options.debug?
     raise e
