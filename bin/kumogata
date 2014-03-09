@@ -38,7 +38,7 @@ begin
 
   out = Kumogata::Client.new(options).send(command, *arguments)
   puts out if out
-rescue => e
+rescue Exception => e
   $stderr.puts("[ERROR] #{e.message}".red)
 
   if options and options.debug?
