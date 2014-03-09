@@ -274,7 +274,7 @@ class Kumogata::Client
     rescue AWS::CloudFormation::Errors::ValidationError
       # Handle `Stack does not exist`
       completed = true
-      Kumogata.logger.info('Successfully')
+      Kumogata.logger.info('Success')
     end
 
     unless completed
@@ -339,7 +339,7 @@ class Kumogata::Client
 
     print_event_log(stack, event_log)
     completed = (stack.status == complete_status)
-    Kumogata.logger.info(completed ? 'Successfully' : 'Failed')
+    Kumogata.logger.info(completed ? 'Success' : 'Failure')
     return completed
   end
 
