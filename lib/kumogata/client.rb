@@ -509,11 +509,11 @@ class Kumogata::Client
   def output_result(stack_name, outputs, summaries)
     puts <<-EOS
 
-Outputs:
-#{JSON.pretty_generate(outputs).colorize_as(:json)}
-
 Stack Resource Summaries:
 #{JSON.pretty_generate(summaries).colorize_as(:json)}
+
+Outputs:
+#{JSON.pretty_generate(outputs).colorize_as(:json)}
 
 (Save to `#{@options.result_log}`)
     EOS
@@ -521,8 +521,8 @@ Stack Resource Summaries:
     open(@options.result_log, 'wb') do |f|
       f.puts JSON.pretty_generate({
         'StackName' => stack_name,
-        'Outputs' => outputs,
         'StackResourceSummaries' => summaries,
+        'Outputs' => outputs,
       })
     end
   end
