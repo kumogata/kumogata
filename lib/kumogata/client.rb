@@ -107,11 +107,16 @@ class Kumogata::Client
   private ###########################################################
 
   def open_template(path_or_url)
+    format = @options.format || (ruby_template?(path_or_url) ? :ruby : :json)
+
     open(path_or_url) do |f|
-      if ruby_template?(path_or_url)
+      case format
+      when :ruby
         evaluate_template(f)
-      else
+      when :json
         JSON.parse(f.read)
+      else
+        raise "Unknown format: #{format}"
       end
     end
   end
@@ -324,14 +329,39 @@ class Kumogata::Client
   end
 
   def while_in_progress(stack, complete_status)
+    event_log = {}
+
     while stack.status =~ /_IN_PROGRESS\Z/
-      print '.'.intense_black unless @options.debug?
+      print_event_log(stack, event_log)
       sleep 1
     end
 
+    print_event_log(stack, event_log)
     completed = (stack.status == complete_status)
     Kumogata.logger.info(completed ? 'Successfully' : 'Failed')
     return completed
+  end
+
+  def print_event_log(stack, event_log)
+    events_for(stack).sort_by {|i| i['Timestamp'] }.each do |event|
+      event_id = event['EventId']
+
+      unless event_log[event_id]
+        event_log[event_id] = event
+
+        timestamp = event['Timestamp']
+        summary = {}
+
+        ['LogicalResourceId', 'ResourceStatus', 'ResourceStatusReason'].map do |k|
+          summary[k] = event[k]
+        end
+
+        puts [
+          timestamp.getlocal.strftime('%Y/%m/%d %H:%M:%S %Z'),
+          summary.to_json.colorize_as(:json),
+        ].join(': ')
+      end
+    end
   end
 
   def build_create_options
@@ -377,7 +407,7 @@ class Kumogata::Client
   def update_deletion_policy(template)
     if @options.delete_stack? or @options.deletion_policy_retain?
       template['Resources'].each do |k, v|
-        v['DeletionPolicy'] = 'Retain'
+        v['DeletionPolicy'] ||= 'Retain'
       end
     end
   end

@@ -1,6 +1,8 @@
 describe 'Kumogata::Client#delete' do
   it 'update a stack from Ruby template' do
     run_client(:delete, :arguments => ['MyStack'], :options => {:force => true}) do |client, cf|
+      client.should_receive(:print_event_log).once
+
       stack = make_double('stack') do |obj|
         obj.should_receive(:delete).with(no_args())
         obj.should_receive(:status).and_return(
