@@ -220,8 +220,9 @@ class Kumogata::Client
 
     Kumogata.logger.info("Creating stack: #{stack_name}".cyan)
     stack = @cloud_formation.stacks.create(stack_name, template.to_json, build_create_options)
+    event_log = {}
 
-    unless while_in_progress(stack, 'CREATE_COMPLETE')
+    unless while_in_progress(stack, 'CREATE_COMPLETE', event_log)
       errmsgs = ['Create failed']
       errmsgs << stack_name
       errmsgs << stack.status_reason if stack.status_reason
@@ -241,11 +242,12 @@ class Kumogata::Client
   def update_stack(template, stack_name)
     stack = @cloud_formation.stacks[stack_name]
     stack.status
-    stack.update(build_update_options(template.to_json))
 
     Kumogata.logger.info("Updating stack: #{stack_name}".green)
+    event_log = create_event_log(stack)
+    stack.update(build_update_options(template.to_json))
 
-    unless while_in_progress(stack, 'UPDATE_COMPLETE')
+    unless while_in_progress(stack, 'UPDATE_COMPLETE', event_log)
       errmsgs = ['Update failed']
       errmsgs << stack_name
       errmsgs << stack.status_reason if stack.status_reason
@@ -262,12 +264,13 @@ class Kumogata::Client
     stack.status
 
     Kumogata.logger.info("Deleting stack: #{stack_name}".red)
+    event_log = create_event_log(stack)
     stack.delete
 
     completed = false
 
     begin
-      completed = while_in_progress(stack, 'DELETE_COMPLETE')
+      completed = while_in_progress(stack, 'DELETE_COMPLETE', event_log)
     rescue AWS::CloudFormation::Errors::ValidationError
       # Handle `Stack does not exist`
       completed = true
@@ -328,9 +331,7 @@ class Kumogata::Client
     end
   end
 
-  def while_in_progress(stack, complete_status)
-    event_log = {}
-
+  def while_in_progress(stack, complete_status, event_log)
     while stack.status =~ /_IN_PROGRESS\Z/
       print_event_log(stack, event_log)
       sleep 1
@@ -362,6 +363,17 @@ class Kumogata::Client
         ].join(': ')
       end
     end
+  end
+
+  def create_event_log(stack)
+    event_log = {}
+
+    events_for(stack).sort_by {|i| i['Timestamp'] }.each do |event|
+      event_id = event['EventId']
+      event_log[event_id] = event
+    end
+
+    return event_log
   end
 
   def build_create_options
