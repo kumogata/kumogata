@@ -324,14 +324,39 @@ class Kumogata::Client
   end
 
   def while_in_progress(stack, complete_status)
+    event_log = {}
+
     while stack.status =~ /_IN_PROGRESS\Z/
-      print '.'.intense_black unless @options.debug?
+      print_event_log(stack, event_log)
       sleep 1
     end
 
+    print_event_log(stack, event_log)
     completed = (stack.status == complete_status)
     Kumogata.logger.info(completed ? 'Successfully' : 'Failed')
     return completed
+  end
+
+  def print_event_log(stack, event_log)
+    events_for(stack).sort_by {|i| i['Timestamp'] }.each do |event|
+      event_id = event['EventId']
+
+      unless event_log[event_id]
+        event_log[event_id] = event
+
+        timestamp = event['Timestamp']
+        summary = {}
+
+        ['LogicalResourceId', 'ResourceStatus', 'ResourceStatusReason'].map do |k|
+          summary[k] = event[k]
+        end
+
+        puts [
+          timestamp.getlocal.strftime('%Y/%m/%d %H:%M:%S %Z'),
+          summary.to_json.colorize_as(:json),
+        ].join(': ')
+      end
+    end
   end
 
   def build_create_options
