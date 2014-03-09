@@ -80,7 +80,7 @@ end
 
 def update_deletion_policy(template)
   template['Resources'].each do |k, v|
-    v['DeletionPolicy'] = 'Retain'
+    v['DeletionPolicy'] ||= 'Retain'
   end
 end
 
