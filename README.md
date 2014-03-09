@@ -280,6 +280,8 @@ end # Resources
   * https://asciinema.org/a/7979
 * Convert a template
   * https://asciinema.org/a/7980
+* Create a stack while outputting the event log
+  * https://asciinema.org/a/8075
 
 ## Contributing
 
