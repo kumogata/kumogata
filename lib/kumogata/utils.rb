@@ -14,8 +14,8 @@ class Kumogata::Utils
     end
 
     def random_param_name(n)
-      a_zA_Z = (('a'..'z').to_a + ('A'..'Z').to_a)
-      (a_zA_Z.sample(1) + (a_zA_Z + ['-']).sample(n - 1)).join
+      a_zA_Z0_9 = (('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a)
+      a_zA_Z0_9.sample(n).join
     end
   end # of class methods
 end
