@@ -80,6 +80,7 @@ Options:
     -k, --access-key ACCESS_KEY
     -s, --secret-key SECRET_KEY
     -r, --region REGION
+        --format TMPLATE_FORMAT
         --skip-replace-underscore
         --deletion-policy-retain
     -p, --parameters KEY_VALUES
