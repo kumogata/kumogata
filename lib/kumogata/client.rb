@@ -107,11 +107,16 @@ class Kumogata::Client
   private ###########################################################
 
   def open_template(path_or_url)
+    format = @options.format || (ruby_template?(path_or_url) ? :ruby : :json)
+
     open(path_or_url) do |f|
-      if ruby_template?(path_or_url)
+      case format
+      when :ruby
         evaluate_template(f)
-      else
+      when :json
         JSON.parse(f.read)
+      else
+        raise "Unknown format: #{format}"
       end
     end
   end
