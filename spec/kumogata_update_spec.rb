@@ -23,6 +23,7 @@ end
     run_client(:update, :arguments => ['MyStack'], :template => template) do |client, cf|
       json = eval_template(template).to_json
       client.should_receive(:print_event_log).once
+      client.should_receive(:create_event_log).once
 
       output = make_double('output') do |obj|
         obj.should_receive(:key) { 'AZ' }
@@ -87,6 +88,7 @@ end
     run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}}) do |client, cf|
       json = eval_template(template).to_json
       client.should_receive(:print_event_log).once
+      client.should_receive(:create_event_log).once
 
       output = make_double('output') do |obj|
         obj.should_receive(:key) { 'AZ' }
@@ -176,6 +178,7 @@ end
     run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}, :encrypt_parameters => ['Password']}) do |client, cf|
       json = eval_template(template, :add_encryption_password => true).to_json
       client.should_receive(:print_event_log).once
+      client.should_receive(:create_event_log).once
 
       output = make_double('output') do |obj|
         obj.should_receive(:key) { 'AZ' }
