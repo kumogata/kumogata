@@ -402,7 +402,7 @@ class Kumogata::Client
   def update_deletion_policy(template)
     if @options.delete_stack? or @options.deletion_policy_retain?
       template['Resources'].each do |k, v|
-        v['DeletionPolicy'] = 'Retain'
+        v['DeletionPolicy'] ||= 'Retain'
       end
     end
   end
