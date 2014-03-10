@@ -154,16 +154,100 @@ end
       client.instance_variable_get(:@post_processing)
             .should_receive(:print_command_result)
             .with('command_a', "ap-northeast-1b\nap-northeast-1\n", "", process_status1)
-            .and_return('command_a' => {'ExitStatus' => 0, 'StdOut' => "echo ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""})
+            .and_return('command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""})
       client.instance_variable_get(:@post_processing)
             .should_receive(:print_command_result)
             .with('command_b', "ap-northeast-1\nap-northeast-1b\n", "", process_status2)
-            .and_return('command_b' => {'ExitStatus' => 0, 'StdOut' => "echo ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""})
+            .and_return('command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""})
 
       client.instance_variable_get(:@post_processing)
             .should_receive(:save_command_results)
-            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "echo ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""}},
-                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "echo ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""}}])
+            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""}},
+                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""}}])
+    end
+  end
+
+  it 'create a stack from Ruby template and run ssh command' do
+    template = <<-TEMPLATE
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+Outputs do
+  PublicIp do
+    Value do
+      Fn__GetAtt "myEC2Instance", "PublicIp"
+    end
+  end
+end
+
+_post do
+  ssh_command do
+    ssh do
+      host { Key "PublicIp" }
+      user "ec2-user"
+    end
+    command <<-EOS
+      ls
+    EOS
+  end
+end
+    TEMPLATE
+
+    run_client(:create, :template => template) do |client, cf|
+      json = eval_template(template, :update_deletion_policy => true).to_json
+      client.should_receive(:print_event_log).twice
+      client.should_receive(:create_event_log).once
+
+      output = make_double('output') do |obj|
+        obj.should_receive(:key) { 'PublicIp' }
+        obj.should_receive(:value) { '127.0.0.1' }
+      end
+
+      resource_summary = make_double('resource_summary') do |obj|
+        obj.should_receive(:[]).with(:logical_resource_id) { 'myEC2Instance' }
+        obj.should_receive(:[]).with(:physical_resource_id) { 'i-XXXXXXXX' }
+        obj.should_receive(:[]).with(:resource_type) { 'AWS::EC2::Instance' }
+        obj.should_receive(:[]).with(:resource_status) { 'CREATE_COMPLETE' }
+        obj.should_receive(:[]).with(:resource_status_reason) { nil }
+        obj.should_receive(:[]).with(:last_updated_timestamp) { '2014-03-02 04:35:12 UTC' }
+      end
+
+      stack = make_double('stack') do |obj|
+        obj.should_receive(:status).and_return(
+            'CREATE_COMPLETE', 'CREATE_COMPLETE',
+            'DELETE_COMPLETE', 'DELETE_COMPLETE', 'DELETE_COMPLETE')
+        obj.should_receive(:outputs) { [output] }
+        obj.should_receive(:resource_summaries) { [resource_summary] }
+        obj.should_receive(:delete)
+      end
+
+      stacks = make_double('stacks') do |obj|
+        obj.should_receive(:create)
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {}) { stack }
+        obj.should_receive(:[])
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX') { stack }
+      end
+
+      cf.should_receive(:stacks).twice { stacks }
+
+      Net::SSH.should_receive(:start).with("127.0.0.1", "ec2-user")
+           .and_return(["file1\nfile2\n", "", 0])
+
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:print_command_result)
+            .with('ssh_command', "file1\nfile2\n", "", 0)
+            .and_return('ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""})
+
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:save_command_results)
+            .with([{'ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
     end
   end
 
@@ -264,16 +348,16 @@ end
       client.instance_variable_get(:@post_processing)
             .should_receive(:print_command_result)
             .with('command_a', "ap-northeast-1b\nap-northeast-1\n", "", process_status1)
-            .and_return('command_a' => {'ExitStatus' => 0, 'StdOut' => "echo ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""})
+            .and_return('command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""})
       client.instance_variable_get(:@post_processing)
             .should_receive(:print_command_result)
             .with('command_b', "ap-northeast-1\nap-northeast-1b\n", "", process_status2)
-            .and_return('command_b' => {'ExitStatus' => 0, 'StdOut' => "echo ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""})
+            .and_return('command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""})
 
       client.instance_variable_get(:@post_processing)
             .should_receive(:save_command_results)
-            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "echo ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""}},
-                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "echo ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""}}])
+            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""}},
+                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""}}])
     end
   end
 
