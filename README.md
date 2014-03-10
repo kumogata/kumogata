@@ -303,7 +303,7 @@ _post do
   end
   my_ssh_command do
     ssh do
-      host { Key "cthulhuPublicIp" }
+      host { Key "MyPublicIp" } # or '<%= Key "MyPublicIp" %>'
       user "ec2-user"
     end
     command <<-EOS
