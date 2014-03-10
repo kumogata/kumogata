@@ -337,6 +337,8 @@ Status: 0
   * https://asciinema.org/a/7980
 * Create a stack while outputting the event log
   * https://asciinema.org/a/8075
+* Create a stack and run post commands
+  * https://asciinema.org/a/8088
 
 ## Contributing
 
