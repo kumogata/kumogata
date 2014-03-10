@@ -72,15 +72,18 @@ class Kumogata::PostProcessing
   end
 
   def print_command_result(name, out, err, status)
+    out ||= ''
+    err ||= ''
+
     puts <<-EOS
 
 ---
 Post Command: #{name.send(status.success? ? :green : :red)}
 ExitStatus: #{status.to_i}
 StdOut:
-#{out}
+#{out.chomp}
 StdErr:
-#{err}
+#{err.chomp}
     EOS
 
     {name => {
