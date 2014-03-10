@@ -332,6 +332,8 @@ class Kumogata::Client
   end
 
   def while_in_progress(stack, complete_status, event_log)
+    # XXX: Status does not change if you have been memoized.
+    #      Should be forcibly disabled memoize?
     while stack.status =~ /_IN_PROGRESS\Z/
       print_event_log(stack, event_log)
       sleep 1
