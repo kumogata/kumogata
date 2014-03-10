@@ -1,5 +1,3 @@
-require 'term/ansicolor'
-
 class String
   @@colorize = false
 
@@ -151,7 +149,7 @@ class String
 
     data = data.flatten.select {|i| not i.nil? }.map {|i|
       if i.kind_of?(String)
-        StringIO.new(i).to_a
+        i.lines.to_a
       else
         i
       end

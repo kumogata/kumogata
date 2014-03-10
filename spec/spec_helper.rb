@@ -39,6 +39,7 @@ def run_client(command, options = {})
   kumogata_arguments = options[:arguments] || []
   kumogata_options = Kumogata::ArgumentParser::DEFAULT_OPTIONS.merge(options[:options] || {})
   kumogata_options[:result_log] = '/dev/null'
+  kumogata_options[:command_result_log] = '/dev/null'
   template_ext = options[:template_ext] || '.rb'
 
   client = Kumogata::Client.new(kumogata_options)

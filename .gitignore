@@ -18,3 +18,4 @@ tmp
 packer_cache
 test.rb
 result.json
+command_result.json

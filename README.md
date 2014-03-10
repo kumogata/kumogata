@@ -5,8 +5,8 @@
 
 Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
-[![Gem Version](https://badge.fury.io/rb/kumogata.png?201403100300)](http://badge.fury.io/rb/kumogata)
-[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403100300)](https://drone.io/github.com/winebarrel/kumogata/latest)
+[![Gem Version](https://badge.fury.io/rb/kumogata.png?201403110046)](http://badge.fury.io/rb/kumogata)
+[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403110046)](https://drone.io/github.com/winebarrel/kumogata/latest)
 
 It can define a template in Ruby DSL, such as:
 
@@ -92,6 +92,7 @@ Options:
         --notify SNS_TOPICS
         --timeout MINUTES
         --result-log PATH
+        --command-result-log PATH
         --force
     -w, --ignore-all-space
         --no-color
@@ -274,6 +275,60 @@ Resources do
 end # Resources
 ```
 
+## Post command
+
+You can run shell/ssh commands after building servers using `_post()`.
+
+* Template
+```ruby
+Parameters do
+  ...
+end
+
+Resources do
+  ...
+end
+
+Outputs do
+  MyPublicIp do
+    Value { Fn__GetAtt name, "PublicIp" }
+  end
+end
+
+_post do
+  my_shell_command do
+    command <<-EOS
+      echo <%= Key "MyPublicIp" %>
+    EOS
+  end
+  my_ssh_command do
+    ssh do
+      host { Key "MyPublicIp" } # or '<%= Key "MyPublicIp" %>'
+      user "ec2-user"
+    end
+    command <<-EOS
+      hostname
+    EOS
+  end
+end
+```
+
+* Execution result
+```
+...
+Command: my_shell_command
+Status: 0
+---
+1> 54.199.251.30
+
+Command: my_ssh_command
+Status: 0
+---
+1> ip-10-0-129-20
+
+(Save to `/foo/bar/command_result.json`)
+```
+
 ## Demo
 
 * Create resources
@@ -282,6 +337,8 @@ end # Resources
   * https://asciinema.org/a/7980
 * Create a stack while outputting the event log
   * https://asciinema.org/a/8075
+* Create a stack and run post commands
+  * https://asciinema.org/a/8088
 
 ## Contributing
 
