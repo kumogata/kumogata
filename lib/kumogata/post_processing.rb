@@ -23,7 +23,7 @@ class Kumogata::PostProcessing
       validate_timing(timing)
       command = attrs.fetch('command')
 
-      @commands[name.to_sym] = {
+      @commands[name] = {
         :after   => timing,
         :command => command,
       }
