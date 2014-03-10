@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hashie'
   spec.add_dependency 'highline'
   spec.add_dependency 'json'
+  spec.add_dependency 'net-ssh'
   spec.add_dependency 'term-ansicolor'
   spec.add_dependency 'uuidtools'
   spec.add_development_dependency 'bundler'
