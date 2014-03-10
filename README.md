@@ -92,6 +92,7 @@ Options:
         --notify SNS_TOPICS
         --timeout MINUTES
         --result-log PATH
+        --command-result-log PATH
         --force
     -w, --ignore-all-space
         --no-color
