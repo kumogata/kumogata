@@ -3,6 +3,7 @@ class Kumogata::Client
     @options = options
     @options = Hashie::Mash.new(@options) unless @options.kind_of?(Hashie::Mash)
     @cloud_formation = AWS::CloudFormation.new
+    @post_processing = Kumogata::PostProcessing.new(@options)
   end
 
   def create(path_or_url, stack_name = nil)
@@ -12,7 +13,10 @@ class Kumogata::Client
     template = open_template(path_or_url)
     update_deletion_policy(template)
     add_encryption_password(template)
-    create_stack(template, stack_name)
+
+    outputs = create_stack(template, stack_name)
+    @post_processing.run(:create, outputs)
+
     nil
   end
 
@@ -41,7 +45,10 @@ class Kumogata::Client
     end
 
     add_encryption_password(template)
-    update_stack(template, stack_name)
+
+    outputs = update_stack(template, stack_name)
+    @post_processing.run(:update, outputs)
+
     nil
   end
 
@@ -141,7 +148,7 @@ class Kumogata::Client
       end
     end
 
-    Dslh.eval(template.read, {
+    template = Dslh.eval(template.read, {
       :key_conv   => key_converter,
       :value_conv => value_converter,
       :scope_hook => proc {|scope|
@@ -149,6 +156,16 @@ class Kumogata::Client
       },
       :filename   => template.path,
     })
+
+    @post_processing.fetch!(template)
+
+    return template
+  end
+
+  def evaluate_after_trigger(template)
+    triggers = template.delete('_after')
+    return {} unless triggers
+
   end
 
   def devaluate_template(template)
@@ -203,6 +220,15 @@ class Kumogata::Client
 
         @__hash__[path] = value
       end
+
+      def _post(options = {}, &block)
+        commands = Dslh::ScopeBlock.nest(binding, 'block')
+
+        @__hash__[:_post] = {
+          :options  => options,
+          :commands => commands,
+        }
+      end
     EOS
   end
 
@@ -237,6 +263,8 @@ class Kumogata::Client
     end
 
     output_result(stack_name, outputs, summaries)
+
+    return outputs
   end
 
   def update_stack(template, stack_name)
@@ -257,6 +285,8 @@ class Kumogata::Client
     outputs = outputs_for(stack)
     summaries = resource_summaries_for(stack)
     output_result(stack_name, outputs, summaries)
+
+    return outputs
   end
 
   def delete_stack(stack_name)

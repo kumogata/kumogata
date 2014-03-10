@@ -6,6 +6,7 @@ class Kumogata::ArgumentParser
     :replace_underscore => true,
     :delete_stack => true,
     :result_log => File.join(Dir.pwd, 'result.json'),
+    :command_result_log => File.join(Dir.pwd, 'command_result.json'),
     :color => true,
     :debug => false,
   }
@@ -91,6 +92,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--notify SNS_TOPICS', Array)              {|v| options[:notify]                        = v     }
         opt.on(''  , '--timeout MINUTES', Integer)              {|v| options[:timeout]                       = v     }
         opt.on(''  , '--result-log PATH')                       {|v| options[:result_log]                    = v     }
+        opt.on(''  , '--command-result-log PATH')               {|v| options[:command]                       = v     }
         opt.on(''  , '--force')                                 {    options[:force]                         = true  }
         opt.on('-w', '--ignore-all-space')                      {    options[:ignore_all_space]              = true  }
         opt.on(''  , '--no-color')                              {    options[:color]                         = false }
