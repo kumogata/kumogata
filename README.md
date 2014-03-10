@@ -274,6 +274,60 @@ Resources do
 end # Resources
 ```
 
+## Post command
+
+You can run shell/ssh commands after building servers using `_post()`.
+
+* Template
+```ruby
+Parameters do
+  ...
+end
+
+Resources do
+  ...
+end
+
+Outputs do
+  MyPublicIp do
+    Value { Fn__GetAtt name, "PublicIp" }
+  end
+end
+
+_post do
+  my_shell_command do
+    command <<-EOS
+      echo <%= Key "MyPublicIp" %>
+    EOS
+  end
+  my_ssh_command do
+    ssh do
+      host { Key "cthulhuPublicIp" }
+      user "ec2-user"
+    end
+    command <<-EOS
+      hostname
+    EOS
+  end
+end
+```
+
+* Execution result
+```
+...
+Command: my_shell_command
+Status: 0
+---
+1> 54.199.251.30
+
+Command: my_ssh_command
+Status: 0
+---
+1> ip-10-0-129-20
+
+(Save to `/foo/bar/command_result.json`)
+```
+
 ## Demo
 
 * Create resources
