@@ -272,7 +272,7 @@ Command: #{name.intense_blue}
 
   def create_string_streams
     stdout_stream = Kumogata::StringStream.new do |line|
-      puts '1> '.intense_green line
+      puts '1> '.intense_green + line
     end
 
     stderr_stream = Kumogata::StringStream.new do |line|
