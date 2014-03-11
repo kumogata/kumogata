@@ -305,6 +305,10 @@ _post do
     ssh do
       host { Key "MyPublicIp" } # or '<%= Key "MyPublicIp" %>'
       user "ec2-user"
+      # see http://net-ssh.github.io/net-ssh/classes/Net/SSH.html#method-c-start
+      #options :timeout => 300
+      #connect_tries 10
+      #retry_interval 5
     end
     command <<-EOS
       hostname
