@@ -43,8 +43,17 @@ class Kumogata::PostProcessing
     @commands.each do |name, attrs|
       next unless attrs[:after].include?(timing)
 
+      print_command(name)
       out, err, status = run_command(attrs, outputs)
-      results << print_command_result(name, out, err, status)
+      print_command_result(out, err, status)
+
+      results << {
+        name => {
+          'ExitStatus' => status.to_i,
+          'StdOut' => out.force_encoding('UTF-8'),
+          'StdErr' => err.force_encoding('UTF-8'),
+        }
+      }
     end
 
     save_command_results(results) unless results.empty?
@@ -178,26 +187,25 @@ class Kumogata::PostProcessing
     EOS
   end
 
-  def print_command_result(name, out, err, status)
+  def print_command(name)
+    puts <<-EOS
+
+Command: #{name.intense_blue}
+    EOS
+  end
+
+  def print_command_result(out, err, status)
     status = status.to_i
     dspout = (out || '').lines.map {|i| "1> ".intense_green + i }.join.chomp
     dsperr = (err || '').lines.map {|i| "2> ".intense_red + i }.join.chomp
 
     puts <<-EOS
-
-Command: #{name.intense_blue}
 Status: #{status.zero? ? status : status.to_s.red}#{
   dspout.empty? ? '' : ("\n---\n" + dspout)
 }#{
   dsperr.empty? ? '' : ("\n---\n" + dsperr)
 }
     EOS
-
-    {name => {
-      'ExitStatus' => status,
-      'StdOut' => out.force_encoding('UTF-8'),
-      'StdErr' => err.force_encoding('UTF-8'),
-    }}
   end
 
   def save_command_results(results)
