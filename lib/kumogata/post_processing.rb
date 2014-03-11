@@ -151,6 +151,8 @@ class Kumogata::PostProcessing
     exit_code = nil
     #exit_signal = nil
 
+    stdout_stream, stderr_stream = create_string_streams
+
     ssh.open_channel do |channel|
       channel.exec(command) do |ch, success|
         unless success
@@ -158,10 +160,12 @@ class Kumogata::PostProcessing
         end
 
         channel.on_data do |ch, data|
+          stdout_stream.push data
           stdout_data << data
         end
 
         channel.on_extended_data do |ch, type, data|
+          stderr_stream.push data
           stderr_data << data
         end
 
@@ -177,13 +181,47 @@ class Kumogata::PostProcessing
 
     ssh.loop
 
+    stdout_stream.close
+    stderr_stream.close
+
     #[stdout_data, stderr_data, exit_code, exit_signal]
     [stdout_data, stderr_data, exit_code]
   end
 
   def run_shell_command(command, outputs)
     command = evaluate_command_template(command, outputs)
-    Open3.capture3(command)
+
+    stdout_data = ''
+    stderr_data = ''
+    exit_code = nil
+
+    stdout_stream, stderr_stream = create_string_streams
+
+    Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
+      th_out = Thread.start do
+        stdout.each_line do |line|
+          stdout_stream.push line
+          stdout_data << line
+        end
+      end
+
+      th_err = Thread.start do
+        stdout.each_line do |line|
+          stdout_stream.push line
+          stdout_data << line
+        end
+      end
+
+      th_out.join
+      th_err.join
+      exit_code = wait_thr.value
+    end
+
+    stdout_stream.close
+    stderr_stream.close
+
+    #[stdout_data, stderr_data, exit_code, exit_signal]
+    [stdout_data, stderr_data, exit_code]
   end
 
   def validate_command_template(name, command, outputs)
@@ -232,17 +270,23 @@ Command: #{name.intense_blue}
     EOS
   end
 
-  def print_command_result(out, err, status)
+  def create_string_streams
+    stdout_stream = Kumogata::StringStream.new do |line|
+      puts '1> '.intense_green line
+    end
+
+    stderr_stream = Kumogata::StringStream.new do |line|
+      puts '2> '.intense_red + line
+    end
+
+    [stdout_stream, stderr_stream]
+  end
+
+  def print_command_result(out, err, status) # XXX:
     status = status.to_i
-    dspout = (out || '').lines.map {|i| "1> ".intense_green + i }.join.chomp
-    dsperr = (err || '').lines.map {|i| "2> ".intense_red + i }.join.chomp
 
     puts <<-EOS
-Status: #{status.zero? ? status : status.to_s.red}#{
-  dspout.empty? ? '' : ("\n---\n" + dspout)
-}#{
-  dsperr.empty? ? '' : ("\n---\n" + dsperr)
-}
+Status: #{status.zero? ? status : status.to_s.red}
     EOS
   end
 
