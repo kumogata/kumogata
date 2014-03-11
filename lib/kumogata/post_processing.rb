@@ -18,21 +18,26 @@ class Kumogata::PostProcessing
     options = _post[:options] || {}
     @command_options.merge(options)
 
+    outputs = template['Outputs'] || {}
+
     _post.fetch(:commands).each do |name, attrs|
       unless attrs.kind_of?(Hash) and attrs['command']
         raise "Invalid post processing: #{name} => #{attrs.inspect}"
       end
 
       timing = [(attrs['after'] || TRIGGER_TIMING)].flatten.map {|i| i.to_sym }
+      command = attrs['command']
+
       validate_timing(name, timing)
+      validate_command_template(name, command, outputs)
 
       @commands[name] = {
         :after   => timing,
-        :command => attrs['command'],
+        :command => command,
       }
 
       if (ssh = attrs['ssh'])
-        validate_ssh(name, ssh)
+        validate_ssh(name, ssh, outputs)
         @commands[name][:ssh] = ssh
       end
     end
@@ -70,7 +75,7 @@ class Kumogata::PostProcessing
     end
   end
 
-  def validate_ssh(name, ssh)
+  def validate_ssh(name, ssh, outputs)
     host, user, options = ssh.values_at('host', 'user', 'options')
 
     unless host and user
@@ -88,6 +93,8 @@ class Kumogata::PostProcessing
       ssh['host'] = host.to_s
     end
 
+    validate_command_template(name, ssh['host'], outputs)
+
     if user.kind_of?(Hash)
       if user.keys != ['Key']
         raise "Invalid post processing ssh user: #{name} => #{user.inspect}"
@@ -98,6 +105,8 @@ class Kumogata::PostProcessing
     else
       ssh['user'] = user.to_s
     end
+
+    validate_command_template(name, ssh['user'], outputs)
 
     if options and not options.kind_of?(Hash)
       raise "Invalid post processing ssh options: #{name} => #{options.inspect}"
@@ -170,6 +179,29 @@ class Kumogata::PostProcessing
   def run_shell_command(command, outputs)
     command = evaluate_command_template(command, outputs)
     Open3.capture3(command)
+  end
+
+  def validate_command_template(name, command, outputs)
+    command = command.undent if @command_options[:undent]
+    trim_mode = @command_options[:trim_mode]
+    expected_outputs = Set.new
+
+    scope = Object.new
+    scope.instance_variable_set(:@__expected_outputs__, expected_outputs)
+
+    scope.instance_eval(<<-EOS)
+      def Key(name)
+        @__expected_outputs__ << name
+      end
+
+      ERB.new(#{command.inspect}, nil, #{trim_mode.inspect}).result(binding)
+    EOS
+
+    expected_outputs.each do |key|
+      unless outputs.keys.include?(key)
+        raise "Unknown output: #{name} => #{key.inspect}"
+      end
+    end
   end
 
   def evaluate_command_template(command, outputs)
