@@ -137,8 +137,9 @@ end
 
       cf.should_receive(:stacks) { stacks }
 
-      process_status1 = double('process_status1')
-      process_status2 = double('process_status2')
+
+      process_status1 = make_double('process_status1') {|obj| obj.should_receive(:to_i).and_return(0) }
+      process_status2 = make_double('process_status2') {|obj| obj.should_receive(:to_i).and_return(0) }
 
       Open3.should_receive(:capture3).with("echo ap-northeast-1b\necho ap-northeast-1\n")
            .and_return(["ap-northeast-1b\nap-northeast-1\n", "", process_status1])
@@ -146,18 +147,21 @@ end
            .and_return(["ap-northeast-1\nap-northeast-1b\n", "", process_status2])
 
       client.instance_variable_get(:@post_processing)
-            .should_receive(:print_command_result)
-            .with('command_a', "ap-northeast-1b\nap-northeast-1\n", "", process_status1)
-            .and_return('command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""})
+            .should_receive(:print_command).with('command_a')
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:print_command).with('command_b')
+
       client.instance_variable_get(:@post_processing)
             .should_receive(:print_command_result)
-            .with('command_b', "ap-northeast-1\nap-northeast-1b\n", "", process_status2)
-            .and_return('command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""})
+            .with("ap-northeast-1b\nap-northeast-1\n", "", process_status1)
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:print_command_result)
+            .with("ap-northeast-1\nap-northeast-1b\n", "", process_status2)
 
       client.instance_variable_get(:@post_processing)
             .should_receive(:save_command_results)
-            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""}},
-                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""}}])
+            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
+                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
     end
   end
 
@@ -232,13 +236,16 @@ end
            .and_return(["file1\nfile2\n", "", 0])
 
       client.instance_variable_get(:@post_processing)
+            .should_receive(:print_command).with('ssh_command')
+
+      client.instance_variable_get(:@post_processing)
             .should_receive(:print_command_result)
-            .with('ssh_command', "file1\nfile2\n", "", 0)
-            .and_return('ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""})
+            .with("file1\nfile2\n", "", 0)
 
       client.instance_variable_get(:@post_processing)
             .should_receive(:save_command_results)
             .with([{'ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
+
     end
   end
 
@@ -325,8 +332,9 @@ end
 
       cf.should_receive(:stacks) { stacks }
 
-      process_status1 = double('process_status1')
-      process_status2 = double('process_status2')
+
+      process_status1 = make_double('process_status1') {|obj| obj.should_receive(:to_i).and_return(0) }
+      process_status2 = make_double('process_status2') {|obj| obj.should_receive(:to_i).and_return(0) }
 
       Open3.should_receive(:capture3).with("echo ap-northeast-1b\necho ap-northeast-1\n")
            .and_return(["ap-northeast-1b\nap-northeast-1\n", "", process_status1])
@@ -334,18 +342,21 @@ end
            .and_return(["ap-northeast-1\nap-northeast-1b\n", "", process_status2])
 
       client.instance_variable_get(:@post_processing)
-            .should_receive(:print_command_result)
-            .with('command_a', "ap-northeast-1b\nap-northeast-1\n", "", process_status1)
-            .and_return('command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""})
+            .should_receive(:print_command).with('command_a')
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:print_command).with('command_b')
+
       client.instance_variable_get(:@post_processing)
             .should_receive(:print_command_result)
-            .with('command_b', "ap-northeast-1\nap-northeast-1b\n", "", process_status2)
-            .and_return('command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""})
+            .with("ap-northeast-1b\nap-northeast-1\n", "", process_status1)
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:print_command_result)
+            .with("ap-northeast-1\nap-northeast-1b\n", "", process_status2)
 
       client.instance_variable_get(:@post_processing)
             .should_receive(:save_command_results)
-            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\necho ap-northeast-1\n", 'StdErr' => ""}},
-                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\necho ap-northeast-1b\n", 'StdErr' => ""}}])
+            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
+                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
     end
   end
 

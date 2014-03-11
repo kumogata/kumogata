@@ -19,15 +19,16 @@ class Kumogata::PostProcessing
     @command_options.merge(options)
 
     _post.fetch(:commands).each do |name, attrs|
+      unless attrs.kind_of?(Hash) and attrs['command']
+        raise "Invalid post processing: #{name} => #{attrs.inspect}"
+      end
+
       timing = [(attrs['after'] || TRIGGER_TIMING)].flatten.map {|i| i.to_sym }
       validate_timing(name, timing)
 
-      command = attrs['command']
-      next unless command
-
       @commands[name] = {
         :after   => timing,
-        :command => command,
+        :command => attrs['command'],
       }
 
       if (ssh = attrs['ssh'])
@@ -43,8 +44,17 @@ class Kumogata::PostProcessing
     @commands.each do |name, attrs|
       next unless attrs[:after].include?(timing)
 
+      print_command(name)
       out, err, status = run_command(attrs, outputs)
-      results << print_command_result(name, out, err, status)
+      print_command_result(out, err, status)
+
+      results << {
+        name => {
+          'ExitStatus' => status.to_i,
+          'StdOut' => out.force_encoding('UTF-8'),
+          'StdErr' => err.force_encoding('UTF-8'),
+        }
+      }
     end
 
     save_command_results(results) unless results.empty?
@@ -55,7 +65,7 @@ class Kumogata::PostProcessing
   def validate_timing(name, timing)
     timing.each do |t|
       unless TRIGGER_TIMING.include?(t)
-        raise "Unknown post processing timing #{timing.inspect} in #{name}"
+        raise "Unknown post processing timing: #{name} => #{timing.inspect}"
       end
     end
   end
@@ -64,12 +74,12 @@ class Kumogata::PostProcessing
     host, user, options = ssh.values_at('host', 'user', 'options')
 
     unless host and user
-      raise "`host` and `user` is required for post processing ssh in #{name}"
+      raise "`host` and `user` is required for post processing ssh: #{name}"
     end
 
     if host.kind_of?(Hash)
       if host.keys != ['Key']
-        raise "Invalid post processing ssh host #{host.inspect} in #{name}"
+        raise "Invalid post processing ssh host: #{name} => #{host.inspect}"
       end
 
       host_key, host_value = host.first
@@ -80,7 +90,7 @@ class Kumogata::PostProcessing
 
     if user.kind_of?(Hash)
       if user.keys != ['Key']
-        raise "Invalid post processing ssh user #{user.inspect} in #{name}"
+        raise "Invalid post processing ssh user: #{name} => #{user.inspect}"
       end
 
       user_key, user_value = user.first
@@ -90,7 +100,7 @@ class Kumogata::PostProcessing
     end
 
     if options and not options.kind_of?(Hash)
-      raise "Invalid post processing ssh options #{user.inspect} in #{name}"
+      raise "Invalid post processing ssh options: #{name} => #{options.inspect}"
     end
   end
 
@@ -178,26 +188,25 @@ class Kumogata::PostProcessing
     EOS
   end
 
-  def print_command_result(name, out, err, status)
+  def print_command(name)
+    puts <<-EOS
+
+Command: #{name.intense_blue}
+    EOS
+  end
+
+  def print_command_result(out, err, status)
     status = status.to_i
     dspout = (out || '').lines.map {|i| "1> ".intense_green + i }.join.chomp
     dsperr = (err || '').lines.map {|i| "2> ".intense_red + i }.join.chomp
 
     puts <<-EOS
-
-Command: #{name.intense_blue}
 Status: #{status.zero? ? status : status.to_s.red}#{
   dspout.empty? ? '' : ("\n---\n" + dspout)
 }#{
   dsperr.empty? ? '' : ("\n---\n" + dsperr)
 }
     EOS
-
-    {name => {
-      'ExitStatus' => status,
-      'StdOut' => out.force_encoding('UTF-8'),
-      'StdErr' => err.force_encoding('UTF-8'),
-    }}
   end
 
   def save_command_results(results)
