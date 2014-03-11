@@ -206,9 +206,9 @@ class Kumogata::PostProcessing
       end
 
       th_err = Thread.start do
-        stdout.each_line do |line|
-          stdout_stream.push line
-          stdout_data << line
+        stderr.each_line do |line|
+          stderr_stream.push line
+          stderr_data << line
         end
       end
 
