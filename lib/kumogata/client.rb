@@ -39,7 +39,10 @@ class Kumogata::Client
 
   def update(path_or_url, stack_name)
     validate_stack_name(stack_name)
+
+    @options.delete_stack = false
     template = open_template(path_or_url)
+    update_deletion_policy(template, :update_metadate => true)
     add_encryption_password(template)
 
     outputs = update_stack(template, stack_name)
@@ -444,11 +447,16 @@ class Kumogata::Client
     end
   end
 
-  def update_deletion_policy(template)
+  def update_deletion_policy(template, options = {})
     if @options.delete_stack? or @options.deletion_policy_retain?
       template['Resources'].each do |k, v|
         next if /\AAWS::CloudFormation::/ =~ v['Type']
         v['DeletionPolicy'] ||= 'Retain'
+
+        if options[:update_metadate]
+          v['Metadata'] ||= {}
+          v['Metadata']['DeletionPolicyUpdateKeyForKumogata'] = "DeletionPolicyUpdateValueForKumogata#{Time.now.to_i}"
+        end
       end
     end
   end

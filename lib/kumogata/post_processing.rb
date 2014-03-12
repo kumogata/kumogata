@@ -25,7 +25,7 @@ class Kumogata::PostProcessing
         raise "Invalid post processing: #{name} => #{attrs.inspect}"
       end
 
-      timing = [(attrs['after'] || TRIGGER_TIMING)].flatten.map {|i| i.to_sym }
+      timing = [(attrs['after'] || [:create])].flatten.map {|i| i.to_sym }
       command = attrs['command']
 
       validate_timing(name, timing)

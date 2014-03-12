@@ -56,6 +56,69 @@ end
     end
   end
 
+  it 'update a stack from Ruby template with deletion policy retain' do
+    template = <<-EOS
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+
+    Timecop.freeze(Time.parse('2014/03/13 0:00')) do
+      run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:deletion_policy_retain => true}) do |client, cf|
+        template = eval_template(template, :update_deletion_policy => true)
+        template["Resources"]["myEC2Instance"]["Metadata"] = {
+          "DeletionPolicyUpdateKeyForKumogata" => "DeletionPolicyUpdateValueForKumogata1394636400"
+        }
+        json = template.to_json
+        client.should_receive(:print_event_log).once
+        client.should_receive(:create_event_log).once
+
+        output = make_double('output') do |obj|
+          obj.should_receive(:key) { 'AZ' }
+          obj.should_receive(:value) { 'ap-northeast-1b' }
+        end
+
+        resource_summary = make_double('resource_summary') do |obj|
+          obj.should_receive(:[]).with(:logical_resource_id) { 'myEC2Instance' }
+          obj.should_receive(:[]).with(:physical_resource_id) { 'i-XXXXXXXX' }
+          obj.should_receive(:[]).with(:resource_type) { 'AWS::EC2::Instance' }
+          obj.should_receive(:[]).with(:resource_status) { 'UPDATE_COMPLETE' }
+          obj.should_receive(:[]).with(:resource_status_reason) { nil }
+          obj.should_receive(:[]).with(:last_updated_timestamp) { '2014-03-02 04:35:12 UTC' }
+        end
+
+        stack = make_double('stack') do |obj|
+          obj.should_receive(:update).with(:template => json)
+          obj.should_receive(:status).and_return(
+              'UPDATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_COMPLETE')
+          obj.should_receive(:outputs) { [output] }
+          obj.should_receive(:resource_summaries) { [resource_summary] }
+        end
+
+        stacks = make_double('stacks') do |obj|
+          obj.should_receive(:[])
+             .with('MyStack') { stack }
+        end
+
+        cf.should_receive(:stacks) { stacks }
+      end
+    end
+  end
+
   it 'update a stack from Ruby template and run command' do
     template = <<-TEMPLATE
 Resources do
@@ -137,35 +200,16 @@ end
 
       cf.should_receive(:stacks) { stacks }
 
+      process_status1 = double('process_status1')
+      process_status2 = double('process_status2')
 
-      process_status1 = make_double('process_status1') {|obj| obj.should_receive(:to_i).and_return(0) }
-      process_status2 = make_double('process_status2') {|obj| obj.should_receive(:to_i).and_return(0) }
-
-      client.instance_variable_get(:@post_processing)
-           .should_receive(:run_shell_command)
-           .with("      echo <%= Key \"AZ\" %>\n      echo <%= Key \"Region\" %>\n", {"AZ"=>"ap-northeast-1b", "Region"=>"ap-northeast-1"})
-           .and_return(["ap-northeast-1b\nap-northeast-1\n", "", process_status1])
-      client.instance_variable_get(:@post_processing)
-           .should_receive(:run_shell_command)
-           .with("      echo <%= Key \"Region\" %>\n      echo <%= Key \"AZ\" %>\n", {"AZ"=>"ap-northeast-1b", "Region"=>"ap-northeast-1"})
-           .and_return(["ap-northeast-1\nap-northeast-1b\n", "", process_status2])
+      Open3.should_not_receive(:capture3)
 
       client.instance_variable_get(:@post_processing)
-            .should_receive(:print_command).with('command_a')
-      client.instance_variable_get(:@post_processing)
-            .should_receive(:print_command).with('command_b')
+            .should_not_receive(:print_command_result)
 
       client.instance_variable_get(:@post_processing)
-            .should_receive(:print_command_result)
-            .with("ap-northeast-1b\nap-northeast-1\n", "", process_status1)
-      client.instance_variable_get(:@post_processing)
-            .should_receive(:print_command_result)
-            .with("ap-northeast-1\nap-northeast-1b\n", "", process_status2)
-
-      client.instance_variable_get(:@post_processing)
-            .should_receive(:save_command_results)
-            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
-                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
+            .should_not_receive(:save_command_results)
     end
   end
 
@@ -191,6 +235,7 @@ end
 
 _post do
   ssh_command do
+    after :update
     ssh do
       host { Key "PublicIp" }
       user "ec2-user"
@@ -251,7 +296,6 @@ end
       client.instance_variable_get(:@post_processing)
             .should_receive(:save_command_results)
             .with([{'ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
-
     end
   end
 

@@ -1,5 +1,7 @@
 require 'kumogata'
 require 'tempfile'
+require 'time'
+require 'timecop'
 require 'uuidtools'
 
 Kumogata::ENCRYPTION_PASSWORD.replace('EncryptionPassword')
