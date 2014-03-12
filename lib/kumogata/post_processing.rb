@@ -135,13 +135,22 @@ class Kumogata::PostProcessing
     connect_tries = (ssh['connect_tries'] || 36).to_i
     retry_interval = (ssh['retry_interval'] || 5).to_i
 
+    stderr_orig = nil
+
     begin
-      retryable(:tries => connect_tries, :on => Net::SSH::Disconnect, :sleep => retry_interval) do
-        Net::SSH.start(*args) {|ssh| ssh_exec!(ssh, command) }
+      stderr_orig = STDERR.dup
+      STDERR.reopen('/dev/null', 'w')
+
+      begin
+        retryable(:tries => connect_tries, :on => Net::SSH::Disconnect, :sleep => retry_interval) do
+          Net::SSH.start(*args) {|ssh| ssh_exec!(ssh, command) }
+        end
+      rescue Net::SSH::HostKeyMismatch => e
+        e.remember_host!
+        retry
       end
-    rescue Net::SSH::HostKeyMismatch => e
-      e.remember_host!
-      retry
+    ensure
+      STDERR.reopen(stderr_orig)
     end
   end
 
