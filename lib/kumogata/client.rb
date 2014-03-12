@@ -148,7 +148,7 @@ class Kumogata::Client
       :key_conv   => key_converter,
       :value_conv => value_converter,
       :scope_hook => proc {|scope|
-        define_template_func(scope, template.path)
+        define_template_func(scope, path_or_url)
       },
       :filename   => path_or_url,
     })
