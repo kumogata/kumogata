@@ -141,9 +141,13 @@ end
       process_status1 = make_double('process_status1') {|obj| obj.should_receive(:to_i).and_return(0) }
       process_status2 = make_double('process_status2') {|obj| obj.should_receive(:to_i).and_return(0) }
 
-      Open3.should_receive(:capture3).with("echo ap-northeast-1b\necho ap-northeast-1\n")
+      client.instance_variable_get(:@post_processing)
+           .should_receive(:run_shell_command)
+           .with("      echo <%= Key \"AZ\" %>\n      echo <%= Key \"Region\" %>\n", {"AZ"=>"ap-northeast-1b", "Region"=>"ap-northeast-1"})
            .and_return(["ap-northeast-1b\nap-northeast-1\n", "", process_status1])
-      Open3.should_receive(:capture3).with("echo ap-northeast-1\necho ap-northeast-1b\n")
+      client.instance_variable_get(:@post_processing)
+           .should_receive(:run_shell_command)
+           .with("      echo <%= Key \"Region\" %>\n      echo <%= Key \"AZ\" %>\n", {"AZ"=>"ap-northeast-1b", "Region"=>"ap-northeast-1"})
            .and_return(["ap-northeast-1\nap-northeast-1b\n", "", process_status2])
 
       client.instance_variable_get(:@post_processing)
@@ -232,7 +236,9 @@ end
 
       cf.should_receive(:stacks) { stacks }
 
-      Net::SSH.should_receive(:start).with("127.0.0.1", "ec2-user")
+      client.instance_variable_get(:@post_processing)
+           .should_receive(:run_ssh_command)
+           .with({"host"=>"<%= Key \"PublicIp\" %>", "user"=>"ec2-user"}, "      ls\n", {"PublicIp"=>"127.0.0.1"})
            .and_return(["file1\nfile2\n", "", 0])
 
       client.instance_variable_get(:@post_processing)
@@ -336,9 +342,13 @@ end
       process_status1 = make_double('process_status1') {|obj| obj.should_receive(:to_i).and_return(0) }
       process_status2 = make_double('process_status2') {|obj| obj.should_receive(:to_i).and_return(0) }
 
-      Open3.should_receive(:capture3).with("echo ap-northeast-1b\necho ap-northeast-1\n")
+      client.instance_variable_get(:@post_processing)
+           .should_receive(:run_shell_command)
+           .with("      echo <%= Key \"AZ\" %>\n      echo <%= Key \"Region\" %>\n", {"AZ"=>"ap-northeast-1b", "Region"=>"ap-northeast-1"})
            .and_return(["ap-northeast-1b\nap-northeast-1\n", "", process_status1])
-      Open3.should_receive(:capture3).with("echo ap-northeast-1\necho ap-northeast-1b\n")
+      client.instance_variable_get(:@post_processing)
+           .should_receive(:run_shell_command)
+           .with("      echo <%= Key \"Region\" %>\n      echo <%= Key \"AZ\" %>\n", {"AZ"=>"ap-northeast-1b", "Region"=>"ap-northeast-1"})
            .and_return(["ap-northeast-1\nap-northeast-1b\n", "", process_status2])
 
       client.instance_variable_get(:@post_processing)
