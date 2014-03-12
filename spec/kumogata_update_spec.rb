@@ -77,11 +77,11 @@ Outputs do
 end
     EOS
 
-    Timecop.freeze(Time.parse('2014/03/13 0:00')) do
+    Timecop.freeze(Time.utc(2014)) do
       run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:deletion_policy_retain => true}) do |client, cf|
         template = eval_template(template, :update_deletion_policy => true)
         template["Resources"]["myEC2Instance"]["Metadata"] = {
-          "DeletionPolicyUpdateKeyForKumogata" => "DeletionPolicyUpdateValueForKumogata1394636400"
+          "DeletionPolicyUpdateKeyForKumogata" => "DeletionPolicyUpdateValueForKumogata1388534400"
         }
         json = template.to_json
         client.should_receive(:print_event_log).once
