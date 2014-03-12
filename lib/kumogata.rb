@@ -19,6 +19,7 @@ require 'set'
 require 'singleton'
 require 'strscan'
 require 'term/ansicolor'
+require 'thread'
 require 'uuidtools'
 
 require 'kumogata/argument_parser'

@@ -116,6 +116,7 @@ describe Kumogata::StringStream do
       "chunk3chunk4chunk5",
       "",
       "",
+      "",
       "chunk6chunk7",
     ])
   end

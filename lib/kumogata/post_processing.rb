@@ -151,7 +151,8 @@ class Kumogata::PostProcessing
     exit_code = nil
     #exit_signal = nil
 
-    stdout_stream, stderr_stream = create_string_streams
+    stdout_stream = create_stdout_stream
+    stderr_stream = create_stderr_stream
 
     ssh.open_channel do |channel|
       channel.exec(command) do |ch, success|
@@ -195,30 +196,40 @@ class Kumogata::PostProcessing
     stderr_data = ''
     exit_code = nil
 
-    stdout_stream, stderr_stream = create_string_streams
-
     Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
+      mutex = Mutex.new
+
       th_out = Thread.start do
+        stdout_stream = create_stdout_stream
+
         stdout.each_line do |line|
-          stdout_stream.push line
+          mutex.synchronize do
+            stdout_stream.push line
+          end
+
           stdout_data << line
         end
+
+        stdout_stream.close
       end
 
       th_err = Thread.start do
+        stderr_stream = create_stderr_stream
+
         stderr.each_line do |line|
-          stderr_stream.push line
+          mutex.synchronize do
+            stderr_stream.push line
+          end
           stderr_data << line
         end
+
+        stderr_stream.close
       end
 
       th_out.join
       th_err.join
       exit_code = wait_thr.value
     end
-
-    stdout_stream.close
-    stderr_stream.close
 
     #[stdout_data, stderr_data, exit_code, exit_signal]
     [stdout_data, stderr_data, exit_code]
@@ -270,16 +281,18 @@ Command: #{name.intense_blue}
     EOS
   end
 
-  def create_string_streams
-    stdout_stream = Kumogata::StringStream.new do |line|
+  def create_stdout_stream
+    Kumogata::StringStream.new do |line|
       puts '1> '.intense_green + line
+      $stdout.flush
     end
+  end
 
-    stderr_stream = Kumogata::StringStream.new do |line|
+  def create_stderr_stream
+    Kumogata::StringStream.new do |line|
       puts '2> '.intense_red + line
+      $stdout.flush
     end
-
-    [stdout_stream, stderr_stream]
   end
 
   def print_command_result(out, err, status) # XXX:

@@ -4,22 +4,26 @@ class Kumogata::StringStream
     @block = block
 
     @fiber = Fiber.new do
-      self.each_line
+      self.run
     end
 
     # Step to `yield`
     @fiber.resume
   end
 
-  def each_line
+  def run
     loop do
       chunk = Fiber.yield
       break unless chunk
 
       @buf << chunk.to_s
+      self.each_line
+    end
+  end
 
-      line = @buf.scan_until(/(\r\n|\r|\n)/)
-      @block.call(line.chomp) if line
+  def each_line
+    while (line = @buf.scan_until(/(\r\n|\r|\n)/))
+      @block.call(line.chomp)
     end
   end
 
@@ -28,6 +32,7 @@ class Kumogata::StringStream
   end
 
   def close
+    self.each_line
     @block.call(@buf.rest) if @buf.rest?
     @fiber.resume
   end
