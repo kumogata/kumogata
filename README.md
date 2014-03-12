@@ -307,8 +307,9 @@ _post do
       user "ec2-user"
       # see http://net-ssh.github.io/net-ssh/classes/Net/SSH.html#method-c-start
       #options :timeout => 300
-      #connect_tries 10
+      #connect_tries 36
       #retry_interval 5
+      #request_pty true
     end
     command <<-EOS
       hostname
@@ -322,12 +323,10 @@ end
 ...
 Command: my_shell_command
 Status: 0
----
 1> 54.199.251.30
 
 Command: my_ssh_command
 Status: 0
----
 1> ip-10-0-129-20
 
 (Save to `/foo/bar/command_result.json`)
