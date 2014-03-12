@@ -61,7 +61,7 @@ def eval_template(template, options = {})
   template_ext = options[:template_ext] || '.rb'
 
   template = tempfile(template, template_ext) do |f|
-    Kumogata::Client.new(kumogata_options).send(:evaluate_template, f)
+    Kumogata::Client.new(kumogata_options).send(:evaluate_template, f, f.path)
   end
 
   if options[:update_deletion_policy]

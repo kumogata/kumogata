@@ -39,11 +39,7 @@ class Kumogata::Client
 
   def update(path_or_url, stack_name)
     validate_stack_name(stack_name)
-
-    template = open(path_or_url) do |f|
-      evaluate_template(f)
-    end
-
+    template = open_template(path_or_url)
     add_encryption_password(template)
 
     outputs = update_stack(template, stack_name)
@@ -119,7 +115,7 @@ class Kumogata::Client
     open(path_or_url) do |f|
       case format
       when :ruby
-        evaluate_template(f)
+        evaluate_template(f, path_or_url)
       when :json
         JSON.parse(f.read)
       else
@@ -132,7 +128,7 @@ class Kumogata::Client
     File.extname(path_or_url) == '.rb'
   end
 
-  def evaluate_template(template)
+  def evaluate_template(template, path_or_url)
     key_converter = proc do |key|
       key = key.to_s
       key.gsub!('__', '::') if @options.replace_underscore?
@@ -154,7 +150,7 @@ class Kumogata::Client
       :scope_hook => proc {|scope|
         define_template_func(scope, template.path)
       },
-      :filename   => template.path,
+      :filename   => path_or_url,
     })
 
     @post_processing.fetch!(template)
