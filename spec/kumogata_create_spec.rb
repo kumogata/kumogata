@@ -246,7 +246,7 @@ end
 
       client.instance_variable_get(:@post_processing)
            .should_receive(:run_ssh_command)
-           .with({"host"=>"<%= Key \"PublicIp\" %>", "user"=>"ec2-user"}, "      ls\n", {"PublicIp"=>"127.0.0.1"})
+           .with({"host"=>"<%= Key \"PublicIp\" %>", "user"=>"ec2-user", "request_pty"=>true}, "      ls\n", {"PublicIp"=>"127.0.0.1"})
            .and_return(["file1\nfile2\n", "", 0])
 
       client.instance_variable_get(:@post_processing)

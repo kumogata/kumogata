@@ -5,8 +5,8 @@
 
 Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
-[![Gem Version](https://badge.fury.io/rb/kumogata.png?201403121452)](http://badge.fury.io/rb/kumogata)
-[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403121452)](https://drone.io/github.com/winebarrel/kumogata/latest)
+[![Gem Version](https://badge.fury.io/rb/kumogata.png?201403122152)](http://badge.fury.io/rb/kumogata)
+[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201403122152)](https://drone.io/github.com/winebarrel/kumogata/latest)
 
 It can define a template in Ruby DSL, such as:
 
@@ -307,8 +307,9 @@ _post do
       user "ec2-user"
       # see http://net-ssh.github.io/net-ssh/classes/Net/SSH.html#method-c-start
       #options :timeout => 300
-      #connect_tries 10
+      #connect_tries 36
       #retry_interval 5
+      #request_pty true
     end
     command <<-EOS
       hostname
@@ -322,12 +323,10 @@ end
 ...
 Command: my_shell_command
 Status: 0
----
 1> 54.199.251.30
 
 Command: my_ssh_command
 Status: 0
----
 1> ip-10-0-129-20
 
 (Save to `/foo/bar/command_result.json`)

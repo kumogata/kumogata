@@ -111,6 +111,8 @@ class Kumogata::PostProcessing
     if options and not options.kind_of?(Hash)
       raise "Invalid post processing ssh options: #{name} => #{options.inspect}"
     end
+
+    ssh['request_pty'] = !!((ssh['request_pty'] || true).to_s =~ /\Atrue\Z/)
   end
 
   def run_command(attrs, outputs)
@@ -136,6 +138,7 @@ class Kumogata::PostProcessing
     retry_interval = (ssh['retry_interval'] || 5).to_i
 
     stderr_orig = nil
+    ssh_exec_opts = {:request_pty => ssh['request_pty']}
 
     begin
       stderr_orig = STDERR.dup
@@ -143,7 +146,7 @@ class Kumogata::PostProcessing
 
       begin
         retryable(:tries => connect_tries, :on => Net::SSH::Disconnect, :sleep => retry_interval) do
-          Net::SSH.start(*args) {|ssh| ssh_exec!(ssh, command) }
+          Net::SSH.start(*args) {|ssh| ssh_exec!(ssh, command, ssh_exec_opts) }
         end
       rescue Net::SSH::HostKeyMismatch => e
         e.remember_host!
@@ -154,7 +157,7 @@ class Kumogata::PostProcessing
     end
   end
 
-  def ssh_exec!(ssh, command)
+  def ssh_exec!(ssh, command, options)
     stdout_data = ''
     stderr_data = ''
     exit_code = nil
@@ -164,6 +167,14 @@ class Kumogata::PostProcessing
     stderr_stream = create_stderr_stream
 
     ssh.open_channel do |channel|
+      if options[:request_pty]
+        channel.request_pty do |ch, success|
+          unless success
+            raise "Couldn't obtain pty (ssh.channel.request_pty)"
+          end
+        end
+      end
+
       channel.exec(command) do |ch, success|
         unless success
           raise "Couldn't execute command #{command.inspect} (ssh.channel.exec)"
