@@ -135,7 +135,7 @@ class Kumogata::Client
   def evaluate_template(template)
     key_converter = proc do |key|
       key = key.to_s
-      key.gsub!('__', '::') if @options.replace_underscore?
+      key.gsub!('__', '::') unless @options.skip_replace_underscore?
       key
     end
 
@@ -547,16 +547,21 @@ Stack Resource Summaries:
 
 Outputs:
 #{JSON.pretty_generate(outputs).colorize_as(:json)}
+EOS
+
+    if @options.result_log?
+      puts <<-EOS
 
 (Save to `#{@options.result_log}`)
-    EOS
+      EOS
 
-    open(@options.result_log, 'wb') do |f|
-      f.puts JSON.pretty_generate({
-        'StackName' => stack_name,
-        'StackResourceSummaries' => summaries,
-        'Outputs' => outputs,
-      })
+      open(@options.result_log, 'wb') do |f|
+        f.puts JSON.pretty_generate({
+          'StackName' => stack_name,
+          'StackResourceSummaries' => summaries,
+          'Outputs' => outputs,
+        })
+      end
     end
   end
 

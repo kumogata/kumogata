@@ -3,7 +3,6 @@ $kumogata = Hashie::Mash.new
 
 class Kumogata::ArgumentParser
   DEFAULT_OPTIONS = {
-    :replace_underscore => true,
     :delete_stack => true,
     :result_log => File.join(Dir.pwd, 'result.json'),
     :command_result_log => File.join(Dir.pwd, 'command_result.json'),
@@ -85,7 +84,7 @@ class Kumogata::ArgumentParser
         opt.on('-s', '--secret-key SECRET_KEY')                 {|v| options[:secret_access_key]             = v     }
         opt.on('-r', '--region REGION')                         {|v| options[:region]                        = v     }
         opt.on(''  , '--format TMPLATE_FORMAT', [:ruby, :json]) {|v| options[:format]                        = v     }
-        opt.on(''  , '--skip-replace-underscore')               {    options[:replace_underscore]            = false }
+        opt.on(''  , '--skip-replace-underscore')               {    options[:skip_replace_underscore]       = false }
         opt.on(''  , '--deletion-policy-retain')                {    options[:deletion_policy_retain]        = true  }
         opt.on('-p', '--parameters KEY_VALUES', Array)          {|v| options[:parameters]                    = v     }
         opt.on('-e', '--encrypt-parameters KEYS', Array)        {|v| options[:encrypt_parameters]            = v     }
