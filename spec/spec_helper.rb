@@ -1,4 +1,5 @@
 require 'kumogata'
+require 'kumogata/argument_parser'
 require 'tempfile'
 require 'uuidtools'
 

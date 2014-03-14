@@ -22,7 +22,6 @@ require 'term/ansicolor'
 require 'thread'
 require 'uuidtools'
 
-require 'kumogata/argument_parser'
 require 'kumogata/client'
 require 'kumogata/crypt'
 require 'kumogata/ext/coderay_ext'
