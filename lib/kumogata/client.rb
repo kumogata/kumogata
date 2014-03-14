@@ -17,14 +17,14 @@ class Kumogata::Client
     outputs = create_stack(template, stack_name)
     @post_processing.run(:create, outputs)
 
-    nil
+    outputs
   end
 
   def validate(path_or_url)
     template = open_template(path_or_url)
     add_encryption_password_for_validation(template)
     validate_template(template)
-    nil
+    true
   end
 
   def convert(path_or_url)
@@ -49,7 +49,7 @@ class Kumogata::Client
     outputs = update_stack(template, stack_name)
     @post_processing.run(:update, outputs)
 
-    nil
+    outputs
   end
 
   def delete(stack_name)
@@ -59,7 +59,7 @@ class Kumogata::Client
       delete_stack(stack_name)
     end
 
-    nil
+    true
   end
 
   def list(stack_name = nil)

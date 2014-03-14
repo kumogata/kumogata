@@ -14,47 +14,51 @@ class Kumogata::ArgumentParser
   COMMANDS = {
     :create => {
       :description => 'Create resources as specified in the template',
-      :arguments   => [:path_or_url, :stack_name?]
+      :arguments   => [:path_or_url, :stack_name?],
+      :output      => false,
     },
     :validate => {
       :description => 'Validate a specified template',
-      :arguments   => [:path_or_url]
+      :arguments   => [:path_or_url],
+      :output      => false,
     },
     :convert => {
       :description => 'Convert a template format',
-      :arguments   => [:path_or_url]
+      :arguments   => [:path_or_url],
     },
     :update => {
       :description => 'Update a stack as specified in the template',
-      :arguments   => [:path_or_url, :stack_name]
+      :arguments   => [:path_or_url, :stack_name],
+      :output      => false,
     },
     :delete => {
       :description => 'Delete a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
+      :output      => false,
     },
     :list => {
       :description => 'List summary information for stacks',
-      :arguments   => [:stack_name?]
+      :arguments   => [:stack_name?],
     },
     :export => {
       :description => 'Export a template from a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
     },
     :'show-events' => {
       :description => 'Show events for a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
     },
     :'show-outputs' => {
       :description => 'Show outputs for a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
     },
     :'show-resources' => {
       :description => 'Show resources for a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
     },
     :diff => {
       :description => 'Compare templates logically',
-      :arguments   => [:path_or_url1, :path_or_url2]
+      :arguments   => [:path_or_url1, :path_or_url2],
     },
   }
 
@@ -128,6 +132,7 @@ class Kumogata::ArgumentParser
       end
     end
 
+    output = COMMANDS[command][:output] || true
     command = command.to_s.gsub('-', '_').to_sym
 
     $kumogata.command = command
@@ -135,7 +140,7 @@ class Kumogata::ArgumentParser
     $kumogata.options = options
     options = $kumogata.options # Copy of the reference
 
-    [command, arguments, options]
+    [command, arguments, options, output]
   end
 
   private

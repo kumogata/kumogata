@@ -15,7 +15,7 @@ parsed = Kumogata::ArgumentParser.parse! {|parser, cmd, args, opts|
 }
 
 begin
-  command, arguments, options = parsed
+  command, arguments, options, output_result = parsed
 
   aws_opts = {}
 
@@ -38,7 +38,10 @@ begin
   end
 
   out = Kumogata::Client.new(options).send(command, *arguments)
-  puts out if out
+
+  if output_result and out
+    puts out
+  end
 rescue Exception => e
   $stderr.puts("[ERROR] #{e.message}".red) unless e.kind_of?(Interrupt)
 
