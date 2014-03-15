@@ -51,7 +51,7 @@ rescue Exception => e
     backtrace = Kumogata::Utils.filter_backtrace(e.backtrace)
     backtrace = backtrace.slice(0, 3)
     unless backtrace.empty?
-      $stderr.puts "\t from #{backtrace.first}".red
+      $stderr.puts "  from #{backtrace.first}".red
     end
   end
 
