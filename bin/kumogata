@@ -2,6 +2,7 @@
 $: << File.expand_path("#{File.dirname __FILE__}/../lib")
 require 'rubygems'
 require 'kumogata'
+require 'kumogata/argument_parser'
 
 options = nil
 
@@ -14,7 +15,7 @@ parsed = Kumogata::ArgumentParser.parse! {|parser, cmd, args, opts|
 }
 
 begin
-  command, arguments, options = parsed
+  command, arguments, options, output_result = parsed
 
   aws_opts = {}
 
@@ -24,8 +25,8 @@ begin
 
   AWS.config(aws_opts) unless aws_opts.empty?
 
-  String.colorize = ($stdout.tty? and options.color?)
-  Diffy::Diff.default_format = ($stdout.tty? and options.color?) ? :color : :text
+  String.colorize = options.color?
+  Diffy::Diff.default_format = options.color? ? :color : :text
 
   if options.debug?
     Kumogata.logger.set_debug(true)
@@ -37,12 +38,21 @@ begin
   end
 
   out = Kumogata::Client.new(options).send(command, *arguments)
-  puts out if out
+
+  if output_result and out
+    puts out
+  end
 rescue Exception => e
   $stderr.puts("[ERROR] #{e.message}".red) unless e.kind_of?(Interrupt)
 
   if options and options.debug?
     raise e
+  else
+    backtrace = Kumogata::Utils.filter_backtrace(e.backtrace)
+    backtrace = backtrace.slice(0, 3)
+    unless backtrace.empty?
+      $stderr.puts "\t from #{backtrace.first}".red
+    end
   end
 
   exit 1

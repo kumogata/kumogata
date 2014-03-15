@@ -3,58 +3,61 @@ $kumogata = Hashie::Mash.new
 
 class Kumogata::ArgumentParser
   DEFAULT_OPTIONS = {
-    :replace_underscore => true,
     :delete_stack => true,
     :result_log => File.join(Dir.pwd, 'result.json'),
     :command_result_log => File.join(Dir.pwd, 'command_result.json'),
-    :color => true,
+    :color => $stdout.tty?,
     :debug => false,
   }
 
   COMMANDS = {
     :create => {
       :description => 'Create resources as specified in the template',
-      :arguments   => [:path_or_url, :stack_name?]
+      :arguments   => [:path_or_url, :stack_name?],
+      :output      => false,
     },
     :validate => {
       :description => 'Validate a specified template',
-      :arguments   => [:path_or_url]
+      :arguments   => [:path_or_url],
+      :output      => false,
     },
     :convert => {
       :description => 'Convert a template format',
-      :arguments   => [:path_or_url]
+      :arguments   => [:path_or_url],
     },
     :update => {
       :description => 'Update a stack as specified in the template',
-      :arguments   => [:path_or_url, :stack_name]
+      :arguments   => [:path_or_url, :stack_name],
+      :output      => false,
     },
     :delete => {
       :description => 'Delete a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
+      :output      => false,
     },
     :list => {
       :description => 'List summary information for stacks',
-      :arguments   => [:stack_name?]
+      :arguments   => [:stack_name?],
     },
     :export => {
       :description => 'Export a template from a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
     },
     :'show-events' => {
       :description => 'Show events for a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
     },
     :'show-outputs' => {
       :description => 'Show outputs for a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
     },
     :'show-resources' => {
       :description => 'Show resources for a specified stack',
-      :arguments   => [:stack_name]
+      :arguments   => [:stack_name],
     },
     :diff => {
       :description => 'Compare templates logically',
-      :arguments   => [:path_or_url1, :path_or_url2]
+      :arguments   => [:path_or_url1, :path_or_url2],
     },
   }
 
@@ -81,7 +84,7 @@ class Kumogata::ArgumentParser
         opt.on('-s', '--secret-key SECRET_KEY')                 {|v| options[:secret_access_key]             = v     }
         opt.on('-r', '--region REGION')                         {|v| options[:region]                        = v     }
         opt.on(''  , '--format TMPLATE_FORMAT', [:ruby, :json]) {|v| options[:format]                        = v     }
-        opt.on(''  , '--skip-replace-underscore')               {    options[:replace_underscore]            = false }
+        opt.on(''  , '--skip-replace-underscore')               {    options[:skip_replace_underscore]       = false }
         opt.on(''  , '--deletion-policy-retain')                {    options[:deletion_policy_retain]        = true  }
         opt.on('-p', '--parameters KEY_VALUES', Array)          {|v| options[:parameters]                    = v     }
         opt.on('-e', '--encrypt-parameters KEYS', Array)        {|v| options[:encrypt_parameters]            = v     }
@@ -95,6 +98,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--command-result-log PATH')               {|v| options[:command]                       = v     }
         opt.on(''  , '--force')                                 {    options[:force]                         = true  }
         opt.on('-w', '--ignore-all-space')                      {    options[:ignore_all_space]              = true  }
+        opt.on(''  , '--color')                                 {    options[:color]                         = true  }
         opt.on(''  , '--no-color')                              {    options[:color]                         = false }
         opt.on(''  , '--debug')                                 {    options[:debug]                         = true  }
         opt.parse!
@@ -128,6 +132,7 @@ class Kumogata::ArgumentParser
       end
     end
 
+    output = COMMANDS[command][:output] || true
     command = command.to_s.gsub('-', '_').to_sym
 
     $kumogata.command = command
@@ -135,7 +140,7 @@ class Kumogata::ArgumentParser
     $kumogata.options = options
     options = $kumogata.options # Copy of the reference
 
-    [command, arguments, options]
+    [command, arguments, options, output]
   end
 
   private

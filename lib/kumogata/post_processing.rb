@@ -62,7 +62,9 @@ class Kumogata::PostProcessing
       }
     end
 
-    save_command_results(results) unless results.empty?
+    if @options.command_result_log? and not results.empty?
+      save_command_results(results)
+    end
   end
 
   private

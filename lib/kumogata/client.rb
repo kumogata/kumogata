@@ -17,14 +17,14 @@ class Kumogata::Client
     outputs = create_stack(template, stack_name)
     @post_processing.run(:create, outputs)
 
-    nil
+    outputs
   end
 
   def validate(path_or_url)
     template = open_template(path_or_url)
     add_encryption_password_for_validation(template)
     validate_template(template)
-    nil
+    true
   end
 
   def convert(path_or_url)
@@ -48,7 +48,7 @@ class Kumogata::Client
     outputs = update_stack(template, stack_name)
     @post_processing.run(:update, outputs)
 
-    nil
+    outputs
   end
 
   def delete(stack_name)
@@ -58,7 +58,7 @@ class Kumogata::Client
       delete_stack(stack_name)
     end
 
-    nil
+    true
   end
 
   def list(stack_name = nil)
@@ -134,7 +134,7 @@ class Kumogata::Client
   def evaluate_template(template, path_or_url)
     key_converter = proc do |key|
       key = key.to_s
-      key.gsub!('__', '::') if @options.replace_underscore?
+      key.gsub!('__', '::') unless @options.skip_replace_underscore?
       key
     end
 
@@ -551,16 +551,21 @@ Stack Resource Summaries:
 
 Outputs:
 #{JSON.pretty_generate(outputs).colorize_as(:json)}
+EOS
+
+    if @options.result_log?
+      puts <<-EOS
 
 (Save to `#{@options.result_log}`)
-    EOS
+      EOS
 
-    open(@options.result_log, 'wb') do |f|
-      f.puts JSON.pretty_generate({
-        'StackName' => stack_name,
-        'StackResourceSummaries' => summaries,
-        'Outputs' => outputs,
-      })
+      open(@options.result_log, 'wb') do |f|
+        f.puts JSON.pretty_generate({
+          'StackName' => stack_name,
+          'StackResourceSummaries' => summaries,
+          'Outputs' => outputs,
+        })
+      end
     end
   end
 
