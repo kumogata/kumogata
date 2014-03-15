@@ -19,7 +19,7 @@ class Kumogata::Utils
     end
 
     def filter_backtrace(backtrace)
-      filter_path = []
+      filter_path = ['(eval)']
 
       if defined?(Gem)
         filter_path.concat(Gem.path)
@@ -32,6 +32,7 @@ class Kumogata::Utils
       filter_path = filter_path.map {|i| /\A#{Regexp.escape(i)}/ }
 
       backtrace.select do |path|
+        path = path.split(':', 2).first
         not filter_path.any? {|i| i =~ path }
       end
     end

@@ -132,7 +132,7 @@ class Kumogata::ArgumentParser
       end
     end
 
-    output = COMMANDS[command][:output] || true
+    output = COMMANDS[command].fetch(:output, true)
     command = command.to_s.gsub('-', '_').to_sym
 
     $kumogata.command = command
