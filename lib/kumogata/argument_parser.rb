@@ -6,7 +6,7 @@ class Kumogata::ArgumentParser
     :delete_stack => true,
     :result_log => File.join(Dir.pwd, 'result.json'),
     :command_result_log => File.join(Dir.pwd, 'command_result.json'),
-    :color => true,
+    :color => $stdout.tty?,
     :debug => false,
   }
 
