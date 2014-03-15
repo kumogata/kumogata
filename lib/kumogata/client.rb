@@ -72,7 +72,16 @@ class Kumogata::Client
     validate_stack_name(stack_name)
 
     template = export_template(stack_name)
-    devaluate_template(template).chomp.colorize_as(:ruby)
+    format = @options.format || :ruby
+
+    case format
+    when :ruby
+      devaluate_template(template).chomp.colorize_as(:ruby)
+    when :json
+      JSON.pretty_generate(template).colorize_as(:json)
+    else
+      raise "Unknown format: #{format}"
+    end
   end
 
   def show_events(stack_name)
