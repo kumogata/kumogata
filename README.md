@@ -76,7 +76,7 @@ Commands:
   show-events    STACK_NAME                 Show events for a specified stack
   show-outputs   STACK_NAME                 Show outputs for a specified stack
   show-resources STACK_NAME                 Show resources for a specified stack
-  diff           PATH_OR_URL1 PATH_OR_URL2  Compare templates logically
+  diff           PATH_OR_URL1 PATH_OR_URL2  Compare templates logically (file, http://..., stack://...)
 
 Options:
     -k, --access-key ACCESS_KEY
@@ -97,6 +97,7 @@ Options:
         --command-result-log PATH
         --force
     -w, --ignore-all-space
+        --color
         --no-color
         --debug
 ```
