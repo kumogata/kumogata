@@ -98,6 +98,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--command-result-log PATH')               {|v| options[:command]                       = v     }
         opt.on(''  , '--force')                                 {    options[:force]                         = true  }
         opt.on('-w', '--ignore-all-space')                      {    options[:ignore_all_space]              = true  }
+        opt.on(''  , '--color')                                 {    options[:color]                         = true  }
         opt.on(''  , '--no-color')                              {    options[:color]                         = false }
         opt.on(''  , '--debug')                                 {    options[:debug]                         = true  }
         opt.parse!
