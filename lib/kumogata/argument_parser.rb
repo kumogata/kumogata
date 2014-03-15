@@ -56,7 +56,7 @@ class Kumogata::ArgumentParser
       :arguments   => [:stack_name],
     },
     :diff => {
-      :description => 'Compare templates logically',
+      :description => 'Compare templates logically (file, http://..., stack://...)',
       :arguments   => [:path_or_url1, :path_or_url2],
     },
   }

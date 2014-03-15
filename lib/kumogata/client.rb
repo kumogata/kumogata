@@ -98,7 +98,16 @@ class Kumogata::Client
 
   def diff(path_or_url1, path_or_url2)
     templates = [path_or_url1, path_or_url2].map do |path_or_url|
-      template = open_template(path_or_url)
+      template = nil
+
+      if path_or_url =~ %r|\Astack://(.*)|
+        stack_name = $1 || ''
+        validate_stack_name(stack_name)
+        template = export_template(stack_name)
+      else
+        template = open_template(path_or_url)
+      end
+
       JSON.pretty_generate(template)
     end
 
