@@ -54,6 +54,8 @@ end
 
 Ruby template structure is almost the same as [JSON template](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-structure.html).
 
+(**You can also use JSON templates**)
+
 ## Installation
 
     $ gem install kumogata
