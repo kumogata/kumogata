@@ -23,6 +23,7 @@ class Kumogata::Utils
 
       if defined?(Gem)
         filter_path.concat(Gem.path)
+        filter_path << Gem.bindir
       end
 
       RbConfig::CONFIG.select {|k, v|
