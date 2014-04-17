@@ -8,6 +8,7 @@ class Kumogata::ArgumentParser
     :command_result_log => File.join(Dir.pwd, 'command_result.json'),
     :color => $stdout.tty?,
     :debug => false,
+    :config_profile => :default,
   }
 
   COMMANDS = {
@@ -80,10 +81,11 @@ class Kumogata::ArgumentParser
       update_usage(opt)
 
       begin
-        opt.on(''  , '--profile CONFIG_PROFILE')                {|v| options[:profile]                       = v     }
         opt.on('-k', '--access-key ACCESS_KEY')                 {|v| options[:access_key_id]                 = v     }
         opt.on('-s', '--secret-key SECRET_KEY')                 {|v| options[:secret_access_key]             = v     }
         opt.on('-r', '--region REGION')                         {|v| options[:region]                        = v     }
+        opt.on(''  , '--config PATH')                           {|v| options[:config_path]                   = v     }
+        opt.on(''  , '--profile CONFIG_PROFILE')                {|v| options[:config_profile]                = v     }
         opt.on(''  , '--format TMPLATE_FORMAT', [:ruby, :json]) {|v| options[:format]                        = v     }
         opt.on(''  , '--skip-replace-underscore')               {    options[:skip_replace_underscore]       = false }
         opt.on(''  , '--deletion-policy-retain')                {    options[:deletion_policy_retain]        = true  }

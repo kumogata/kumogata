@@ -17,21 +17,42 @@ parsed = Kumogata::ArgumentParser.parse! {|parser, cmd, args, opts|
 begin
   command, arguments, options, output_result = parsed
 
+  String.colorize = options.color?
+  Diffy::Diff.default_format = options.color? ? :color : :text
+
   aws_opts = {}
+
+  # Set config file path
+  if options.config_path?
+    unless File.exist?(options.config_path)
+      raise "No such config file: #{options.config_path}"
+    end
+
+    AWSConfig.config_file = options.config_path
+  end
+
+  # Load .aws/config
+  # See http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
+  if File.exist?(AWSConfig.config_file)
+    unless AWSConfig.has_profile?(options.config_profile)
+      raise "No profile : #{AWSConfig.config_file} => #{options.config_profile}"
+    end
+
+    {
+      'aws_access_key_id'     => :access_key_id,
+      'aws_secret_access_key' => :secret_access_key,
+      'region'                => :region,
+    }.each do |config_key, option_key|
+      option_value = AWSConfig[options.config_profile][config_key]
+      aws_opts[option_key] = option_value if option_value
+    end
+  end
 
   [:access_key_id, :secret_access_key, :region].each do |key|
     aws_opts[key] = options[key] if options[key]
   end
 
-  profile = options.fetch(:profile, :default)
-  if AWSConfig.has_profile?(profile)
-    AWS.config(AWSConfig[profile].config_hash)
-  else
-    AWS.config(aws_opts) unless aws_opts.empty?
-  end
-
-  String.colorize = options.color?
-  Diffy::Diff.default_format = options.color? ? :color : :text
+  AWS.config(aws_opts) unless aws_opts.empty?
 
   if options.debug?
     Kumogata.logger.set_debug(true)
