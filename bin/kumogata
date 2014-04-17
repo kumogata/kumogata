@@ -23,7 +23,12 @@ begin
     aws_opts[key] = options[key] if options[key]
   end
 
-  AWS.config(aws_opts) unless aws_opts.empty?
+  profile = options.fetch(:profile, :default)
+  if AWSConfig.has_profile?(profile)
+    AWS.config(AWSConfig[profile].config_hash)
+  else
+    AWS.config(aws_opts) unless aws_opts.empty?
+  end
 
   String.colorize = options.color?
   Diffy::Diff.default_format = options.color? ? :color : :text
