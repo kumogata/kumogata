@@ -2,6 +2,7 @@ module Kumogata; end
 require 'kumogata/version'
 
 require 'aws-sdk'
+require 'aws_config'
 require 'base64'
 require 'coderay'
 require 'diffy'
