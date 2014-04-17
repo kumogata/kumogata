@@ -35,7 +35,7 @@ begin
   # See http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html
   if File.exist?(AWSConfig.config_file)
     unless AWSConfig.has_profile?(options.config_profile)
-      raise "No profile : #{AWSConfig.config_file} => #{options.config_profile}"
+      raise "No profile: #{AWSConfig.config_file} => #{options.config_profile}"
     end
 
     {
