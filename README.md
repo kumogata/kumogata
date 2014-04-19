@@ -340,7 +340,7 @@ Status: 0
 
 ## YAML template
 
-You can also use the template YAML instead of JSON and Ruby.
+You can also use the YAML template instead of JSON and Ruby.
 
 ```yaml
 ---
