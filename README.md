@@ -85,6 +85,7 @@ Options:
         --config PATH
         --profile CONFIG_PROFILE
         --format TMPLATE_FORMAT
+        --output-format FORMAT
         --skip-replace-underscore
         --deletion-policy-retain
     -p, --parameters KEY_VALUES
