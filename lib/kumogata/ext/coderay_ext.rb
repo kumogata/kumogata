@@ -16,3 +16,5 @@ CodeRay::Encoders::Terminal::TOKEN_COLORS[:string] = {
   :delimiter => "\e[1;32m",
   :escape => "\e[1;32m",
 }
+
+CodeRay::Encoders::Terminal::TOKEN_COLORS[:error] = "\e[0m"
