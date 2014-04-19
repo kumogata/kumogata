@@ -23,6 +23,7 @@ require 'strscan'
 require 'term/ansicolor'
 require 'thread'
 require 'uuidtools'
+require 'yaml'
 
 require 'kumogata/client'
 require 'kumogata/crypt'

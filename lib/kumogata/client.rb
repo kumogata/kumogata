@@ -29,11 +29,23 @@ class Kumogata::Client
 
   def convert(path_or_url)
     template = open_template(path_or_url)
+    output_format = @options.output_format
 
-    if ruby_template?(path_or_url)
-      JSON.pretty_generate(template).colorize_as(:json)
-    else
+    unless output_format
+      output_format = case guess_format(path_or_url)
+                      when :ruby then :json
+                      when :json then :ruby
+                      when :yaml then :json
+                      end
+    end
+
+    case output_format
+    when :ruby
       devaluate_template(template).chomp.colorize_as(:ruby)
+    when :json
+      JSON.pretty_generate(template).colorize_as(:json)
+    when :yaml
+      YAML.dump(template).colorize_as(:yaml)
     end
   end
 
@@ -131,7 +143,7 @@ class Kumogata::Client
   private ###########################################################
 
   def open_template(path_or_url)
-    format = @options.format || (ruby_template?(path_or_url) ? :ruby : :json)
+    format = @options.format || guess_format(path_or_url)
 
     open(path_or_url) do |f|
       case format
@@ -139,14 +151,25 @@ class Kumogata::Client
         evaluate_template(f, path_or_url)
       when :json
         JSON.parse(f.read)
+      when :yaml
+        YAML.load(f.read)
       else
         raise "Unknown format: #{format}"
       end
     end
   end
 
-  def ruby_template?(path_or_url)
-    File.extname(path_or_url) == '.rb'
+  def guess_format(path_or_url)
+    case File.extname(path_or_url)
+    when '.rb'
+      :ruby
+    when '.json', '.js'
+      :json
+    when '.yml', '.yaml'
+      :yaml
+    else
+      :json
+    end
   end
 
   def evaluate_template(template, path_or_url)
