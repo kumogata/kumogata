@@ -37,6 +37,19 @@ class Kumogata::Utils
         not filter_path.any? {|i| i =~ path }
       end
     end
+
+    def stringify(obj)
+      case obj
+      when Array
+        obj.map {|i| stringify(i) }
+      when Hash
+        hash = {}
+        obj.each {|k, v| hash[stringify(k)] = stringify(v) }
+        hash
+      else
+        obj.to_s
+      end
+    end
   end # of class methods
 end
 
