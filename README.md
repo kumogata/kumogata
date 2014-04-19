@@ -379,7 +379,7 @@ Outputs:
 
 ### Convert JSON template to YAML
 
-    $ gem install kumogata convert Drupal_Single_Instance.template --output-format=yaml
+    $ kumogata convert Drupal_Single_Instance.template --output-format=yaml
 
 ## Demo
 
