@@ -82,30 +82,30 @@ class Kumogata::ArgumentParser
 
       begin
         supported_formats = [:ruby, :json, :yaml]
-        opt.on('-k', '--access-key ACCESS_KEY')                          {|v| options[:access_key_id]                 = v     }
-        opt.on('-s', '--secret-key SECRET_KEY')                          {|v| options[:secret_access_key]             = v     }
-        opt.on('-r', '--region REGION')                                  {|v| options[:region]                        = v     }
-        opt.on(''  , '--config PATH')                                    {|v| options[:config_path]                   = v     }
-        opt.on(''  , '--profile CONFIG_PROFILE')                         {|v| options[:config_profile]                = v     }
-        opt.on(''  , '--format TMPLATE_FORMAT', supported_formats)       {|v| options[:format]                        = v     }
-        opt.on(''  , '--output-format OUTPUT_FORMAT', supported_formats) {|v| options[:output_format]                 = v     }
-        opt.on(''  , '--skip-replace-underscore')                        {    options[:skip_replace_underscore]       = false }
-        opt.on(''  , '--deletion-policy-retain')                         {    options[:deletion_policy_retain]        = true  }
-        opt.on('-p', '--parameters KEY_VALUES', Array)                   {|v| options[:parameters]                    = v     }
-        opt.on('-e', '--encrypt-parameters KEYS', Array)                 {|v| options[:encrypt_parameters]            = v     }
-        opt.on('',   '--encryption-password PASS')                       {|v| options[:encryption_password]           = v     }
-        opt.on('',   '--skip-send-password')                             {    options[:skip_send_password]            = true  }
-        opt.on(''  , '--capabilities CAPABILITIES', Array)               {|v| options[:capabilities]                  = v     }
-        opt.on(''  , '--disable-rollback')                               {    options[:disable_rollback]              = true  }
-        opt.on(''  , '--notify SNS_TOPICS', Array)                       {|v| options[:notify]                        = v     }
-        opt.on(''  , '--timeout MINUTES', Integer)                       {|v| options[:timeout]                       = v     }
-        opt.on(''  , '--result-log PATH')                                {|v| options[:result_log]                    = v     }
-        opt.on(''  , '--command-result-log PATH')                        {|v| options[:command]                       = v     }
-        opt.on(''  , '--force')                                          {    options[:force]                         = true  }
-        opt.on('-w', '--ignore-all-space')                               {    options[:ignore_all_space]              = true  }
-        opt.on(''  , '--color')                                          {    options[:color]                         = true  }
-        opt.on(''  , '--no-color')                                       {    options[:color]                         = false }
-        opt.on(''  , '--debug')                                          {    options[:debug]                         = true  }
+        opt.on('-k', '--access-key ACCESS_KEY')                    {|v| options[:access_key_id]                 = v     }
+        opt.on('-s', '--secret-key SECRET_KEY')                    {|v| options[:secret_access_key]             = v     }
+        opt.on('-r', '--region REGION')                            {|v| options[:region]                        = v     }
+        opt.on(''  , '--config PATH')                              {|v| options[:config_path]                   = v     }
+        opt.on(''  , '--profile CONFIG_PROFILE')                   {|v| options[:config_profile]                = v     }
+        opt.on(''  , '--format TMPLATE_FORMAT', supported_formats) {|v| options[:format]                        = v     }
+        opt.on(''  , '--output-format FORMAT', supported_formats)  {|v| options[:output_format]                 = v     }
+        opt.on(''  , '--skip-replace-underscore')                  {    options[:skip_replace_underscore]       = false }
+        opt.on(''  , '--deletion-policy-retain')                   {    options[:deletion_policy_retain]        = true  }
+        opt.on('-p', '--parameters KEY_VALUES', Array)             {|v| options[:parameters]                    = v     }
+        opt.on('-e', '--encrypt-parameters KEYS', Array)           {|v| options[:encrypt_parameters]            = v     }
+        opt.on('',   '--encryption-password PASS')                 {|v| options[:encryption_password]           = v     }
+        opt.on('',   '--skip-send-password')                       {    options[:skip_send_password]            = true  }
+        opt.on(''  , '--capabilities CAPABILITIES', Array)         {|v| options[:capabilities]                  = v     }
+        opt.on(''  , '--disable-rollback')                         {    options[:disable_rollback]              = true  }
+        opt.on(''  , '--notify SNS_TOPICS', Array)                 {|v| options[:notify]                        = v     }
+        opt.on(''  , '--timeout MINUTES', Integer)                 {|v| options[:timeout]                       = v     }
+        opt.on(''  , '--result-log PATH')                          {|v| options[:result_log]                    = v     }
+        opt.on(''  , '--command-result-log PATH')                  {|v| options[:command]                       = v     }
+        opt.on(''  , '--force')                                    {    options[:force]                         = true  }
+        opt.on('-w', '--ignore-all-space')                         {    options[:ignore_all_space]              = true  }
+        opt.on(''  , '--color')                                    {    options[:color]                         = true  }
+        opt.on(''  , '--no-color')                                 {    options[:color]                         = false }
+        opt.on(''  , '--debug')                                    {    options[:debug]                         = true  }
         opt.parse!
 
         unless (command = ARGV.shift)
