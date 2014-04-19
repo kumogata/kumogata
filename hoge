@@ -1,0 +1,21 @@
+{
+  "Resources": {
+    "myEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-07f68106",
+        "InstanceType": "t1.micro"
+      }
+    }
+  },
+  "Outputs": {
+    "AZ": {
+      "Value": {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+}

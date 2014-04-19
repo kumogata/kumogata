@@ -47,14 +47,137 @@ end
     EOS
   end
 
-  it 'convert Ruby template to JSON template' do
+  it 'convert Ruby template to YAML template' do
+    template = <<-EOS
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+
+    json_template = run_client(:convert, :template => template, :options => {:output_format => :yaml})
+
+    expect(json_template).to eq((<<-EOS))
+---
+Resources:
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-XXXXXXXX
+      InstanceType: t1.micro
+Outputs:
+  AZ:
+    Value:
+      Fn::GetAtt:
+      - myEC2Instance
+      - AvailabilityZone
+    EOS
+  end
+
+  it 'convert YAML template to Ruby template' do
+    template = <<-EOS
+---
+Resources:
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-XXXXXXXX
+      InstanceType: t1.micro
+Outputs:
+  AZ:
+    Value:
+      Fn::GetAtt:
+      - myEC2Instance
+      - AvailabilityZone
+    EOS
+
+    ruby_template = run_client(:convert, :template => template, :template_ext => '.yml', :options => {:output_format => :ruby})
+
+    expect(ruby_template).to eq((<<-EOS).chomp)
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+  end
+
+  it 'convert YAML template to JSON template' do
+    template = <<-EOS
+---
+Resources:
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-XXXXXXXX
+      InstanceType: t1.micro
+Outputs:
+  AZ:
+    Value:
+      Fn::GetAtt:
+      - myEC2Instance
+      - AvailabilityZone
+    EOS
+
+    ruby_template = run_client(:convert, :template => template, :template_ext => '.yml', :options => {:output_format => :json})
+
+    expect(ruby_template).to eq((<<-EOS).chomp)
+{
+  "Resources": {
+    "myEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-XXXXXXXX",
+        "InstanceType": "t1.micro"
+      }
+    }
+  },
+  "Outputs": {
+    "AZ": {
+      "Value": {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+}
+    EOS
+  end
+
+  it 'convert JSON template to Ruby template' do
     template = <<-EOS
 {
   "Resources": {
     "myEC2Instance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "ImageId": "ami-07f68106",
+        "ImageId": "ami-XXXXXXXX",
         "InstanceType": "t1.micro"
       }
     }
@@ -79,7 +202,7 @@ Resources do
   myEC2Instance do
     Type "AWS::EC2::Instance"
     Properties do
-      ImageId "ami-07f68106"
+      ImageId "ami-XXXXXXXX"
       InstanceType "t1.micro"
     end
   end
@@ -91,6 +214,50 @@ Outputs do
     end
   end
 end
+    EOS
+  end
+
+  it 'convert JSON template to YAML template' do
+    template = <<-EOS
+{
+  "Resources": {
+    "myEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-XXXXXXXX",
+        "InstanceType": "t1.micro"
+      }
+    }
+  },
+  "Outputs": {
+    "AZ": {
+      "Value": {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+}
+    EOS
+
+    ruby_template = run_client(:convert, :template => template, :template_ext => '.template', :options => {:output_format => :yaml})
+
+    expect(ruby_template).to eq((<<-EOS))
+---
+Resources:
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-XXXXXXXX
+      InstanceType: t1.micro
+Outputs:
+  AZ:
+    Value:
+      Fn::GetAtt:
+      - myEC2Instance
+      - AvailabilityZone
     EOS
   end
 
