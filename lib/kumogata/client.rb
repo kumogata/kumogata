@@ -152,7 +152,8 @@ class Kumogata::Client
       when :json
         JSON.parse(f.read)
       when :yaml
-        YAML.load(f.read)
+        parsed = YAML.load(f.read)
+        Kumogata::Utils.stringify(parsed)
       else
         raise "Unknown format: #{format}"
       end
