@@ -339,6 +339,8 @@ Status: 0
 
 ## YAML template
 
+You can also use the template YAML instead of JSON and Ruby.
+
 ```yaml
 ---
 Resources:
