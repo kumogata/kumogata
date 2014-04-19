@@ -337,6 +337,46 @@ Status: 0
 (Save to `/foo/bar/command_result.json`)
 ```
 
+## YAML template
+
+```yaml
+---
+Resources:
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-XXXXXXXX
+      InstanceType: t1.micro
+Outputs:
+  AZ:
+    Value:
+      Fn::GetAtt:
+      - myEC2Instance
+      - AvailabilityZone
+
+# {
+#   "Resources": {
+#     "myEC2Instance": {
+#       "Type": "AWS::EC2::Instance",
+#       "Properties": {
+#         "ImageId": "ami-XXXXXXXX",
+#         "InstanceType": "t1.micro"
+#       }
+#     }
+#   },
+#   "Outputs": {
+#     "AZ": {
+#       "Value": {
+#         "Fn::GetAtt": [
+#           "myEC2Instance",
+#           "AvailabilityZone"
+#         ]
+#       }
+#     }
+#   }
+# }
+```
+
 ## Demo
 
 * Create resources
