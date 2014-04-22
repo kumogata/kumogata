@@ -281,6 +281,32 @@ Resources do
 end # Resources
 ```
 
+## Iteration
+
+You can use the Iteration in the template using `_(...)` method.
+
+```ruby
+Resources do
+  ['instance1', 'instance2', 'instance3'].echo {|instance_name|
+    _(instance_name) do
+      Type "AWS::EC2::Instance"
+      Properties do
+        ImageId "ami-XXXXXXXX"
+        InstanceType { Ref "InstanceType" }
+        KeyName "your_key_name"
+
+        UserData (<<-EOS).undent.encode64
+          #!/bin/bash
+          yum install -y httpd
+          service httpd start
+          hostname #{instance_name}
+        EOS
+      end
+    end
+  }
+end
+```
+
 ## Post command
 
 You can run shell/ssh commands after building servers using `_post()`.
