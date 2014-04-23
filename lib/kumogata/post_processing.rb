@@ -277,7 +277,7 @@ class Kumogata::PostProcessing
 
     expected_outputs.each do |key|
       unless outputs.keys.include?(key)
-        raise "Unknown output: #{name} => #{key.inspect}"
+        $stderr.puts("[WARN] Undefined output: #{name} => #{key.inspect}".yellow)
       end
     end
   end
