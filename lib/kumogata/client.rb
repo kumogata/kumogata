@@ -3,6 +3,7 @@ class Kumogata::Client
     @options = options
     @options = Hashie::Mash.new(@options) unless @options.kind_of?(Hashie::Mash)
     @cloud_formation = AWS::CloudFormation.new
+    @outputs_filter = Kumogata::OutputsFilter.new(@options)
     @post_processing = Kumogata::PostProcessing.new(@options)
   end
 
@@ -15,7 +16,7 @@ class Kumogata::Client
     add_encryption_password(template)
 
     outputs = create_stack(template, stack_name)
-    filter_outputs(template, outputs)
+    @outputs_filter.filter!(outputs)
     @post_processing.run(:create, outputs)
 
     outputs
@@ -59,7 +60,7 @@ class Kumogata::Client
     add_encryption_password(template)
 
     outputs = update_stack(template, stack_name)
-    filter_outputs(template, outputs)
+    @outputs_filter.filter!(outputs)
     @post_processing.run(:update, outputs)
 
     outputs
@@ -200,6 +201,7 @@ class Kumogata::Client
       :filename   => path_or_url,
     })
 
+    @outputs_filter.fetch!(template)
     @post_processing.fetch!(template)
 
     return template
@@ -623,13 +625,5 @@ EOS
     unless /\A[a-zA-Z][-a-zA-Z0-9]*\Z/i =~ stack_name
       raise "1 validation error detected: Value '#{stack_name}' at 'stackName' failed to satisfy constraint: Member must satisfy regular expression pattern: [a-zA-Z][-a-zA-Z0-9]*"
     end
-  end
-
-  def filter_outputs(template, outputs)
-    if (_outputs_filter = template.delete(:_outputs_filter))
-      _outputs_filter.call(outputs)
-    end
-
-    return outputs
   end
 end
