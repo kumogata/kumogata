@@ -421,7 +421,7 @@ end
 
 _outputs_filter do |output|
   outputs["PublicIp"].gsub!('.', '_')
-  # XXX.XXX.XXX.XXX => XXX-XXX-XXX-XXX
+  # PublicIp: XXX.XXX.XXX.XXX => XXX-XXX-XXX-XXX
 end
 
 _post do
