@@ -15,6 +15,7 @@ class Kumogata::Client
     add_encryption_password(template)
 
     outputs = create_stack(template, stack_name)
+    filter_outputs(template, outputs)
     @post_processing.run(:create, outputs)
 
     outputs
@@ -58,6 +59,7 @@ class Kumogata::Client
     add_encryption_password(template)
 
     outputs = update_stack(template, stack_name)
+    filter_outputs(template, outputs)
     @post_processing.run(:update, outputs)
 
     outputs
@@ -260,6 +262,10 @@ class Kumogata::Client
         end
 
         @__hash__[path] = value
+      end
+
+      def _outputs_filter(&block)
+        @__hash__[:_outputs_filter] = block
       end
 
       def _post(options = {}, &block)
@@ -617,5 +623,13 @@ EOS
     unless /\A[a-zA-Z][-a-zA-Z0-9]*\Z/i =~ stack_name
       raise "1 validation error detected: Value '#{stack_name}' at 'stackName' failed to satisfy constraint: Member must satisfy regular expression pattern: [a-zA-Z][-a-zA-Z0-9]*"
     end
+  end
+
+  def filter_outputs(template, outputs)
+    if (_outputs_filter = template.delete(:_outputs_filter))
+      _outputs_filter.call(outputs)
+    end
+
+    return outputs
   end
 end

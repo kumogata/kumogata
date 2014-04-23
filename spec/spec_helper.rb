@@ -35,6 +35,12 @@ def tempfile(content, template_ext)
   end
 end
 
+class Proc
+  def to_s
+    "<Proc Object>"
+  end
+end
+
 def run_client(command, options = {})
   $stdout = open('/dev/null', 'w') unless ENV['DEBUG']
 

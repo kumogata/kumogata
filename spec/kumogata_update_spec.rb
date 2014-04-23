@@ -299,6 +299,96 @@ end
     end
   end
 
+  it 'update a stack from Ruby template and run ssh command (modify outputs)' do
+    template = <<-TEMPLATE
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+Outputs do
+  PublicIp do
+    Value do
+      Fn__GetAtt "myEC2Instance", "PublicIp"
+    end
+  end
+end
+
+_outputs_filter do |outputs|
+  outputs['PublicIp'].gsub!('.', '-')
+end
+
+_post do
+  ssh_command do
+    after :update
+    ssh do
+      host { Key "PublicIp" }
+      user "ec2-user"
+    end
+    command <<-EOS
+      ls
+    EOS
+  end
+end
+    TEMPLATE
+
+    run_client(:update, :arguments => ['MyStack'], :template => template) do |client, cf|
+      json = eval_template(template).to_json
+      client.should_receive(:print_event_log).once
+      client.should_receive(:create_event_log).once
+
+      output = make_double('output') do |obj|
+        obj.should_receive(:key) { 'PublicIp' }
+        obj.should_receive(:value) { '127.0.0.1' }
+      end
+
+      resource_summary = make_double('resource_summary') do |obj|
+        obj.should_receive(:[]).with(:logical_resource_id) { 'myEC2Instance' }
+        obj.should_receive(:[]).with(:physical_resource_id) { 'i-XXXXXXXX' }
+        obj.should_receive(:[]).with(:resource_type) { 'AWS::EC2::Instance' }
+        obj.should_receive(:[]).with(:resource_status) { 'UPDATE_COMPLETE' }
+        obj.should_receive(:[]).with(:resource_status_reason) { nil }
+        obj.should_receive(:[]).with(:last_updated_timestamp) { '2014-03-02 04:35:12 UTC' }
+      end
+
+      stack = make_double('stack') do |obj|
+        obj.should_receive(:update).with(:template => json)
+        obj.should_receive(:status).and_return(
+            'UPDATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_COMPLETE')
+        obj.should_receive(:outputs) { [output] }
+        obj.should_receive(:resource_summaries) { [resource_summary] }
+      end
+
+      stacks = make_double('stacks') do |obj|
+        obj.should_receive(:[])
+           .with('MyStack') { stack }
+      end
+
+      cf.should_receive(:stacks) { stacks }
+
+      client.instance_variable_get(:@post_processing)
+           .should_receive(:run_ssh_command)
+           .with({"host"=>"<%= Key \"PublicIp\" %>", "user"=>"ec2-user", "request_pty"=>true}, "      ls\n", {"PublicIp"=>"127-0-0-1"})
+           .and_return(["file1\nfile2\n", "", 0])
+
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:print_command).with('ssh_command')
+
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:print_command_result)
+            .with("file1\nfile2\n", "", 0)
+
+      client.instance_variable_get(:@post_processing)
+            .should_receive(:save_command_results)
+            .with([{'ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
+    end
+  end
+
   it 'update a stack from Ruby template and run command (specifies timing)' do
     template = <<-TEMPLATE
 Resources do

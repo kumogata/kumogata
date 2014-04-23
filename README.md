@@ -410,6 +410,36 @@ Outputs:
 
     $ kumogata convert Drupal_Single_Instance.template --output-format=yaml
 
+## Outputs Filter
+
+```ruby
+Outputs do
+  MyPublicIp do
+    Value { Fn__GetAtt "MyInstance", "PublicIp" }
+  end
+end
+
+_outputs_filter do |output|
+  outputs["PublicIp"].gsub!('.', '_')
+  # PublicIp: XXX.XXX.XXX.XXX => XXX-XXX-XXX-XXX
+end
+
+_post do
+  ...
+end
+```
+
+## Configuration File
+
+Kumogata supports [aws-cli configuration file](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-waitcondition.html).
+
+```
+[default]
+aws_access_key_id=AKIAIOSFODNN7EXAMPLE
+aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+aws_security_token=texample123324
+```
+
 ## Demo
 
 * Create resources
