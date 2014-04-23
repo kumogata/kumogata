@@ -410,6 +410,25 @@ Outputs:
 
     $ kumogata convert Drupal_Single_Instance.template --output-format=yaml
 
+## Outputs Filter
+
+```ruby
+Outputs do
+  MyPublicIp do
+    Value { Fn__GetAtt "MyInstance", "PublicIp" }
+  end
+end
+
+_outputs_filter do |output|
+  outputs["PublicIp"].gsub!('.', '_')
+  # XXX.XXX.XXX.XXX => XXX-XXX-XXX-XXX
+end
+
+_post do
+  ...
+end
+```
+
 ## Demo
 
 * Create resources
