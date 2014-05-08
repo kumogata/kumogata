@@ -268,6 +268,10 @@ class Kumogata::PostProcessing
     scope.instance_variable_set(:@__expected_outputs__, expected_outputs)
 
     scope.instance_eval(<<-EOS)
+      def Ref(name)
+        $kumogata.options.parameters[name]
+      end
+
       def Key(name)
         @__expected_outputs__ << name
       end
@@ -290,6 +294,10 @@ class Kumogata::PostProcessing
     scope.instance_variable_set(:@__outputs__, outputs)
 
     scope.instance_eval(<<-EOS)
+      def Ref(name)
+        $kumogata.options.parameters[name]
+      end
+
       def Key(name)
         @__outputs__[name]
       end
