@@ -210,7 +210,6 @@ class Kumogata::Client
   def evaluate_after_trigger(template)
     triggers = template.delete('_after')
     return {} unless triggers
-
   end
 
   def devaluate_template(template)
