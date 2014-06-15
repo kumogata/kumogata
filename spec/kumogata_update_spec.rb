@@ -56,6 +56,50 @@ end
     end
   end
 
+  it 'update a stack from Ruby template (detach)' do
+    template = <<-EOS
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+
+    out = run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:detach => true}) do |client, cf|
+      json = eval_template(template).to_json
+      client.should_not_receive(:print_event_log)
+      client.should_receive(:create_event_log).once
+
+      stack = make_double('stack') do |obj|
+        obj.should_receive(:update).with(:template => json)
+        obj.should_receive(:status).once
+        obj.should_not_receive(:outputs)
+        obj.should_not_receive(:resource_summaries)
+      end
+
+      stacks = make_double('stacks') do |obj|
+        obj.should_receive(:[])
+           .with('MyStack') { stack }
+      end
+
+      cf.should_receive(:stacks) { stacks }
+    end
+
+    expect(out).to eq(Kumogata::Client::DETACH_MESSAGE)
+  end
+
   it 'update a stack from Ruby template with deletion policy retain' do
     template = <<-EOS
 Resources do
