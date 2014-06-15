@@ -5,8 +5,8 @@
 
 Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
-[![Gem Version](https://badge.fury.io/rb/kumogata.png?201405081730)](http://badge.fury.io/rb/kumogata)
-[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201405081730)](https://drone.io/github.com/winebarrel/kumogata/latest)
+[![Gem Version](https://badge.fury.io/rb/kumogata.png?201406151300)](http://badge.fury.io/rb/kumogata)
+[![Build Status](https://drone.io/github.com/winebarrel/kumogata/status.png?201406151300)](https://drone.io/github.com/winebarrel/kumogata/latest)
 
 It can define a template in Ruby DSL, such as:
 
@@ -34,11 +34,13 @@ Resources do
       InstanceType { Ref "InstanceType" }
       KeyName "your_key_name"
 
-      UserData (<<-EOS).undent.encode64
-        #!/bin/bash
-        yum install -y httpd
-        service httpd start
-      EOS
+      UserData do
+        Fn__Base64 (<<-EOS).undent
+          #!/bin/bash
+          yum install -y httpd
+          service httpd start
+        EOS
+      end
     end
   end
 end
@@ -98,6 +100,7 @@ Options:
         --timeout MINUTES
         --result-log PATH
         --command-result-log PATH
+        --detach
         --force
     -w, --ignore-all-space
         --color
