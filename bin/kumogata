@@ -65,7 +65,9 @@ begin
 
   out = Kumogata::Client.new(options).send(command, *arguments)
 
-  if output_result and out
+  if [:create, :update, :delete].include?(command) and options.detach?
+    puts '[detached]'
+  elsif output_result and out
     puts out
   end
 rescue Exception => e

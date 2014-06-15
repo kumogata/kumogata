@@ -16,10 +16,12 @@ class Kumogata::Client
     add_encryption_password(template)
 
     outputs = create_stack(template, stack_name)
-    @outputs_filter.filter!(outputs)
-    @post_processing.run(:create, outputs)
 
-    outputs
+    unless @options.detach?
+      @outputs_filter.filter!(outputs)
+      @post_processing.run(:create, outputs)
+      outputs
+    end
   end
 
   def validate(path_or_url)
@@ -60,10 +62,12 @@ class Kumogata::Client
     add_encryption_password(template)
 
     outputs = update_stack(template, stack_name)
-    @outputs_filter.filter!(outputs)
-    @post_processing.run(:update, outputs)
 
-    outputs
+    unless @options.detach?
+      @outputs_filter.filter!(outputs)
+      @post_processing.run(:update, outputs)
+      outputs
+    end
   end
 
   def delete(stack_name)
@@ -73,7 +77,9 @@ class Kumogata::Client
       delete_stack(stack_name)
     end
 
-    true
+    unless @options.detach?
+      true
+    end
   end
 
   def list(stack_name = nil)
@@ -294,6 +300,9 @@ class Kumogata::Client
 
     Kumogata.logger.info("Creating stack: #{stack_name}".cyan)
     stack = @cloud_formation.stacks.create(stack_name, template.to_json, build_create_options)
+
+    return if @options.detach?
+
     event_log = {}
 
     unless while_in_progress(stack, 'CREATE_COMPLETE', event_log)
@@ -323,6 +332,8 @@ class Kumogata::Client
     event_log = create_event_log(stack)
     stack.update(build_update_options(template.to_json))
 
+    return if @options.detach?
+
     unless while_in_progress(stack, 'UPDATE_COMPLETE', event_log)
       errmsgs = ['Update failed']
       errmsgs << stack_name
@@ -344,6 +355,8 @@ class Kumogata::Client
     Kumogata.logger.info("Deleting stack: #{stack_name}".red)
     event_log = create_event_log(stack)
     stack.delete
+
+    return if @options.detach?
 
     completed = false
 

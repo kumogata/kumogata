@@ -59,6 +59,51 @@ end
     end
   end
 
+  it 'create a stack from Ruby template (detach)' do
+    template = <<-EOS
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+
+    out = run_client(:create, :template => template, :options => {:detach => true}) do |client, cf|
+      json = eval_template(template, :update_deletion_policy => true).to_json
+      client.should_not_receive(:print_event_log)
+      client.should_not_receive(:create_event_log)
+
+      stack = make_double('stack') do |obj|
+        obj.should_not_receive(:status)
+        obj.should_not_receive(:outputs)
+        obj.should_not_receive(:resource_summaries)
+        obj.should_not_receive(:delete)
+      end
+
+      stacks = make_double('stacks') do |obj|
+        obj.should_receive(:create)
+           .with('kumogata-user-host-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', json, {}) { stack }
+        obj.should_not_receive(:[])
+      end
+
+      cf.should_receive(:stacks).once { stacks }
+    end
+
+    expect(out).to be_nil
+  end
+
   it 'create a stack from Ruby template and run command' do
     template = <<-TEMPLATE
 Resources do

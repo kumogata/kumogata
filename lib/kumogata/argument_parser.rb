@@ -101,6 +101,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--timeout MINUTES', Integer)                 {|v| options[:timeout]                 = v     }
         opt.on(''  , '--result-log PATH')                          {|v| options[:result_log]              = v     }
         opt.on(''  , '--command-result-log PATH')                  {|v| options[:command]                 = v     }
+        opt.on(''  , '--detach')                                   {    options[:detach]                  = true  }
         opt.on(''  , '--force')                                    {    options[:force]                   = true  }
         opt.on('-w', '--ignore-all-space')                         {    options[:ignore_all_space]        = true  }
         opt.on(''  , '--color')                                    {    options[:color]                   = true  }
