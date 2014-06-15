@@ -11,7 +11,7 @@ class String
     end
   end # of class methods
 
-  Term::ANSIColor::Attribute.named_attributes.map do |attribute|
+  Term::ANSIColor::Attribute.named_attributes.each do |attribute|
     class_eval(<<-EOS, __FILE__, __LINE__ + 1)
       def #{attribute.name}
         if @@colorize
