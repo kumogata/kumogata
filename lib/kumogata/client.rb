@@ -36,7 +36,7 @@ class Kumogata::Client
     output_format = @options.output_format
 
     unless output_format
-      output_format = case guess_format(path_or_url)
+      output_format = case @options.format || guess_format(path_or_url)
                       when :ruby then :json
                       when :json then :ruby
                       when :yaml then :json
@@ -154,7 +154,7 @@ class Kumogata::Client
   def open_template(path_or_url)
     format = @options.format || guess_format(path_or_url)
 
-    open(path_or_url) do |f|
+    block = proc do |f|
       case format
       when :ruby
         evaluate_template(f, path_or_url)
@@ -166,6 +166,12 @@ class Kumogata::Client
       else
         raise "Unknown format: #{format}"
       end
+    end
+
+    if path_or_url == '-'
+      block.call($stdin)
+    else
+      open(path_or_url, &block)
     end
   end
 
