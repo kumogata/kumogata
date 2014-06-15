@@ -101,7 +101,7 @@ end
       cf.should_receive(:stacks).once { stacks }
     end
 
-    expect(out).to eq(Kumogata::Client::DETACH_MESSAGE)
+    expect(out).to be_nil
   end
 
   it 'create a stack from Ruby template and run command' do

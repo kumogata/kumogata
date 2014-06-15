@@ -37,6 +37,6 @@ describe 'Kumogata::Client#delete' do
       cf.should_receive(:stacks) { stacks }
     end
 
-    expect(out).to eq(Kumogata::Client::DETACH_MESSAGE)
+    expect(out).to be_nil
   end
 end

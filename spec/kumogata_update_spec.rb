@@ -97,7 +97,7 @@ end
       cf.should_receive(:stacks) { stacks }
     end
 
-    expect(out).to eq(Kumogata::Client::DETACH_MESSAGE)
+    expect(out).to be_nil
   end
 
   it 'update a stack from Ruby template with deletion policy retain' do

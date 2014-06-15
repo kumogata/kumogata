@@ -1,6 +1,4 @@
 class Kumogata::Client
-  DETACH_MESSAGE = '[detached]'
-
   def initialize(options)
     @options = options
     @options = Hashie::Mash.new(@options) unless @options.kind_of?(Hashie::Mash)
@@ -22,10 +20,7 @@ class Kumogata::Client
     unless @options.detach?
       @outputs_filter.filter!(outputs)
       @post_processing.run(:create, outputs)
-
       outputs
-    else
-      DETACH_MESSAGE
     end
   end
 
@@ -71,10 +66,7 @@ class Kumogata::Client
     unless @options.detach?
       @outputs_filter.filter!(outputs)
       @post_processing.run(:update, outputs)
-
       outputs
-    else
-      DETACH_MESSAGE
     end
   end
 
@@ -87,8 +79,6 @@ class Kumogata::Client
 
     unless @options.detach?
       true
-    else
-      DETACH_MESSAGE
     end
   end
 
