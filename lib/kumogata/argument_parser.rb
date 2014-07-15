@@ -8,7 +8,6 @@ class Kumogata::ArgumentParser
     :command_result_log => File.join(Dir.pwd, 'command_result.json'),
     :color => $stdout.tty?,
     :debug => false,
-    :config_profile => :default,
   }
 
   COMMANDS = {
@@ -81,7 +80,7 @@ class Kumogata::ArgumentParser
       update_usage(opt)
 
       begin
-        supported_formats = [:ruby, :json, :yaml]
+        supported_formats = [:ruby, :json, :yaml, :js]
         opt.on('-k', '--access-key ACCESS_KEY')                    {|v| options[:access_key_id]           = v     }
         opt.on('-s', '--secret-key SECRET_KEY')                    {|v| options[:secret_access_key]       = v     }
         opt.on('-r', '--region REGION')                            {|v| options[:region]                  = v     }

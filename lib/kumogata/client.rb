@@ -40,6 +40,7 @@ class Kumogata::Client
                       when :ruby then :json
                       when :json then :ruby
                       when :yaml then :json
+                      when :js then :json
                       end
     end
 
@@ -50,6 +51,8 @@ class Kumogata::Client
       JSON.pretty_generate(template).colorize_as(:json)
     when :yaml
       YAML.dump(template).colorize_as(:yaml)
+    when :js
+      '(' + JSON.pretty_generate(template).colorize_as(:json) + ')'
     end
   end
 
@@ -163,6 +166,14 @@ class Kumogata::Client
       when :yaml
         parsed = YAML.load(f.read)
         Kumogata::Utils.stringify(parsed)
+      when :js
+        obj = V8::Context.new.eval(f.read)
+
+        unless obj.instance_of?(V8::Object)
+          raise "Invalid JavaScript template. Please return Object: #{path_or_url}"
+        end
+
+        Kumogata::Utils.stringify(obj.to_hash)
       else
         raise "Unknown format: #{format}"
       end
@@ -179,10 +190,12 @@ class Kumogata::Client
     case File.extname(path_or_url)
     when '.rb'
       :ruby
-    when '.json', '.js'
+    when '.json'
       :json
     when '.yml', '.yaml'
       :yaml
+    when '.js'
+      :js
     else
       :json
     end
