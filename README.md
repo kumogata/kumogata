@@ -9,7 +9,8 @@ It supports the following format:
 * Ruby
 * YAML
 * JavaScript
-* CoffeeScript
+* CoffeeScript (experimental)
+* JSON5 (experimental)
 
 [![Gem Version](https://badge.fury.io/rb/kumogata.png?201406152020)](http://badge.fury.io/rb/kumogata)
 [![Build Status](https://travis-ci.org/winebarrel/kumogata.svg?branch=master)](https://travis-ci.org/winebarrel/kumogata)
