@@ -528,6 +528,58 @@ Outputs:
 
     $ kumogata convert Drupal_Single_Instance.template --output-format=yaml
 
+## [JSON5](http://json5.org/) template
+
+You can also use the [JSON5](http://json5.org/) template instead of JSON and Ruby.
+
+```javascript
+{
+  Resources: { /* comment */
+    myEC2Instance: {
+      Type: "AWS::EC2::Instance",
+      Properties: {
+        ImageId: "ami-XXXXXXXX",
+        InstanceType: "t1.micro"
+      }
+    }
+  },
+  Outputs: {
+    AZ: { /* comment */
+      Value: {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+}
+
+/*
+ {
+   "Resources": {
+     "myEC2Instance": {
+       "Type": "AWS::EC2::Instance",
+       "Properties": {
+         "ImageId": "ami-XXXXXXXX",
+         "InstanceType": "t1.micro"
+       }
+     }
+   },
+   "Outputs": {
+     "AZ": {
+       "Value": {
+         "Fn::GetAtt": [
+           "myEC2Instance",
+           "AvailabilityZone"
+         ]
+       }
+     }
+   }
+ }
+ */
+```
+
 ## Outputs Filter
 
 ```ruby
