@@ -2,6 +2,14 @@
 
 Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
+This is a `format converter` + `useful tool`.
+It supports the following format:
+
+* JSON
+* Ruby
+* YAML
+* JavaScript
+
 [![Gem Version](https://badge.fury.io/rb/kumogata.png?201406152020)](http://badge.fury.io/rb/kumogata)
 [![Build Status](https://travis-ci.org/winebarrel/kumogata.svg?branch=master)](https://travis-ci.org/winebarrel/kumogata)
 
