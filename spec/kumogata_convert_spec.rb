@@ -225,6 +225,101 @@ end
     EOS
   end
 
+  it 'convert Ruby template to JSON5 template' do
+    template = <<-EOS
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+
+    js_template = run_client(:convert, :template => template, :options => {:output_format => :json5})
+
+    expect(js_template).to eq <<-EOS.strip
+{
+  "Resources": {
+    "myEC2Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-XXXXXXXX",
+        "InstanceType": "t1.micro"
+      }
+    }
+  },
+  "Outputs": {
+    "AZ": {
+      "Value": {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+}
+    EOS
+  end
+
+  it 'convert JSON5 template to Ruby template' do
+    template = <<-EOS
+{
+  Resources: { /* comment */
+    myEC2Instance: {
+      Type: "AWS::EC2::Instance",
+      Properties: {
+        ImageId: "ami-XXXXXXXX",
+        InstanceType: "t1.micro"
+      }
+    }
+  },
+  Outputs: {
+    AZ: { /* comment */
+      Value: {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+}
+    EOS
+
+    ruby_template = run_client(:convert, :template => template, :template_ext => '.json5', :options => {:output_format => :ruby})
+
+    expect(ruby_template).to eq((<<-EOS).chomp)
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+  end
+
   it 'convert JavaScript template to Ruby template' do
     template = <<-EOS
 fetch_ami = () -> "ami-XXXXXXXX"
