@@ -362,6 +362,66 @@ Status: 0
 (Save to `/foo/bar/command_result.json`)
 ```
 
+## JavaScript template
+
+You can also use the YAML template instead of JSON and Ruby.
+
+```javascript
+function fetch_ami() {
+  return "ami-XXXXXXXX";
+}
+
+({
+  Resources: { /* comment */
+    myEC2Instance: {
+      Type: "AWS::EC2::Instance",
+      Properties: {
+        ImageId: fetch_ami(),
+        InstanceType: "t1.micro"
+      }
+    }
+  },
+  Outputs: {
+    AZ: { /* comment */
+      Value: {
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+      }
+    }
+  }
+})
+
+/*
+ {
+   "Resources": {
+     "myEC2Instance": {
+       "Type": "AWS::EC2::Instance",
+       "Properties": {
+         "ImageId": "ami-XXXXXXXX",
+         "InstanceType": "t1.micro"
+       }
+     }
+   },
+   "Outputs": {
+     "AZ": {
+       "Value": {
+         "Fn::GetAtt": [
+           "myEC2Instance",
+           "AvailabilityZone"
+         ]
+       }
+     }
+   }
+ }
+ */
+``
+
+### Convert JSON template to JavaScript
+
+    $ kumogata convert Drupal_Single_Instance.template --output-format=js
+
 ## YAML template
 
 You can also use the YAML template instead of JSON and Ruby.
