@@ -19,6 +19,8 @@ class Kumogata::ConfigParser
 
     @path.each_line do |line|
       line.strip!
+      next if line.empty?
+
       if line =~ /\A\[(.+)\]\z/
         profile_name = $1
       elsif profile_name

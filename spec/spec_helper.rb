@@ -1,5 +1,6 @@
 require 'kumogata'
 require 'kumogata/argument_parser'
+require 'kumogata/config_parser'
 require 'tempfile'
 require 'time'
 require 'timecop'
@@ -23,9 +24,9 @@ class Kumogata::Crypt
   end
 end
 
-def tempfile(content, template_ext)
+def tempfile(content, template_ext = nil)
   basename = "#{File.basename __FILE__}.#{$$}"
-  basename = [basename, template_ext]
+  basename = [basename, template_ext] if template_ext
 
   Tempfile.open(basename) do |f|
     f << content
