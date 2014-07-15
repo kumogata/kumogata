@@ -424,7 +424,7 @@ function fetch_ami() {
    }
  }
  */
-``
+```
 
 ### Convert JSON template to JavaScript
 
