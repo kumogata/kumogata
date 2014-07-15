@@ -9,6 +9,7 @@ It supports the following format:
 * Ruby
 * YAML
 * JavaScript
+* CoffeeScript
 
 [![Gem Version](https://badge.fury.io/rb/kumogata.png?201406152020)](http://badge.fury.io/rb/kumogata)
 [![Build Status](https://travis-ci.org/winebarrel/kumogata.svg?branch=master)](https://travis-ci.org/winebarrel/kumogata)
@@ -430,6 +431,55 @@ function fetch_ami() {
 ### Convert JSON template to JavaScript
 
     $ kumogata convert Drupal_Single_Instance.template --output-format=js
+
+## CoffeeScript template
+
+You can also use the CoffeeScript template instead of JSON and Ruby.
+
+```coffeescript
+fetch_ami = () -> "ami-XXXXXXXX"
+
+/* For JS Object is evaluated last, it must use `return` */
+return {
+  Resources:
+    myEC2Instance:
+      Type: "AWS::EC2::Instance",
+      Properties:
+        ImageId: fetch_ami(),
+        InstanceType: "t1.micro"
+  Outputs:
+    AZ: # comment
+      Value:
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+}
+
+###
+ {
+   "Resources": {
+     "myEC2Instance": {
+       "Type": "AWS::EC2::Instance",
+       "Properties": {
+         "ImageId": "ami-XXXXXXXX",
+         "InstanceType": "t1.micro"
+       }
+     }
+   },
+   "Outputs": {
+     "AZ": {
+       "Value": {
+         "Fn::GetAtt": [
+           "myEC2Instance",
+           "AvailabilityZone"
+         ]
+       }
+     }
+   }
+ }
+###
+```
 
 ## YAML template
 
