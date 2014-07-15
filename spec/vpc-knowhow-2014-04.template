@@ -1,0 +1,703 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "VPC knowhow template",
+  "Parameters": {
+    "KeyName": {
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern": "[-_ a-zA-Z0-9]*",
+      "ConstraintDescription": "can contain only alphanumeric characters, spaces, dashes and underscores."
+    },
+    "SSHFrom" : {
+      "Description" : "Lockdown SSH access to the bastion host (default can be accessed from anywhere)",
+      "Type" : "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "Default" : "0.0.0.0/0",
+      "AllowedPattern" : "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription" : "must be a valid CIDR range of the form x.x.x.x/x."
+    },
+    "DBInstanceType" : {
+      "Description" : "EC2 instance type for the Blue environment",
+      "Default" : "db.t1.micro",
+      "Type" : "String"
+    },
+    "DBSnapshotName" : {
+      "Default" : "",
+      "Description" : "The name of a DB snapshot (optional)",
+      "Type" : "String"
+    },
+    "DBAllocatedStorage" : {
+      "Default" : "5",
+      "Description" : "DB instance disk size",
+      "Type" : "Number"
+    },
+    "DBUsername": {
+      "Default": "admin",
+      "Description" : "The database master account username",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "16",
+      "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
+    },
+    "DBPassword" : {
+      "Description" : "Password of RDS master password",
+      "Type" : "String",
+      "NoEcho": "true",
+      "MinLength": "4"
+    },
+    "DBName" : {
+      "Default" : "",
+      "Description" : "The name of a DB01 database",
+      "Type" : "String"
+    },
+    "WebInstanceType" : {
+      "Description" : "EC2 instance type for the web server",
+      "Default" : "t1.micro",
+      "Type" : "String"
+    },
+    "WebFleetSize" : {
+      "Description" : "Number of EC2 instances to launch for the web server",
+      "Default" : "2",
+      "Type" : "Number",
+      "MaxValue" : "100",
+      "MinValue" : "1"
+    },
+    "HostedZone" : {
+      "Description" : "The DNS name of an existing Amazon Route 53 hosted zone",
+      "Type" : "String"
+    }
+  },
+  "Conditions" : {
+    "UseDBSnapshot" : { "Fn::Not" : [ { "Fn::Equals" : [ { "Ref" : "DBSnapshotName" }, "" ] } ] }
+  },
+  "Mappings": {
+    "AWSAmazonLinuxAMI": {
+      "us-east-1":      { "name":"Virginia",   "201303": "ami-3275ee5b", "201309": "ami-35792c5c", "201403": "ami-2f726546" },
+      "us-west-2":      { "name":"Oregon",     "201303": "ami-ecbe2adc", "201309": "ami-d03ea1e0", "201403": "ami-b8f69f88" },
+      "us-west-1":      { "name":"California", "201303": "ami-66d1fc23", "201309": "ami-687b4f2d", "201403": "ami-84f1cfc1" },
+      "eu-west-1":      { "name":"Ireland",    "201303": "ami-44939930", "201309": "ami-149f7863", "201403": "ami-a921dfde" },
+      "ap-southeast-1": { "name":"Singapole",  "201303": "ami-aa9ed2f8", "201309": "ami-14f2b946", "201403": "ami-787c2c2a" },
+      "ap-southeast-2": { "name":"Sydney",     "201303": "ami-363eaf0c", "201309": "ami-a148d59b", "201403": "ami-0bc85031" },
+      "ap-northeast-1": { "name":"Tokyo",      "201303": "ami-173fbf16", "201309": "ami-3561fe34", "201403": "ami-a1bec3a0" },
+      "sa-east-1":      { "name":"SaoPaulo",   "201303": "ami-dd6bb0c0", "201309": "ami-9f6ec982", "201403": "ami-89de7c94" }
+    },
+    "ELBLogger": {
+      "us-east-1":      { "AccountID": "127311923021" },
+      "us-west-2":      { "AccountID": "797873946194" },
+      "us-west-1":      { "AccountID": "027434742980" },
+      "eu-west-1":      { "AccountID": "156460612806" },
+      "ap-southeast-1": { "AccountID": "114774131450" },
+      "ap-southeast-2": { "AccountID": "783225319266" },
+      "ap-northeast-1": { "AccountID": "582318560864" },
+      "sa-east-1":      { "AccountID": "507241528517" },
+      "us-gov-west-1":  { "AccountID": "048591011584" }
+    },
+    "StackConfig" : {
+      "VPC"               : { "CIDR" : "10.0.0.0/16" },
+      "FrontendSubnet1"   : { "CIDR" : "10.0.0.0/24" },
+      "FrontendSubnet2"   : { "CIDR" : "10.0.1.0/24" },
+      "ApplicationSubnet1": { "CIDR" : "10.0.100.0/24" },
+      "ApplicationSubnet2": { "CIDR" : "10.0.101.0/24" },
+      "DatastoreSubnet1"  : { "CIDR" : "10.0.200.0/24" },
+      "DatastoreSubnet2"  : { "CIDR" : "10.0.201.0/24" },
+      "BastionServer"     : { "InstanceType" : "t1.micro" }
+    }
+  },
+  "Resources": {
+    "PowerUserRole" : {
+      "Type" : "AWS::IAM::Role",
+      "Properties" : {
+        "AssumeRolePolicyDocument" : {
+          "Statement": [ {
+            "Effect": "Allow",
+              "Principal": {
+                "Service": [ "ec2.amazonaws.com" ]
+              },
+              "Action": [ "sts:AssumeRole" ]
+          } ]
+        },
+        "Path" : "/",
+        "Policies" :[ {
+          "PolicyName" : "PowerUserPolicy",
+          "PolicyDocument" : {
+            "Statement": [ {
+              "Sid": "PowerUserStmt",
+              "Effect": "Allow",
+              "NotAction": "iam:*",
+              "Resource": "*"
+            } ]
+          }
+        }]
+      }
+    },
+    "PowerUserProfile" : {
+      "Type" : "AWS::IAM::InstanceProfile",
+      "Properties" : {
+        "Path": "/",
+        "Roles" : [ { "Ref" : "PowerUserRole" } ]
+      }
+    },
+
+    "LogBucket" : {
+      "Type" : "AWS::S3::Bucket",
+      "DeletionPolicy" : "Retain"
+    },
+    "LogBucketPolicy" : {
+      "Type" : "AWS::S3::BucketPolicy",
+      "Properties" : {
+        "Bucket" : { "Ref" : "LogBucket" },
+        "PolicyDocument" : {
+          "Id" : "LogBucketPolicy",
+          "Statement" : [{
+            "Sid" : "WriteAccess",
+            "Action" : [ "s3:PutObject" ],
+            "Effect" : "Allow",
+            "Resource" : { "Fn::Join" : [ "", [
+              "arn:aws:s3:::", { "Ref" : "LogBucket" } , "/AWSLogs/", { "Ref" : "AWS::AccountId" }, "/*"
+            ]]},
+            "Principal" : {
+              "AWS" : { "Fn::FindInMap" : [ "ELBLogger", { "Ref": "AWS::Region" }, "AccountID" ]}
+            }
+          }]
+        }
+      }
+    },
+
+    "VPC" : {
+      "Type" : "AWS::EC2::VPC",
+      "Properties" : {
+        "CidrBlock" : { "Fn::FindInMap" : [ "StackConfig", "VPC", "CIDR" ]},
+        "EnableDnsSupport" : "true",
+        "EnableDnsHostnames" : "true",
+        "InstanceTenancy" : "default",
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId" } },
+          {"Key" : "Network", "Value" : "Public" }
+        ]
+      }
+    },
+    "InternetGateway" : {
+      "Type" : "AWS::EC2::InternetGateway",
+      "Properties" : {
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId" } },
+          {"Key" : "Network", "Value" : "Public" }
+        ]
+      }
+    },
+    "AttachGateway" : {
+      "Type" : "AWS::EC2::VPCGatewayAttachment",
+      "Properties" : {
+        "VpcId" : {"Ref" : "VPC"},
+        "InternetGatewayId" : {"Ref" : "InternetGateway"}
+      }
+    },
+
+    "PublicRouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC" },
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+          {"Key" : "Network", "Value" : "Public" }
+        ]
+      }
+    },
+    "PrivateRouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC" },
+        "Tags" : [
+          { "Key" : "Application", "Value" : { "Ref" : "AWS::StackId" } },
+          { "Key" : "Network", "Value" : "Private" }
+        ]
+      }
+    },
+    "PublicRoute" : {
+      "Type" : "AWS::EC2::Route",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "PublicRouteTable" },
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "GatewayId" : { "Ref" : "InternetGateway" }
+      }
+    },
+
+    "FrontendSubnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "VpcId": { "Ref": "VPC" },
+        "AvailabilityZone" : { "Fn::Select" : [ "0", { "Fn::GetAZs" : { "Ref" : "AWS::Region" }}]},
+        "CidrBlock": { "Fn::FindInMap" : [ "StackConfig", "FrontendSubnet1", "CIDR" ]},
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+          {"Key" : "Network", "Value" : "Public" }
+        ]
+      }
+    },
+    "FrontendSubnet2": {
+      "Type": "AWS::EC2::Subnet",
+      "DependsOn" : "AttachGateway",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "AvailabilityZone" : { "Fn::Select" : [ "1", { "Fn::GetAZs" : { "Ref" : "AWS::Region" }}]},
+        "CidrBlock": { "Fn::FindInMap" : [ "StackConfig", "FrontendSubnet2", "CIDR" ]},
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+          {"Key" : "Network", "Value" : "Public" }
+        ]
+      }
+    },
+    "ApplicationSubnet1" : {
+      "Type" : "AWS::EC2::Subnet",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "VpcId" : {"Ref" : "VPC"},
+        "CidrBlock" : { "Fn::FindInMap" : [ "StackConfig", "ApplicationSubnet1", "CIDR" ]},
+        "AvailabilityZone" : { "Fn::Select" : [ "0", { "Fn::GetAZs" : { "Ref" : "AWS::Region" }}]},
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+          {"Key" : "Network", "Value" : "Public" }
+        ]
+      }
+    },
+    "ApplicationSubnet2" : {
+      "Type" : "AWS::EC2::Subnet",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "VpcId" : {"Ref" : "VPC"},
+        "CidrBlock" : { "Fn::FindInMap" : [ "StackConfig", "ApplicationSubnet2", "CIDR" ]},
+        "AvailabilityZone" : { "Fn::Select" : [ "1", { "Fn::GetAZs" : { "Ref" : "AWS::Region" }}]},
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"} },
+          {"Key" : "Network", "Value" : "Public" }
+        ]
+      }
+    },
+    "DatastoreSubnet1" : {
+      "Type" : "AWS::EC2::Subnet",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC" },
+        "CidrBlock" : { "Fn::FindInMap" : [ "StackConfig", "DatastoreSubnet1", "CIDR" ]},
+        "AvailabilityZone" : { "Fn::Select" : [ "0", { "Fn::GetAZs" : { "Ref" : "AWS::Region" }}]},
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId" } },
+          {"Key" : "Network", "Value" : "Private" }
+        ]
+      }
+    },
+    "DatastoreSubnet2" : {
+      "Type" : "AWS::EC2::Subnet",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC" },
+        "CidrBlock" : { "Fn::FindInMap" : [ "StackConfig", "DatastoreSubnet2", "CIDR" ]},
+        "AvailabilityZone" : { "Fn::Select" : [ "1", { "Fn::GetAZs" : { "Ref" : "AWS::Region" }}]},
+        "Tags" : [
+          {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId" } },
+          {"Key" : "Network", "Value" : "Private" }
+        ]
+      }
+    },
+
+    "FrontendSubnet1RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "FrontendSubnet1" },
+        "RouteTableId" : { "Ref" : "PublicRouteTable" }
+      }
+    },
+    "FrontendSubnet2RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "FrontendSubnet2" },
+        "RouteTableId" : { "Ref" : "PublicRouteTable" }
+      }
+    },
+    "ApplicationSubnet1RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "ApplicationSubnet1" },
+        "RouteTableId" : { "Ref" : "PublicRouteTable" }
+      }
+    },
+    "ApplicationSubnet2RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "ApplicationSubnet2" },
+        "RouteTableId" : { "Ref" : "PublicRouteTable" }
+      }
+    },
+    "DatastoreSubnet1RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "DatastoreSubnet1" },
+        "RouteTableId" : { "Ref" : "PrivateRouteTable" }
+      }
+    },
+    "DatastoreSubnet2RouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "DatastoreSubnet2" },
+        "RouteTableId" : { "Ref" : "PrivateRouteTable" }
+      }
+    },
+
+
+    "VPCDefaultSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC" },
+        "GroupDescription" : "Allow all communications in VPC",
+        "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : { "Fn::FindInMap" : [ "StackConfig", "VPC", "CIDR" ]} },
+          { "IpProtocol" : "udp", "FromPort" : "0", "ToPort" : "65535", "CidrIp" : { "Fn::FindInMap" : [ "StackConfig", "VPC", "CIDR" ]} },
+          { "IpProtocol" : "icmp", "FromPort" : "-1", "ToPort" : "-1", "CidrIp" : { "Fn::FindInMap" : [ "StackConfig", "VPC", "CIDR" ]} }
+        ]
+      }
+    },
+    "SSHSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC" },
+        "GroupDescription" : "Enable SSH access via port 22",
+        "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "22",  "ToPort" : "22",  "CidrIp" : { "Ref" : "SSHFrom" }}
+        ]
+      }
+    },
+    "PublicWebSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC" },
+        "GroupDescription" : "Public Security Group with HTTP access on port 443 from the internet",
+        "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0" },
+          { "IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0" }
+        ]
+      }
+    },
+
+    "ApplicationSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "VpcId" : {"Ref" : "VPC"},
+        "GroupDescription" : "Marker security group for Application server."
+      }
+    },
+    
+    "MySQLSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "VpcId" : {"Ref" : "VPC"},
+        "GroupDescription" : "Marker security group for MySQL server."
+      }
+    },
+
+    "BastionWaitHandle" : {
+      "Type" : "AWS::CloudFormation::WaitConditionHandle"
+    },
+    "BastionWaitCondition" : {
+      "Type" : "AWS::CloudFormation::WaitCondition",
+      "DependsOn" : "BastionInstance",
+      "Properties" : {
+        "Handle" : { "Ref" : "BastionWaitHandle" },
+        "Timeout" : "900"
+      }
+    },
+    "BastionInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "InstanceType": { "Fn::FindInMap" : [ "StackConfig", "BastionServer", "InstanceType" ]},
+        "KeyName": { "Ref": "KeyName" },
+        "SubnetId": { "Ref" : "FrontendSubnet1" },
+        "ImageId": { "Fn::FindInMap": [ "AWSAmazonLinuxAMI", { "Ref": "AWS::Region" }, "201403" ]},
+        "IamInstanceProfile": { "Ref" : "PowerUserProfile" },
+        "SecurityGroupIds" : [
+          { "Ref" : "SSHSecurityGroup" },
+          { "Ref" : "VPCDefaultSecurityGroup" }
+        ],
+        "Tags": [
+          { "Key": "Name", "Value": "Bastion" }
+        ],
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : [ "", [
+          "#! /bin/bash -v\n",
+          "yum update -y\n",
+
+          "# Helper function\n",
+          "function error_exit\n",
+          "{\n",
+          "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "BastionWaitHandle" }, "'\n",
+          "  exit 1\n",
+          "}\n",
+
+          "# Install packages\n",
+          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r BastionInstance ",
+          "    --region ", { "Ref" : "AWS::Region" }, " || error_exit 'Failed to run cfn-init'\n",
+
+          "# All is well so signal success\n",
+          "/opt/aws/bin/cfn-signal -e $? -r \"BastionInstance setup complete\" '", { "Ref" : "BastionWaitHandle" }, "'\n"
+        ]]}}
+      },
+      "Metadata" : {
+        "AWS::CloudFormation::Init" : {
+          "config" : {
+            "packages" : {
+              "yum" : {
+                "mysql55" :      [],
+                "jq" :           [],
+                "python-magic" : []
+              }
+            }
+          }
+        }
+      }
+    },
+    "BastionInstanceEIP": {
+      "Type": "AWS::EC2::EIP",
+      "DependsOn" : "AttachGateway",
+      "Properties": {
+        "Domain": "vpc",
+        "InstanceId": { "Ref": "BastionInstance" }
+      }
+    },
+    "BastionDNSRecord" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties" : {
+        "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZone"}, "." ]]},
+        "Comment" : "A record for the Bastion instance.",
+        "Name" : { "Fn::Join" : [ "", ["bastion.", {"Ref" : "HostedZone"}, "." ]]},
+        "Type" : "A",
+        "TTL" : "300",
+        "ResourceRecords" : [
+          {"Ref" :"BastionInstanceEIP"}
+        ]
+      }
+    },
+    "BastionLocalDNSRecord" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties" : {
+        "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZone"}, "." ]]},
+        "Comment" : "A record for the private IP address of Bastion instance.",
+        "Name" : { "Fn::Join" : [ "", ["bastion.local.", {"Ref" : "HostedZone"}, "." ]]},
+        "Type" : "A",
+        "TTL" : "300",
+        "ResourceRecords" : [
+          { "Fn::GetAtt" : [ "BastionInstance", "PrivateIp" ] }
+        ]
+      }
+    },
+
+    "DBParamGroup" : {
+      "Type": "AWS::RDS::DBParameterGroup",
+      "Properties" : {
+        "Description" : "Default parameter group for Portnoy",
+        "Family" : "MySQL5.6",
+        "Parameters" : {
+          "character_set_database" : "utf8mb4",
+          "character_set_client" : "utf8mb4",
+          "character_set_connection" : "utf8mb4",
+          "character_set_results" : "utf8mb4",
+          "character_set_server" : "utf8mb4",
+          "skip-character-set-client-handshake" : "TRUE"
+        }
+      }
+    },
+    "DBSubnetGroup" : {
+      "Type" : "AWS::RDS::DBSubnetGroup",
+      "Properties" : {
+        "DBSubnetGroupDescription" : "Database subnets for RDS",
+        "SubnetIds" : [
+          { "Ref": "DatastoreSubnet1" },
+          { "Ref": "DatastoreSubnet2" }
+        ]
+      }
+    },
+    "DBInstance" : {
+      "Type" : "AWS::RDS::DBInstance",
+      "DeletionPolicy" : "Snapshot",
+      "Properties" : {
+        "DBInstanceClass" : { "Ref" : "DBInstanceType" },
+        "AllocatedStorage" : { "Ref" : "DBAllocatedStorage" },
+        "Engine" : "MySQL",
+        "MultiAZ" : "true",
+        "EngineVersion" : "5.6.13",
+        "MasterUsername" : {"Ref":"DBUsername"},
+        "MasterUserPassword" : {"Ref":"DBPassword"},
+        "BackupRetentionPeriod" : "35",
+        "DBParameterGroupName" : {"Ref":"DBParamGroup"},
+        "DBSubnetGroupName" : {"Ref":"DBSubnetGroup"},
+        "DBSnapshotIdentifier" : { "Fn::If" : [
+          "UseDBSnapshot",
+          { "Ref" : "DBSnapshotName" },
+          { "Ref" : "AWS::NoValue" }
+        ]},
+        "PreferredBackupWindow": "19:00-19:30",
+        "PreferredMaintenanceWindow": "sat:20:00-sat:20:30",
+        "VPCSecurityGroups" : [
+          { "Ref" : "VPCDefaultSecurityGroup" },
+          { "Ref" : "MySQLSecurityGroup" }
+        ]
+      }
+    },
+    "DatabaseDNSRecord" : {
+      "Type" : "AWS::Route53::RecordSet",
+      "Properties" : {
+        "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZone"}, "." ]]},
+        "Comment" : "CNAME for the database.",
+        "Name" : { "Fn::Join" : [ "", [ "db.local.", { "Ref" : "HostedZone" }, "." ]]},
+        "Type" : "CNAME",
+        "TTL" : "300",
+        "ResourceRecords" : [
+          { "Fn::GetAtt" : [ "DBInstance", "Endpoint.Address" ] }
+        ]
+      }
+    },
+
+    "ApplicationFleet" : {
+      "Type" : "AWS::AutoScaling::AutoScalingGroup",
+      "UpdatePolicy" : {
+        "AutoScalingRollingUpdate" : {
+          "MaxBatchSize" : "1",
+          "MinInstancesInService" : "1",
+          "PauseTime" : "PT2M30S"
+        }
+      },
+      "Properties" : {
+        "AvailabilityZones" : [
+          { "Fn::GetAtt" : [ "ApplicationSubnet1", "AvailabilityZone" ] },
+          { "Fn::GetAtt" : [ "ApplicationSubnet2", "AvailabilityZone" ] }
+        ],
+        "VPCZoneIdentifier" : [
+          { "Ref" : "ApplicationSubnet1" },
+          { "Ref" : "ApplicationSubnet2" }
+        ],
+        "LaunchConfigurationName" : { "Ref" : "ApplicationServerLaunchConfig"  },
+        "MinSize" : { "Ref" : "WebFleetSize" },
+        "MaxSize" : { "Ref" : "WebFleetSize" },
+        "DesiredCapacity" : { "Ref" : "WebFleetSize" },
+        "LoadBalancerNames" : [ { "Ref" : "ElasticLoadBalancer" } ],
+        "Tags" : [
+          { "Key" : "Name", "Value" : "Application", "PropagateAtLaunch" : "true" }
+        ]
+      }
+    },
+    "ApplicationServerLaunchConfig"  : {
+      "Type" : "AWS::AutoScaling::LaunchConfiguration",
+      "Properties" : {
+        "InstanceType": { "Ref" : "WebInstanceType" },
+        "KeyName": { "Ref" : "KeyName" },
+        "ImageId": { "Fn::FindInMap": [ "AWSAmazonLinuxAMI", { "Ref": "AWS::Region" }, "201403" ]},
+        "SecurityGroups": [
+          { "Ref" : "VPCDefaultSecurityGroup" },
+          { "Ref" : "ApplicationSecurityGroup" }
+        ],
+        "AssociatePublicIpAddress" : "true",
+        "IamInstanceProfile": { "Ref" : "PowerUserProfile" },
+        "InstanceMonitoring" : "false",
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#! /bin/bash -v\n",
+          "yum update -y\n",
+
+          "# Install packages\n",
+          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r ApplicationServerLaunchConfig ",
+          "    --region ", { "Ref" : "AWS::Region" }, " || error_exit 'Failed to run cfn-init'\n"
+        ]]}}
+      },
+      "Metadata" : {
+        "AWS::CloudFormation::Init" : {
+          "config" : {
+            "packages" : {
+              "yum" : {
+                "httpd"   : [],
+                "mysql55" : []
+              }
+            },
+            "files" : {
+              "/var/www/html/index.html" : {
+                "content" : "<html><head><title>Hello</title></head><body>Hello, world!</body></html>",
+                "mode"   : "000644",
+                "owner"  : "apache",
+                "group"  : "apache"
+              }
+            },
+            "services" : {
+              "sysvinit" : {
+                "httpd"   : { "enabled" : "true", "ensureRunning" : "true" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "ElasticLoadBalancer" : {
+      "Type" : "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "Subnets" : [
+          { "Ref" : "FrontendSubnet1" },
+          { "Ref" : "FrontendSubnet2" }
+        ],
+        "Listeners" : [
+          { "LoadBalancerPort" : "80", "InstancePort" : "80", "Protocol" : "HTTP" }
+        ],
+        "HealthCheck" : {
+          "Target" : "HTTP:80/index.html",
+          "HealthyThreshold" : "2",
+          "UnhealthyThreshold" : "2",
+          "Interval" : "6",
+          "Timeout" : "5"
+        },
+        "SecurityGroups" : [
+          { "Ref" : "PublicWebSecurityGroup" }
+        ]
+      }
+    },
+    "LoadBalancerDNSRecord" : {
+      "Type" : "AWS::Route53::RecordSetGroup",
+      "Properties" : {
+        "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZone"}, "." ]]},
+        "Comment" : "Zone apex alias targeted to LoadBalancer.",
+        "RecordSets" : [
+          {
+            "Name" : { "Fn::Join" : [ "", [{"Ref" : "HostedZone"}, "." ]]},
+            "Type" : "A",
+            "AliasTarget" : {
+              "HostedZoneId" : { "Fn::GetAtt" : ["ElasticLoadBalancer", "CanonicalHostedZoneNameID"] },
+              "DNSName" : { "Fn::GetAtt" : ["ElasticLoadBalancer","CanonicalHostedZoneName"] }
+            }
+          }
+        ]
+      }
+    }
+  },
+
+  "Outputs": {
+    "JdbcConnectionString": {
+      "Value": { "Fn::Join": [ "", [
+        "jdbc:mysql://",
+        { "Ref": "DatabaseDNSRecord" }, ":",
+        { "Fn::GetAtt": [ "DBInstance", "Endpoint.Port" ] }, "/",
+        { "Ref" : "DBName" }
+      ]]},
+      "Description": "-"
+    },
+    "SSHToBackendServer": {
+      "Value": { "Fn::Join":["", [
+        "ssh -i /path/to/", { "Ref": "KeyName" }, ".pem",
+        " -oProxyCommand='ssh -i /path/to/", { "Ref": "KeyName" }, ".pem -W %h:%p ec2-user@", {"Ref" : "BastionDNSRecord"}, "'",
+        " ec2-user@<private-ip>"
+      ]]},
+      "Description": "SSH command to connect to the backend servers"
+    }
+  }
+}
