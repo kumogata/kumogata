@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'net-ssh'
   spec.add_dependency 'retryable'
   spec.add_dependency 'term-ansicolor'
+  spec.add_dependency 'therubyracer'
   spec.add_dependency 'uuidtools'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
