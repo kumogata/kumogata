@@ -19,7 +19,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'aws-sdk'
-  spec.add_dependency 'aws_config', '>= 0.0.2'
   spec.add_dependency 'coderay'
   spec.add_dependency 'diffy'
   spec.add_dependency 'dslh', '>= 0.2.7'
