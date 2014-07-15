@@ -379,6 +379,7 @@ function fetch_ami() {
   return "ami-XXXXXXXX";
 }
 
+/* For JS Object is evaluated last, it must be enclosed in parentheses */
 ({
   Resources: { /* comment */
     myEC2Instance: {
