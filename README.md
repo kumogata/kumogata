@@ -372,7 +372,7 @@ Status: 0
 
 ## JavaScript template
 
-You can also use the YAML template instead of JSON and Ruby.
+You can also use the JavaScript template instead of JSON and Ruby.
 
 ```javascript
 function fetch_ami() {
