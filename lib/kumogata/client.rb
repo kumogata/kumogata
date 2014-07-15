@@ -186,7 +186,6 @@ class Kumogata::Client
 
         Kumogata::Utils.stringify(obj.to_hash)
       else
-      else
         raise "Unknown format: #{format}"
       end
     end

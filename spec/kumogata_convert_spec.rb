@@ -225,6 +225,50 @@ end
     EOS
   end
 
+  it 'convert JavaScript template to Ruby template' do
+    template = <<-EOS
+fetch_ami = () -> "ami-XXXXXXXX"
+
+# comment
+return {
+  Resources:
+    myEC2Instance:
+      Type: "AWS::EC2::Instance",
+      Properties:
+        ImageId: fetch_ami(),
+        InstanceType: "t1.micro"
+  Outputs:
+    AZ: # comment
+      Value:
+        "Fn::GetAtt": [
+          "myEC2Instance",
+          "AvailabilityZone"
+        ]
+}
+    EOS
+
+    ruby_template = run_client(:convert, :template => template, :template_ext => '.coffee', :options => {:output_format => :ruby})
+
+    expect(ruby_template).to eq((<<-EOS).chomp)
+Resources do
+  myEC2Instance do
+    Type "AWS::EC2::Instance"
+    Properties do
+      ImageId "ami-XXXXXXXX"
+      InstanceType "t1.micro"
+    end
+  end
+end
+Outputs do
+  AZ do
+    Value do
+      Fn__GetAtt "myEC2Instance", "AvailabilityZone"
+    end
+  end
+end
+    EOS
+  end
+
   it 'convert YAML template to JSON template' do
     template = <<-EOS
 ---
