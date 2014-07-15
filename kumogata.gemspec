@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'aws-sdk'
   spec.add_dependency 'coderay'
+  spec.add_dependency 'coffee-script'
   spec.add_dependency 'diffy'
   spec.add_dependency 'dslh', '>= 0.2.7'
   spec.add_dependency 'hashie'

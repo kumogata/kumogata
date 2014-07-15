@@ -80,7 +80,7 @@ class Kumogata::ArgumentParser
       update_usage(opt)
 
       begin
-        supported_formats = [:ruby, :json, :yaml, :js]
+        supported_formats = [:ruby, :json, :yaml, :js, :coffee]
         opt.on('-k', '--access-key ACCESS_KEY')                    {|v| options[:access_key_id]           = v     }
         opt.on('-s', '--secret-key SECRET_KEY')                    {|v| options[:secret_access_key]       = v     }
         opt.on('-r', '--region REGION')                            {|v| options[:region]                  = v     }

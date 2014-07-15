@@ -53,6 +53,8 @@ class Kumogata::Client
       YAML.dump(template).colorize_as(:yaml)
     when :js
       '(' + JSON.pretty_generate(template).colorize_as(:json) + ')'
+    when :coffee
+      raise 'Output to CoffeeScript is not implemented'
     end
   end
 
@@ -174,6 +176,16 @@ class Kumogata::Client
         end
 
         Kumogata::Utils.stringify(obj.to_hash)
+      when :coffee
+        completed = CoffeeScript.compile(f.read)
+        obj = V8::Context.new.eval(completed)
+
+        unless obj.instance_of?(V8::Object)
+          raise "Invalid CoffeeScript template. Please return Object: #{path_or_url}"
+        end
+
+        Kumogata::Utils.stringify(obj.to_hash)
+      else
       else
         raise "Unknown format: #{format}"
       end
@@ -196,6 +208,8 @@ class Kumogata::Client
       :yaml
     when '.js'
       :js
+    when '.coffee'
+      :coffee
     else
       :json
     end
