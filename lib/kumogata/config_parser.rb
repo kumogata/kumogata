@@ -22,7 +22,7 @@ class Kumogata::ConfigParser
       next if line.empty?
 
       if line =~ /\A\[(.+)\]\z/
-        profile_name = $1
+        profile_name = $1.split.last
       elsif profile_name
         key, value = line.split('=', 2).map {|i| i.strip }
         @profiles[profile_name] ||= {}
