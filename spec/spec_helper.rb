@@ -1,6 +1,5 @@
 require 'kumogata'
 require 'kumogata/argument_parser'
-require 'kumogata/config_parser'
 require 'tempfile'
 require 'time'
 require 'timecop'
