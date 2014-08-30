@@ -187,7 +187,8 @@ class Kumogata::Client
 
         Kumogata::Utils.stringify(obj.to_hash)
       when :json5
-        JSON5.parse(f.read)
+        parsed = JSON5.parse(f.read)
+        Kumogata::Utils.stringify(parsed)
       else
         raise "Unknown format: #{format}"
       end
