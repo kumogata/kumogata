@@ -13,6 +13,11 @@ aws_access_key_id = xAKIAIOSFODNN7EXAMPLE
 aws_secret_access_key = xwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 aws_security_token = xtexample123324
 
+[profile profile3]
+aws_access_key_id = xAKIAIOSFODNN7EXAMPLE
+aws_secret_access_key = xwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+aws_security_token = xtexample123324
+
 [invalid]
     EOS
 
@@ -27,6 +32,12 @@ aws_security_token = xtexample123324
       )
 
       expect(subject['profile2']).to eq(
+        'aws_access_key_id' => 'xAKIAIOSFODNN7EXAMPLE',
+        'aws_secret_access_key' => 'xwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+        'aws_security_token' => 'xtexample123324',
+      )
+
+      expect(subject['profile3']).to eq(
         'aws_access_key_id' => 'xAKIAIOSFODNN7EXAMPLE',
         'aws_secret_access_key' => 'xwJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
         'aws_security_token' => 'xtexample123324',
