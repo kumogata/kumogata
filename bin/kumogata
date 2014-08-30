@@ -24,7 +24,7 @@ begin
 
   if options.config_profile
     provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(
-      :profile_name => profile_name
+      :profile_name => options.config_profile
     )
 
     aws_opts[:credential_provider] = provider
