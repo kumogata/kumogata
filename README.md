@@ -601,13 +601,13 @@ end
 
 ## Configuration File
 
-Kumogata supports [aws-cli configuration file](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-waitcondition.html).
+Kumogata supports [aws-sdk configuration file](http://docs.aws.amazon.com/AWSSdkDocsRuby/latest/DeveloperGuide/ruby-dg-setup.html#set-up-creds).
 
 ```
 [default]
 aws_access_key_id=AKIAIOSFODNN7EXAMPLE
 aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-aws_security_token=texample123324
+aws_session_token=texample123324
 ```
 
 ## Demo
