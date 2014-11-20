@@ -156,7 +156,7 @@ JSON template can be converted to Ruby template.
   * `_user_data()` has been removed
 * `_join()` has been removed
 
-### String#fn_joine()
+### String#fn_join()
 
 Ruby templates will be converted as follows by `String#fn_join()`:
 
