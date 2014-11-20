@@ -91,6 +91,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--skip-replace-underscore')                  {    options[:skip_replace_underscore] = false }
         opt.on(''  , '--deletion-policy-retain')                   {    options[:deletion_policy_retain]  = true  }
         opt.on('-p', '--parameters KEY_VALUES', Array)             {|v| options[:parameters]              = v     }
+        opt.on('-j', '--json-parameters JSON')                     {|v| options[:json_parameters]         = v     }
         opt.on('-e', '--encrypt-parameters KEYS', Array)           {|v| options[:encrypt_parameters]      = v     }
         opt.on('',   '--encryption-password PASS')                 {|v| options[:encryption_password]     = v     }
         opt.on('',   '--skip-send-password')                       {    options[:skip_send_password]      = true  }
@@ -198,6 +199,10 @@ class Kumogata::ArgumentParser
     (options.parameters || []).each do |i|
       key, value = i.split('=', 2)
       parameters[key] = value
+    end
+
+    if options.json_parameters
+      parameters.merge! JSON.parse(options.json_parameters)
     end
 
     options.parameters = parameters
