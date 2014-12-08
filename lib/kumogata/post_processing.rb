@@ -146,7 +146,7 @@ class Kumogata::PostProcessing
       stderr_orig = STDERR.dup
       STDERR.reopen('/dev/null', 'w')
 
-      retryable(:tries => connect_tries, :sleep => retry_interval) do
+      Retryable.retryable(:tries => connect_tries, :sleep => retry_interval) do
         begin
           Net::SSH.start(*args) {|ssh| ssh.exec!('echo') }
         rescue Net::SSH::HostKeyMismatch => e
