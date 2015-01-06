@@ -521,6 +521,11 @@ class Kumogata::Client
   def build_update_options(template)
     opts = {:template => template}
     add_parameters(opts)
+
+    [:capabilities].each do |k|
+      opts[k] = @options[k] if @options[k]
+    end
+
     return opts
   end
 
