@@ -107,6 +107,7 @@ class Kumogata::ArgumentParser
         opt.on(''  , '--color')                                    {    options[:color]                   = true  }
         opt.on(''  , '--no-color')                                 {    options[:color]                   = false }
         opt.on(''  , '--debug')                                    {    options[:debug]                   = true  }
+        opt.on('-v', '--verbose')                                  {    options[:verbose]                 = true  }
         opt.parse!
 
         unless (command = ARGV.shift)

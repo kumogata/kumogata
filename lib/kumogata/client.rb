@@ -594,6 +594,9 @@ class Kumogata::Client
     end
 
     Kumogata.logger.info('Template validated successfully'.green)
+    if @options.verbose
+      Kumogata.logger.info(JSON.pretty_generate(JSON.parse(result.to_json)).colorize_as(:json))
+    end
   end
 
   def events_for(stack)
