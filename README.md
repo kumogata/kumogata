@@ -98,6 +98,7 @@ Options:
         --skip-replace-underscore
         --deletion-policy-retain
     -p, --parameters KEY_VALUES
+    -j, --json-parameters JSON
     -e, --encrypt-parameters KEYS
         --encryption-password PASS
         --skip-send-password
