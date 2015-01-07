@@ -3,8 +3,8 @@ describe 'Kumogata::Client#show_resources' do
 
     resources = run_client(:show_resources, :arguments => ['MyStack']) do |client, cf|
       stack = make_double('stack') do |obj|
-        obj.should_receive(:status) { 'CREATE_COMPLETE' }
-        obj.should_receive(:resource_summaries).and_return([
+        expect(obj).to receive(:status) { 'CREATE_COMPLETE' }
+        expect(obj).to receive(:resource_summaries).and_return([
           {
             :logical_resource_id    => 'myEC2Instance',
             :physical_resource_id   => 'i-XXXXXXXX',
@@ -17,10 +17,10 @@ describe 'Kumogata::Client#show_resources' do
       end
 
       stacks = make_double('stacks') do |obj|
-        obj.should_receive(:[]).with('MyStack') { stack }
+        expect(obj).to receive(:[]).with('MyStack') { stack }
       end
 
-      cf.should_receive(:stacks) { stacks }
+      expect(cf).to receive(:stacks) { stacks }
     end
 
     expect(resources).to eq((<<-EOS).chomp)

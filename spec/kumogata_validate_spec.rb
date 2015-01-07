@@ -23,7 +23,7 @@ end
     run_client(:validate, :template => template) do |client, cf|
       json = eval_template(template, :add_encryption_password_for_validation => true).to_json
 
-      cf.should_receive(:validate_template).with(json) {
+      expect(cf).to receive(:validate_template).with(json) {
         {}
       }
     end
@@ -54,7 +54,7 @@ end
       run_client(:validate, :template => template) do |client, cf|
         json = eval_template(template, :add_encryption_password_for_validation => true).to_json
 
-        cf.should_receive(:validate_template).with(json) {
+        expect(cf).to receive(:validate_template).with(json) {
           {
             :code => 'CODE',
             :message => 'MESSAGE'
@@ -92,7 +92,7 @@ end
       add_encryption_password_for_validation(template)
       json = template.to_json
 
-      cf.should_receive(:validate_template) {
+      expect(cf).to receive(:validate_template) {
         {}
       }
     end
@@ -127,7 +127,7 @@ end
         add_encryption_password_for_validation(template)
         json = template.to_json
 
-        cf.should_receive(:validate_template).with(json) {
+        expect(cf).to receive(:validate_template).with(json) {
           {
             :code => 'CODE',
             :message => 'MESSAGE'
@@ -179,12 +179,12 @@ end
               "description"=>"'test CloudFormation Template\n",
               "response_metadata"=>{"request_id"=>"XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"}}
 
-    Kumogata.logger.should_receive(:info).with('Template validated successfully')
-    Kumogata.logger.should_receive(:info).with(JSON.pretty_generate(result))
+    expect(Kumogata.logger).to receive(:info).with('Template validated successfully')
+    expect(Kumogata.logger).to receive(:info).with(JSON.pretty_generate(result))
 
     run_client(:validate, :template => template, :options => {:verbose => true}) do |client, cf|
       json = eval_template(template, :add_encryption_password_for_validation => true).to_json
-      cf.should_receive(:validate_template).with(json) { result }
+      expect(cf).to receive(:validate_template).with(json) { result }
     end
   end
 end

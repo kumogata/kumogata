@@ -3,28 +3,28 @@ describe 'Kumogata::Client#show_events' do
 
     resources = run_client(:show_events, :arguments => ['MyStack']) do |client, cf|
       event = make_double('event') do |obj|
-        obj.should_receive(:event_id) { "f45e6070-a4f7-11e3-9326-5088487c4896" }
-        obj.should_receive(:logical_resource_id) { "kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca" }
-        obj.should_receive(:physical_resource_id) { "arn:aws:cloudformation:ap-northeast-1:822997939312:stack/kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca/f1381a30-a4f7-11e3-a340-506cf9a1c096" }
-        obj.should_receive(:resource_properties) { nil }
-        obj.should_receive(:resource_status) { "CREATE_FAILED" }
-        obj.should_receive(:resource_status_reason) { "The following resource(s) failed to create: [myEC2Instance]. " }
-        obj.should_receive(:resource_type) { "AWS::CloudFormation::Stack" }
-        obj.should_receive(:stack_id) { "arn:aws:cloudformation:ap-northeast-1:822997939312:stack/kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca/f1381a30-a4f7-11e3-a340-506cf9a1c096" }
-        obj.should_receive(:stack_name) { "kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca" }
-        obj.should_receive(:timestamp) { "2014-03-06 06:24:21 UTC" }
+        expect(obj).to receive(:event_id) { "f45e6070-a4f7-11e3-9326-5088487c4896" }
+        expect(obj).to receive(:logical_resource_id) { "kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca" }
+        expect(obj).to receive(:physical_resource_id) { "arn:aws:cloudformation:ap-northeast-1:822997939312:stack/kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca/f1381a30-a4f7-11e3-a340-506cf9a1c096" }
+        expect(obj).to receive(:resource_properties) { nil }
+        expect(obj).to receive(:resource_status) { "CREATE_FAILED" }
+        expect(obj).to receive(:resource_status_reason) { "The following resource(s) failed to create: [myEC2Instance]. " }
+        expect(obj).to receive(:resource_type) { "AWS::CloudFormation::Stack" }
+        expect(obj).to receive(:stack_id) { "arn:aws:cloudformation:ap-northeast-1:822997939312:stack/kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca/f1381a30-a4f7-11e3-a340-506cf9a1c096" }
+        expect(obj).to receive(:stack_name) { "kumogata-f11118a4-a4f7-11e3-8183-98fe943e66ca" }
+        expect(obj).to receive(:timestamp) { "2014-03-06 06:24:21 UTC" }
       end
 
       stack = make_double('stack') do |obj|
-        obj.should_receive(:status) { 'CREATE_COMPLETE' }
-        obj.should_receive(:events).and_return([event])
+        expect(obj).to receive(:status) { 'CREATE_COMPLETE' }
+        expect(obj).to receive(:events).and_return([event])
       end
 
       stacks = make_double('stacks') do |obj|
-        obj.should_receive(:[]).with('MyStack') { stack }
+        expect(obj).to receive(:[]).with('MyStack') { stack }
       end
 
-      cf.should_receive(:stacks) { stacks }
+      expect(cf).to receive(:stacks) { stacks }
     end
 
     expect(resources).to eq((<<-EOS).chomp)

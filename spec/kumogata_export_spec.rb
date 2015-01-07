@@ -26,15 +26,15 @@ describe 'Kumogata::Client#export' do
 
     template = run_client(:export, :arguments => ['MyStack']) do |client, cf|
       stack = make_double('stack') do |obj|
-        obj.should_receive(:status) { 'CREATE_COMPLETE' }
-        obj.should_receive(:template) { json }
+        expect(obj).to receive(:status) { 'CREATE_COMPLETE' }
+        expect(obj).to receive(:template) { json }
       end
 
       stacks = make_double('stacks') do |obj|
-        obj.should_receive(:[]).with('MyStack') { stack }
+        expect(obj).to receive(:[]).with('MyStack') { stack }
       end
 
-      cf.should_receive(:stacks) { stacks }
+      expect(cf).to receive(:stacks) { stacks }
     end
 
     expect(template).to eq((<<-EOS).chomp)
@@ -84,15 +84,15 @@ end
 
     template = run_client(:export, :arguments => ['MyStack'], :options => {:format => :json}) do |client, cf|
       stack = make_double('stack') do |obj|
-        obj.should_receive(:status) { 'CREATE_COMPLETE' }
-        obj.should_receive(:template) { json }
+        expect(obj).to receive(:status) { 'CREATE_COMPLETE' }
+        expect(obj).to receive(:template) { json }
       end
 
       stacks = make_double('stacks') do |obj|
-        obj.should_receive(:[]).with('MyStack') { stack }
+        expect(obj).to receive(:[]).with('MyStack') { stack }
       end
 
-      cf.should_receive(:stacks) { stacks }
+      expect(cf).to receive(:stacks) { stacks }
     end
 
     expect(template).to eq((<<-EOS).chomp)

@@ -3,20 +3,20 @@ describe 'Kumogata::Client#show_outputs' do
 
     outputs = run_client(:show_outputs, :arguments => ['MyStack']) do |client, cf|
       output = make_double('output') do |obj|
-        obj.should_receive(:key) { 'AZ' }
-        obj.should_receive(:value) { 'ap-northeast-1a' }
+        expect(obj).to receive(:key) { 'AZ' }
+        expect(obj).to receive(:value) { 'ap-northeast-1a' }
       end
 
       stack = make_double('stack') do |obj|
-        obj.should_receive(:status) { 'CREATE_COMPLETE' }
-        obj.should_receive(:outputs) { [output] }
+        expect(obj).to receive(:status) { 'CREATE_COMPLETE' }
+        expect(obj).to receive(:outputs) { [output] }
       end
 
       stacks = make_double('stacks') do |obj|
-        obj.should_receive(:[]).with('MyStack') { stack }
+        expect(obj).to receive(:[]).with('MyStack') { stack }
       end
 
-      cf.should_receive(:stacks) { stacks }
+      expect(cf).to receive(:stacks) { stacks }
     end
 
     expect(outputs).to eq((<<-EOS).chomp)
