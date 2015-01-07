@@ -113,6 +113,7 @@ Options:
         --color
         --no-color
         --debug
+    -v, --verbose
 ```
 
 ### KUMOGATA_OPTIONS
