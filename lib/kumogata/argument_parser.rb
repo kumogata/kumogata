@@ -8,6 +8,7 @@ class Kumogata::ArgumentParser
     :command_result_log => File.join(Dir.pwd, 'command_result.json'),
     :color => $stdout.tty?,
     :debug => false,
+    :config_profile => 'default'
   }
 
   COMMANDS = {
