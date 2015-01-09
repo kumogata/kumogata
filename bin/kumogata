@@ -3,6 +3,7 @@ $: << File.expand_path("#{File.dirname __FILE__}/../lib")
 require 'rubygems'
 require 'kumogata'
 require 'kumogata/argument_parser'
+require 'aws_config'
 
 options = nil
 
@@ -23,6 +24,11 @@ begin
   aws_opts = {}
 
   if options.config_profile
+    aws_config = AWSConfig[options.config_profile]
+    if aws_config
+      aws_opts[:region] = aws_config[:region]
+    end
+
     provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(
       :profile_name => options.config_profile
     )
