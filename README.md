@@ -91,8 +91,8 @@ Options:
     -k, --access-key ACCESS_KEY
     -s, --secret-key SECRET_KEY
     -r, --region REGION
-        --config PATH
         --profile CONFIG_PROFILE
+        --credentials-path PATH
         --format TMPLATE_FORMAT
         --output-format FORMAT
         --skip-replace-underscore
