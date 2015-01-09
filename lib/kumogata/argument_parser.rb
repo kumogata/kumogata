@@ -84,8 +84,8 @@ class Kumogata::ArgumentParser
         opt.on('-k', '--access-key ACCESS_KEY')                    {|v| options[:access_key_id]           = v     }
         opt.on('-s', '--secret-key SECRET_KEY')                    {|v| options[:secret_access_key]       = v     }
         opt.on('-r', '--region REGION')                            {|v| options[:region]                  = v     }
-        opt.on(''  , '--config PATH')                              {|v| options[:config_path]             = v     }
         opt.on(''  , '--profile CONFIG_PROFILE')                   {|v| options[:config_profile]          = v     }
+        opt.on(''  , '--credentials-path PATH')                    {|v| options[:credentials_path]        = v     }
         opt.on(''  , '--format TMPLATE_FORMAT', supported_formats) {|v| options[:format]                  = v     }
         opt.on(''  , '--output-format FORMAT', supported_formats)  {|v| options[:output_format]           = v     }
         opt.on(''  , '--skip-replace-underscore')                  {    options[:skip_replace_underscore] = false }

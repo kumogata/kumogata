@@ -22,12 +22,16 @@ begin
 
   aws_opts = {}
 
-  if options.config_profile
-    provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(
-      :profile_name => options.config_profile
-    )
+  if options.config_profile or options.credentials_path
+    credentials_opts = {}
+    credentials_opts[:profile_name] = options.config_profile if options.config_profile
+    credentials_opts[:path] = options.credentials_path if options.credentials_path
 
+    provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(credentials_opts)
     aws_opts[:credential_provider] = provider
+
+    region = provider.send(:load_profile)['region']
+    aws_opts[:region] = region if region
   end
 
   [:access_key_id, :secret_access_key, :region].each do |key|
