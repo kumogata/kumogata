@@ -623,10 +623,5 @@ aws_session_token=texample123324
 * Create a stack and run post commands
   * https://asciinema.org/a/8088
 
-## Contributing
-
-1. Fork it ( http://github.com/winebarrel/kumogata/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+## Similar tools
+* [Codenize.tools](http://http://codenize.tools/)
