@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['sgwr_dts@yahoo.co.jp']
   spec.summary       = %q{A tool for AWS CloudFormation.}
   spec.description   = %q{A tool for AWS CloudFormation. It can define a template in Ruby DSL.}
-  spec.homepage      = 'https://github.com/winebarrel/kumogata'
+  spec.homepage      = 'http://kumogata.codenize.tools'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
