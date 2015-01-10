@@ -624,4 +624,4 @@ aws_session_token=texample123324
   * https://asciinema.org/a/8088
 
 ## Similar tools
-* [Codenize.tools](http://http://codenize.tools/)
+* [Codenize.tools](http://codenize.tools/)
