@@ -1,0 +1,14 @@
+# Site settings
+title: Kumogata
+email: sgwr_dts@yahoo.co.jp
+description: "Kumogata is a tool for AWS CloudFormation. It can define a template in Ruby DSL."
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://kumogata.codenize.tools/"
+github_url: "https://github.com/winebarrel/kumogata"
+twitter_username: sgwr_dts
+github_username:  winebarrel
+original_background_image_url: "https://www.flickr.com/photos/maddog78/2212457767/in/photolist-4nvqBz-ntS23C-e7JUgQ-kN1Xeo-2Sy5YB-ayhNZh-o5oLY4-ndKtgX-8paVuF-fNMEHR-xnabm-2X6gZr-2X6h2p-85Tvj3-dpmBfy-czDgc7-5auBuH-e6McMe-fipesM-nVe1rX-pfucgr-dJNDp3-bpC2B-6F4pTy-in68Zj-ehyhPC-8GC1xB-fyLSSK-dc7zMr-nekbXV-2X6htT-5KiRqw-2X6hca-2X6hDZ-ahtkXa-ctEtQh-s8pCp-cKafA1-2X6hKc-ziuq8-nDTRwU-g3R3Wr-2XaHRY-9ZVTmH-jywxrB-4TphUS-fL5mTv-m8HUPB-dwRZRR-foCi88"
+background_image_licence: "images/background.license"
+
+# Build settings
+markdown: kramdown
