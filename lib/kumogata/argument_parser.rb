@@ -8,6 +8,7 @@ class Kumogata::ArgumentParser
     :command_result_log => File.join(Dir.pwd, 'command_result.json'),
     :color => $stdout.tty?,
     :debug => false,
+    :config_path => File.expand_path('~/.aws/config'),
   }
 
   COMMANDS = {
@@ -86,6 +87,7 @@ class Kumogata::ArgumentParser
         opt.on('-r', '--region REGION')                            {|v| options[:region]                  = v     }
         opt.on(''  , '--profile CONFIG_PROFILE')                   {|v| options[:config_profile]          = v     }
         opt.on(''  , '--credentials-path PATH')                    {|v| options[:credentials_path]        = v     }
+        opt.on(''  , '--config-path PATH')                         {|v| options[:config_path]             = v     }
         opt.on(''  , '--format TMPLATE_FORMAT', supported_formats) {|v| options[:format]                  = v     }
         opt.on(''  , '--output-format FORMAT', supported_formats)  {|v| options[:output_format]           = v     }
         opt.on(''  , '--skip-replace-underscore')                  {    options[:skip_replace_underscore] = false }

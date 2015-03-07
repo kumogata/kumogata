@@ -93,6 +93,7 @@ Options:
     -r, --region REGION
         --profile CONFIG_PROFILE
         --credentials-path PATH
+        --config-path PATH
         --format TMPLATE_FORMAT
         --output-format FORMAT
         --skip-replace-underscore
@@ -199,7 +200,7 @@ end
 
 ```ruby
 Resources do
-  _include 'template2.rb'
+  _include 'template2.rb', :ami_id => 'ami-XXXXXXXX'
 end
 ```
 
@@ -209,7 +210,7 @@ end
 myEC2Instance do
   Type "AWS::EC2::Instance"
   Properties do
-    ImageId "ami-XXXXXXXX"
+    ImageId args[:ami_id]
     InstanceType { Ref "InstanceType" }
     KeyName "your_key_name"
   end
