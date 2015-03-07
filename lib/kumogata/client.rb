@@ -291,7 +291,7 @@ class Kumogata::Client
 
   def define_template_func(scope, path_or_url)
     scope.instance_eval(<<-EOS)
-      def _include(file)
+      def _include(file, args = {})
         path = file.dup
 
         unless path =~ %r|\\A/| or path =~ %r|\\A\\w+://|
