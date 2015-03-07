@@ -29,8 +29,12 @@ begin
 
     provider = AWS::Core::CredentialProviders::SharedCredentialFileProvider.new(credentials_opts)
     aws_opts[:credential_provider] = provider
+  end
 
-    region = provider.send(:load_profile)['region']
+  if File.exist?(options.config_path) and File.readable?(options.config_path)
+    ini = AWS::Core::IniParser.parse(File.read(options.config_path))
+    profile = options.config_profile || 'default'
+    region = ini[profile]['region']
     aws_opts[:region] = region if region
   end
 
