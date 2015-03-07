@@ -93,6 +93,7 @@ Options:
     -r, --region REGION
         --profile CONFIG_PROFILE
         --credentials-path PATH
+        --config-path PATH
         --format TMPLATE_FORMAT
         --output-format FORMAT
         --skip-replace-underscore
