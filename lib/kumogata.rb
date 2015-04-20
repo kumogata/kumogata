@@ -1,7 +1,7 @@
 module Kumogata; end
 require 'kumogata/version'
 
-require 'aws-sdk'
+require 'aws-sdk-v1'
 require 'base64'
 require 'coderay'
 require 'coffee-script'
