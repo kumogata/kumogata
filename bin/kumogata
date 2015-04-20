@@ -34,6 +34,7 @@ begin
   if File.exist?(options.config_path) and File.readable?(options.config_path)
     ini = AWS::Core::IniParser.parse(File.read(options.config_path))
     profile = options.config_profile || 'default'
+    profile = "profile #{profile}" unless profile == 'default'
     region = ini[profile]['region']
     aws_opts[:region] = region if region
   end
