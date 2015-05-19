@@ -511,7 +511,8 @@ class Kumogata::Client
     opts = {}
     add_parameters(opts)
 
-    [:capabilities, :disable_rollback, :notify, :timeout].each do |k|
+    [:capabilities, :disable_rollback, :notify, :timeout,
+     :stack_policy_body, :stack_policy_url].each do |k|
       opts[k] = @options[k] if @options[k]
     end
 
@@ -522,7 +523,7 @@ class Kumogata::Client
     opts = {:template => template}
     add_parameters(opts)
 
-    [:capabilities].each do |k|
+    [:capabilities, :stack_policy_body, :stack_policy_url].each do |k|
       opts[k] = @options[k] if @options[k]
     end
 
