@@ -298,7 +298,7 @@ You can use the Iteration in the template using `_(...)` method.
 
 ```ruby
 Resources do
-  ['instance1', 'instance2', 'instance3'].echo {|instance_name|
+  ['instance1', 'instance2', 'instance3'].each {|instance_name|
     _(instance_name) do
       Type "AWS::EC2::Instance"
       Properties do
