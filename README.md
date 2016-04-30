@@ -1,3 +1,5 @@
+**[Kumogata2](https://github.com/winebarrel/kumogata2) is now available! Please try it out!**
+
 # Kumogata
 
 Kumogata is a tool for [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
