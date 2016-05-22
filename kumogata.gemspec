@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'coderay'
   spec.add_dependency 'coffee-script'
   spec.add_dependency 'diffy'
-  spec.add_dependency 'dslh', '>= 0.2.7'
+  spec.add_dependency 'dslh', '>= 0.2.7', '< 0.3'
   spec.add_dependency 'hashie'
   spec.add_dependency 'highline'
   spec.add_dependency 'json'
