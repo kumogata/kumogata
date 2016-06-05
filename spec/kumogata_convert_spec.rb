@@ -773,6 +773,18 @@ Outputs do
       <%= Fn__GetAZs "us-east-1" %>
     EOS
   end
+
+  ConditionalValue do
+    Value (<<-EOS).fn_join
+      <%= Fn__If ["Tokyo", "ap-northeast-1", _{ Ref "AWS::Region" }] %>
+    EOS
+  end
+
+  SelectedValue do
+    Value (<<-EOS).fn_join
+      <%= Fn__Select [1, _ { Fn__GetAZs "ap-northeast-1" }] %>
+    EOS
+  end
 end
     TEMPLATE
 
@@ -910,6 +922,43 @@ end
           [
             {
               "Fn::GetAZs": "us-east-1"
+            },
+            "\n"
+          ]
+        ]
+      }
+    },
+    "ConditionalValue": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::If": [
+                "Tokyo",
+                "ap-northeast-1",
+                {
+                  "Ref": "AWS::Region"
+                }
+              ]
+            },
+            "\n"
+          ]
+        ]
+      }
+    },
+    "SelectedValue": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::Select": [
+                1,
+                {
+                  "Fn::GetAZs": "ap-northeast-1"
+                }
+              ]
             },
             "\n"
           ]
