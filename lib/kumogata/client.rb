@@ -223,7 +223,10 @@ class Kumogata::Client
   def evaluate_template(template, path_or_url)
     key_converter = proc do |key|
       key = key.to_s
-      key.gsub!('__', '::') unless @options.skip_replace_underscore?
+      unless @options.skip_replace_underscore?
+        key.gsub!('_', ':')
+        key.gsub!('__', '::')
+      end
       key
     end
 
