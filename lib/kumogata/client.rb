@@ -223,7 +223,10 @@ class Kumogata::Client
   def evaluate_template(template, path_or_url)
     key_converter = proc do |key|
       key = key.to_s
-      key.gsub!('__', '::') unless @options.skip_replace_underscore?
+      unless @options.skip_replace_underscore?
+        key.gsub!('_', ':')
+        key.gsub!('__', '::')
+      end
       key
     end
 
@@ -337,7 +340,9 @@ class Kumogata::Client
     end
 
     Kumogata.logger.info("Creating stack: #{stack_name}".cyan)
-    stack = @cloud_formation.stacks.create(stack_name, template.to_json, build_create_options)
+    stack = @cloud_formation.stacks.create(stack_name,
+                                           JSON.pretty_generate(template),
+                                           build_create_options)
 
     return if @options.detach?
 
@@ -368,7 +373,7 @@ class Kumogata::Client
 
     Kumogata.logger.info("Updating stack: #{stack_name}".green)
     event_log = create_event_log(stack)
-    stack.update(build_update_options(template.to_json))
+    stack.update(build_update_options(JSON.pretty_generate(template)))
 
     return if @options.detach?
 

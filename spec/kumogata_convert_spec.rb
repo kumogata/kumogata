@@ -614,7 +614,7 @@ end
               }
             },
             "commands": {
-              "any_name": {
+              "any:name": {
                 "command": {
                   "Fn::Join": [
                     "",
@@ -845,7 +845,7 @@ end
               }
             },
             "commands": {
-              "any_name": {
+              "any:name": {
                 "command": {
                   "Fn::Join": [
                     "",

@@ -21,7 +21,8 @@ end
     EOS
 
     run_client(:update, :arguments => ['MyStack'], :template => template) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
@@ -78,7 +79,8 @@ end
     EOS
 
     run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:capabilities => ['AWS::CloudFormation::Stack']}) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
@@ -135,7 +137,8 @@ end
     EOS
 
     out = run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:detach => true}) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).not_to receive(:print_event_log)
       expect(client).to receive(:create_event_log).once
 
@@ -184,7 +187,7 @@ end
         template["Resources"]["myEC2Instance"]["Metadata"] = {
           "DeletionPolicyUpdateKeyForKumogata" => "DeletionPolicyUpdateValueForKumogata1388534400"
         }
-        json = template.to_json
+        json = JSON.pretty_generate(template)
         expect(client).to receive(:print_event_log).once
         expect(client).to receive(:create_event_log).once
 
@@ -263,7 +266,8 @@ end
     TEMPLATE
 
     run_client(:update, :arguments => ['MyStack'], :template => template) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
@@ -349,7 +353,8 @@ end
     TEMPLATE
 
     run_client(:update, :arguments => ['MyStack'], :template => template) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
@@ -388,7 +393,7 @@ end
            .and_return(["file1\nfile2\n", "", 0])
 
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('ssh_command')
+            .to receive(:print_command).with('ssh:command')
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:print_command_result)
@@ -396,7 +401,7 @@ end
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:save_command_results)
-            .with([{'ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
+            .with([{'ssh:command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
     end
   end
 
@@ -439,7 +444,8 @@ end
     TEMPLATE
 
     run_client(:update, :arguments => ['MyStack'], :template => template) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
@@ -478,7 +484,7 @@ end
            .and_return(["file1\nfile2\n", "", 0])
 
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('ssh_command')
+            .to receive(:print_command).with('ssh:command')
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:print_command_result)
@@ -486,7 +492,7 @@ end
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:save_command_results)
-            .with([{'ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
+            .with([{'ssh:command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
     end
   end
 
@@ -535,7 +541,8 @@ end
     TEMPLATE
 
     run_client(:update, :arguments => ['MyStack'], :template => template) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
@@ -587,9 +594,9 @@ end
            .and_return(["ap-northeast-1\nap-northeast-1b\n", "", process_status2])
 
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('command_a')
+            .to receive(:print_command).with('command:a')
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('command_b')
+            .to receive(:print_command).with('command:b')
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:print_command_result)
@@ -600,8 +607,8 @@ end
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:save_command_results)
-            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
-                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
+            .with([{'command:a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
+                   {'command:b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
     end
   end
 
@@ -650,7 +657,8 @@ end
     TEMPLATE
 
     run_client(:update, :arguments => ['MyStack'], :template => template) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
@@ -731,7 +739,8 @@ end
     EOS
 
     run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}}) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
@@ -821,7 +830,8 @@ end
     EOS
 
     run_client(:update, :arguments => ['MyStack'], :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}, :encrypt_parameters => ['Password']}) do |client, cf|
-      json = eval_template(template, :add_encryption_password => true).to_json
+      template = eval_template(template, :add_encryption_password => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
       expect(client).to receive(:create_event_log).once
 
