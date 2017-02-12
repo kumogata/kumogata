@@ -261,6 +261,7 @@ class Kumogata::Client
 
   def devaluate_template(template)
     exclude_key = proc do |k|
+      k = k.to_s.gsub(':', '_')
       k = k.to_s.gsub('::', '__')
       k !~ /\A[_a-z]\w+\Z/i and k !~ %r|\A/\S*\Z|
     end
@@ -277,6 +278,7 @@ class Kumogata::Client
           end
         end
       else
+        k.gsub(':', '_')
         k.gsub('::', '__')
       end
     end
