@@ -28,7 +28,7 @@ def tempfile(content, template_ext = nil)
   basename = [basename, template_ext] if template_ext
 
   Tempfile.open(basename) do |f|
-    f << content.chomp
+    f << content
     f.flush
     f.rewind
     yield(f)

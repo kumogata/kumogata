@@ -21,7 +21,8 @@ end
     EOS
 
     run_client(:create, :template => template) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
@@ -81,7 +82,8 @@ end
     EOS
 
     out = run_client(:create, :template => template, :options => {:detach => true}) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).not_to receive(:print_event_log)
       expect(client).not_to receive(:create_event_log)
 
@@ -147,7 +149,8 @@ end
     TEMPLATE
 
     run_client(:create, :template => template) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
@@ -201,9 +204,9 @@ end
            .and_return(["ap-northeast-1\nap-northeast-1b\n", "", process_status2])
 
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('command_a')
+            .to receive(:print_command).with('command:a')
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('command_b')
+            .to receive(:print_command).with('command:b')
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:print_command_result)
@@ -214,8 +217,8 @@ end
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:save_command_results)
-            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
-                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
+            .with([{'command:a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
+                   {'command:b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
     end
   end
 
@@ -253,7 +256,8 @@ end
     TEMPLATE
 
     run_client(:create, :template => template) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
@@ -295,7 +299,7 @@ end
            .and_return(["file1\nfile2\n", "", 0])
 
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('ssh_command')
+            .to receive(:print_command).with('ssh:command')
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:print_command_result)
@@ -303,7 +307,7 @@ end
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:save_command_results)
-            .with([{'ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
+            .with([{'ssh:command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
     end
   end
 
@@ -345,7 +349,8 @@ end
     TEMPLATE
 
     run_client(:create, :template => template) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
@@ -387,7 +392,7 @@ end
            .and_return(["file1\nfile2\n", "", 0])
 
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('ssh_command')
+            .to receive(:print_command).with('ssh:command')
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:print_command_result)
@@ -395,7 +400,7 @@ end
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:save_command_results)
-            .with([{'ssh_command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
+            .with([{'ssh:command' => {'ExitStatus' => 0, 'StdOut' => "file1\nfile2\n", 'StdErr' => ""}}])
     end
   end
 
@@ -444,7 +449,8 @@ end
     TEMPLATE
 
     run_client(:create, :template => template) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
@@ -498,9 +504,9 @@ end
            .and_return(["ap-northeast-1\nap-northeast-1b\n", "", process_status2])
 
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('command_a')
+            .to receive(:print_command).with('command:a')
       expect(client.instance_variable_get(:@post_processing))
-            .to receive(:print_command).with('command_b')
+            .to receive(:print_command).with('command:b')
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:print_command_result)
@@ -511,8 +517,8 @@ end
 
       expect(client.instance_variable_get(:@post_processing))
             .to receive(:save_command_results)
-            .with([{'command_a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
-                   {'command_b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
+            .with([{'command:a' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1b\nap-northeast-1\n", 'StdErr' => ""}},
+                   {'command:b' => {'ExitStatus' => 0, 'StdOut' => "ap-northeast-1\nap-northeast-1b\n", 'StdErr' => ""}}])
     end
   end
 
@@ -561,7 +567,8 @@ end
     TEMPLATE
 
     run_client(:create, :template => template) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
@@ -637,7 +644,7 @@ end
     run_client(:create, :template => template) do |client, cf|
       template = eval_template(template, :update_deletion_policy => true)
       expect(template['Resources']['myEC2Instance']['DeletionPolicy']).to eq('Delete')
-      json = template.to_json
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
@@ -705,7 +712,8 @@ end
     EOS
 
     run_client(:create, :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}}) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
@@ -765,7 +773,8 @@ end
     EOS
 
     run_client(:create, :arguments => ['MyStack'], :template => template) do |client, cf|
-      json = eval_template(template).to_json
+      template = eval_template(template)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
 
       output = make_double('output') do |obj|
@@ -821,7 +830,8 @@ end
     EOS
 
     run_client(:create, :arguments => ['MyStack'], :template => template, :options => {:deletion_policy_retain => true}) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true).to_json
+      template = eval_template(template, :update_deletion_policy => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).once
 
       output = make_double('output') do |obj|
@@ -911,7 +921,8 @@ end
     EOS
 
     run_client(:create, :template => template, :options => {:parameters => {'InstanceType'=>'m1.large'}, :encrypt_parameters => ['Password']}) do |client, cf|
-      json = eval_template(template, :update_deletion_policy => true, :add_encryption_password => true).to_json
+      template = eval_template(template, :update_deletion_policy => true, :add_encryption_password => true)
+      json = JSON.pretty_generate(template)
       expect(client).to receive(:print_event_log).twice
       expect(client).to receive(:create_event_log).once
 
