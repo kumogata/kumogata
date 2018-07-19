@@ -1,4 +1,4 @@
-**[Kumogata2](https://github.com/winebarrel/kumogata2) is now available! Please try it out!**
+**[Kumogata2](https://github.com/kumogata/kumogata2) is now available! Please try it out!**
 
 # Kumogata
 
@@ -15,7 +15,7 @@ It supports the following format:
 * JSON5 (experimental)
 
 [![Gem Version](https://badge.fury.io/rb/kumogata.png?201406152020)](http://badge.fury.io/rb/kumogata)
-[![Build Status](https://travis-ci.org/winebarrel/kumogata.svg?branch=master)](https://travis-ci.org/winebarrel/kumogata)
+[![Build Status](https://travis-ci.org/kumogata/kumogata.svg?branch=master)](https://travis-ci.org/kumogata/kumogata)
 
 It can define a template in Ruby DSL, such as:
 
